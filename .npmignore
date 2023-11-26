@@ -1,0 +1,12 @@
+node_modules/
+src/
+tests/
+.github/
+examples/
+
+.gitignore
+.npmignore
+.prettierrc
+jest.config.js
+tsconfig.json
+lib/*.tsbuildinfo

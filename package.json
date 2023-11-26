@@ -1,0 +1,50 @@
+{
+  "name": "@lilbunnyrabbit/task-manager",
+  "version": "0.0.0-dev",
+  "description": "Task management system.",
+  "keywords": [
+    "node",
+    "npm",
+    "javascript",
+    "typescript",
+    "task-manager"
+  ],
+  "homepage": "https://github.com/lilBunnyRabbit/task-manager#readme",
+  "bugs": {
+    "url": "https://github.com/lilBunnyRabbit/task-manager/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lilBunnyRabbit/task-manager.git"
+  },
+  "license": "MIT",
+  "author": "Andraž Mesarič-Sirec <amesaricsirec@gmail.com>",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib/",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.2",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.1.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
