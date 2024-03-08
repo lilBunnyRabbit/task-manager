@@ -1,0 +1,11 @@
+{
+  "entryPoints": ["src/"],
+  "excludeExternals": false,
+  "excludePrivate": true,
+  "excludeReferences": true,
+  "entryPointStrategy": "expand",
+
+  "githubPages": true,
+  "hideGenerator": true,
+  "out": "./docs/api"
+}
