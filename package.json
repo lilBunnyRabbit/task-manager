@@ -44,6 +44,9 @@
     "release": "changeset publish",
     "generate:docs": "typedoc"
   },
+  "dependencies": {
+    "@lilbunnyrabbit/utils": "^0.0.3"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@types/jest": "^29.5.12",
