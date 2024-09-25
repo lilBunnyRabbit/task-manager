@@ -64,7 +64,7 @@ You can find more examples of how to use this task management system in the [`ex
 
 This is a quick rundown of the key classes and methods in the task management system.
 
-If you're looking for detailed API docs, check out the [full documentation](https://lilbunnyrabbit.github.io/task-manager/docs/api) generated via [Typedoc](https://typedoc.org/).
+If you're looking for detailed API docs, check out the [full documentation](https://lilbunnyrabbit.github.io/task-manager/api) generated via [Typedoc](https://typedoc.org/).
 
 ### TaskManager
 
