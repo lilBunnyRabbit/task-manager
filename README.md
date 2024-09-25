@@ -1,17 +1,88 @@
-# NPM Package Template
+# [TypeScript](https://www.typescriptlang.org/) Task Management System
 
-[![npm version](https://img.shields.io/npm/v/@lilbunnyrabbit/<package-name>.svg)](https://www.npmjs.com/package/@lilbunnyrabbit/<package-name>)
-[![npm downloads](https://img.shields.io/npm/dt/@lilbunnyrabbit/<package-name>.svg)](https://www.npmjs.com/package/@lilbunnyrabbit/<package-name>)
+[![npm version](https://img.shields.io/npm/v/@lilbunnyrabbit/task-manager.svg)](https://www.npmjs.com/package/@lilbunnyrabbit/task-manager)
+[![npm downloads](https://img.shields.io/npm/dt/@lilbunnyrabbit/task-manager.svg)](https://www.npmjs.com/package/@lilbunnyrabbit/task-manager)
 
-This repository serves as a template for creating npm packages, simplifying the setup and development process for your npm packages. Replace all the `<package-name>` and `<repo-name>` with the name of the repository and/or package.
+A flexible and powerful task management system built with [TypeScript](https://www.typescriptlang.org/). It helps in managing both synchronous and asynchronous tasks with ease, allowing you to queue tasks, execute them sequentially or in parallel, and monitor their progress.
+
+> [!NOTE]  
+> This project uses `EventEmitter` and `Optional` from [![npm version](https://img.shields.io/npm/v/%40lilbunnyrabbit%2Futils?label=%40lilbunnyrabbit%2Futils)](https://www.npmjs.com/package/@lilbunnyrabbit/utils) for handling events and optional values.
 
 ## Installation
 
 To use this package in your project, run:
 
 ```sh
-npm i @lilbunnyrabbit/<package-name>
+npm i @lilbunnyrabbit/task-manager
 ```
+
+## Getting Started
+
+This system revolves around two main components: [`TaskManager`](#taskmanager) and [`Task`](#task).
+
+- **[`TaskManager`](#taskmanager)**: Manages task execution, queuing, and progress tracking. It can run tasks sequentially or in parallel, giving full control over execution.
+- **[`Task`](#task)**: Represents a single unit of work. Each task encapsulates its own logic, data, and execution state, with custom error handling and progress reporting.
+
+### Creating a Task
+
+You can create a task using the `createTask` function:
+
+```ts
+import { createTask } from "@lilbunnyrabbit/task-manager";
+
+const myTask = createTask<void, string>({
+  name: "Example Task",
+
+  async execute() {
+    return "Task Completed!";
+  },
+});
+```
+
+### Managing Tasks with TaskManager
+
+[`Tasks`](#task) are managed using the [`TaskManager`](#taskmanager), which allows you to add tasks, track progress, and handle task completion:
+
+```ts
+import { TaskManager } from "@lilbunnyrabbit/task-manager";
+
+const manager = new TaskManager();
+
+manager.addTasks([myTask()]);
+manager.start();
+```
+
+## Examples
+
+You can find more examples of how to use this task management system in the [`examples`](./examples) folder. Some key examples include:
+
+- **[Basic Task Execution](./examples/basic-example)**: Learn how to create and execute a simple task.
+- **[Sequential Task Execution](./examples/sequential-example)**: Execute tasks one after the other.
+- **[Parallel Task Execution](./examples/parallel-example)**: Run tasks concurrently with parallel execution.
+
+## API Overview
+
+This is a quick rundown of the key classes and methods in the task management system.
+
+If you're looking for detailed API docs, check out the [full documentation](https://lilbunnyrabbit.github.io/task-manager/docs/api) generated via [Typedoc](https://typedoc.org/).
+
+### TaskManager
+
+The `TaskManager` is responsible for managing tasks and controlling their execution.
+
+- `addTasks(tasks: Task[])`: Adds tasks to the queue.
+- `start([force: boolean])`: Starts executing the tasks in the queue.
+- `stop()`: Stops execution of tasks.
+- `reset()`: Resets the task manager and its state.
+- `clearQueue()`: Clears the task queue.
+
+### Task
+
+A `Task` represents a single unit of work within the system.
+
+- `execute()`: Executes the task.
+- `parse()`: Returns a UI-friendly representation of the task's state.
+- `clone()`: Clones the task for re-execution.
 
 ## Development
 
@@ -22,8 +93,8 @@ This section provides a guide for developers to set up the project environment a
 Clone the repository and install dependencies:
 
 ```sh
-git clone https://github.com/lilBunnyRabbit/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/lilBunnyRabbit/task-manager.git
+cd task-manager
 npm install
 ```
 

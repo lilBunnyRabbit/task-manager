@@ -1,20 +1,24 @@
 {
-  "name": "@lilbunnyrabbit/npm-package-template",
+  "name": "@lilbunnyrabbit/task-manager",
   "version": "0.0.0",
-  "description": "Template repository for creating `npm` packages.",
+  "description": "A flexible and powerful task management system for managing asynchronous and synchronous tasks in TypeScript.",
   "keywords": [
     "node",
     "npm",
     "javascript",
-    "typescript"
+    "typescript",
+    "task",
+    "task-manager",
+    "asynchronous",
+    "task management"
   ],
-  "homepage": "https://github.com/lilBunnyRabbit/npm-package-template#readme",
+  "homepage": "https://github.com/lilBunnyRabbit/task-manager#readme",
   "bugs": {
-    "url": "https://github.com/lilBunnyRabbit/npm-package-template/issues"
+    "url": "https://github.com/lilBunnyRabbit/task-manager/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lilBunnyRabbit/npm-package-template.git"
+    "url": "https://github.com/lilBunnyRabbit/task-manager.git"
   },
   "license": "MIT",
   "author": "Andraž Mesarič-Sirec <amesaricsirec@gmail.com>",

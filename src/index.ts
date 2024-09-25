@@ -1,2 +1,2 @@
-export * from "./Task";
-export * from "./TaskManager";
+export * from "./task";
+export * from "./task-manager";
