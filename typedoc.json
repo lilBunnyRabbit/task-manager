@@ -1,9 +1,15 @@
 {
-  "entryPoints": ["src/"],
+  "entryPoints": ["src/index.ts", "README.md"],
   "excludeExternals": false,
   "excludePrivate": true,
-  "excludeReferences": true,
+  "excludeReferences": false,
   "entryPointStrategy": "expand",
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": true
+  },
 
   "githubPages": true,
   "hideGenerator": true,

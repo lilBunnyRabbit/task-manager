@@ -1,10 +1,9 @@
 name: Release
 
 on:
-  # Disabled for template
-  # push:
-  #   branches:
-  #     - master
+  push:
+    branches:
+      - master
 
   workflow_dispatch:
 
