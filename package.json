@@ -1,6 +1,6 @@
 {
   "name": "@lilbunnyrabbit/task-manager",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A flexible and powerful task management system for managing asynchronous and synchronous tasks in TypeScript.",
   "keywords": [
     "node",
