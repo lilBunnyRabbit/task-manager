@@ -29,7 +29,7 @@ class TaskManagerBase extends EventEmitter<{
   /**
    * Emits when all tasks in the queue are executed successfully.
    */
-  success: unknown;
+  success: void;
 }> {
   // Status
 
@@ -422,7 +422,7 @@ export class TaskManager extends TaskManagerBase {
       }
     }
 
-    return this.setStatus("success");
+    return this.setStatus("success").emit("success");
   }
 
   /**
