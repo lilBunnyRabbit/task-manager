@@ -1,5 +1,11 @@
 import type { Task } from "./task";
 
+export type TaskSpec<TData = unknown, TResult = unknown, TError = any> = {
+  TData: TData;
+  TResult: TResult;
+  TError: TError;
+};
+
 /**
  * Possible statuses of a {@link Task}.
  */

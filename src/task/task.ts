@@ -2,7 +2,7 @@ import { EventEmitter, Optional } from "@lilbunnyrabbit/utils";
 import { TaskManager } from "../task-manager";
 import { TaskBuilder, TaskConfig } from "./task-builder";
 import { createTaskId } from "./task.helper";
-import { ParsedTask, TaskStatus } from "./task.type";
+import { ParsedTask, TaskSpec, TaskStatus } from "./task.type";
 
 /**
  * Base class for managing core functionalities of a task, like status, progress, error handling, and event emission.
@@ -12,7 +12,7 @@ import { ParsedTask, TaskStatus } from "./task.type";
  *
  * @extends EventEmitter - Emits `change` and `progress` events.
  */
-class TaskBase<TResult, TError> extends EventEmitter<{
+class TaskBase<TSpec extends TaskSpec> extends EventEmitter<{
   /**
    * Emits when anything about the task changes (status, progress, etc.).
    */
@@ -117,7 +117,7 @@ class TaskBase<TResult, TError> extends EventEmitter<{
   /**
    * List of errors encountered during the task's execution.
    */
-  protected _errors?: TError[];
+  protected _errors?: TSpec["TError"][];
 
   /**
    * Gets the list of errors.
@@ -208,7 +208,7 @@ class TaskBase<TResult, TError> extends EventEmitter<{
   /**
    * Result of the task, encapsulated in an Optional object.
    */
-  protected _result: Optional<TResult> = Optional.empty();
+  protected _result: Optional<TSpec["TResult"]> = Optional.empty();
 
   /**
    * The result of the task, encapsulated in an Optional object.
@@ -258,7 +258,7 @@ class TaskBase<TResult, TError> extends EventEmitter<{
  *
  * @extends TaskBase - Inherits core functionalities like status, progress, and event emission.
  */
-export class Task<TData = any, TResult = any, TError = any> extends TaskBase<TResult, TError> {
+export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
    * Unique identifier of the task.
    */
@@ -278,10 +278,10 @@ export class Task<TData = any, TResult = any, TError = any> extends TaskBase<TRe
    * @param data - Data required to execute the task.
    */
   constructor(
-    readonly builder: TaskBuilder<TData, TResult, TError>,
+    readonly builder: TaskBuilder<TSpec>,
     readonly name: string,
-    private _config: Omit<TaskConfig<TData, TResult, TError>, "name">,
-    readonly data: TData
+    private _config: Omit<TaskConfig<TSpec>, "name">,
+    readonly data: TSpec["TData"]
   ) {
     super();
     this.id = createTaskId(name);
@@ -316,7 +316,7 @@ export class Task<TData = any, TResult = any, TError = any> extends TaskBase<TRe
    * @returns Result of the task execution.
    * @throws If the task is not in the "idle" state or if the execution fails.
    */
-  public async execute() {
+  public async execute(): Promise<Optional<TSpec["TResult"]>> {
     if (this.status !== "idle") {
       throw new Error('Task is not in "idle" state.');
     }
@@ -326,8 +326,10 @@ export class Task<TData = any, TResult = any, TError = any> extends TaskBase<TRe
     try {
       const result = await Promise.resolve(this._config.execute.bind(this)(this.data));
       this.result = Optional(result);
+
+      return this.result;
     } catch (error) {
-      this.addError(error as TError);
+      this.addError(error as TSpec["TError"]);
       this.setStatus("error");
       throw error;
     }
@@ -344,7 +346,7 @@ export class Task<TData = any, TResult = any, TError = any> extends TaskBase<TRe
     return {
       status: `${this.name} - ${this.status}`,
       warnings: this.warnings,
-      errors: this.errors?.map((error) => {
+      errors: this.errors?.map((error: any) => {
         if (error instanceof Error) {
           return error.message;
         }

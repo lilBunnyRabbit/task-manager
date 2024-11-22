@@ -1,5 +1,6 @@
 import { Task } from "./task";
 import { TaskBuilder } from "./task-builder";
+import { TaskSpec } from "./task.type";
 
 /**
  * Creates a unique identifier for a task based on its name and the current time.
@@ -33,9 +34,6 @@ export function createTaskId(name: string) {
  *
  * @returns `true` if the object is an instance of {@link Task}.
  */
-export function isTask<TData, TResult, TError>(
-  task: unknown,
-  taskBuilder: TaskBuilder<TData, TResult, TError>
-): task is Task<TData, TResult, TError> {
+export function isTask<TSpec extends TaskSpec>(task: unknown, taskBuilder: TaskBuilder<TSpec>): task is Task<TSpec> {
   return task instanceof Task && task.builder.id === taskBuilder.id;
 }

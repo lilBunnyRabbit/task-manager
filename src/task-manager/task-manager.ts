@@ -1,6 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/utils";
 import { Task, TaskBuilder, isTask } from "../task";
 import { TaskManagerFlag, TaskManagerStatus } from "./task-manager.type";
+import { TaskSpec } from "../task/task.type";
 
 /**
  * Base class for managing task statuses, progress, flags, and queue operations.
@@ -484,7 +485,7 @@ export class TaskManager extends TaskManagerBase {
    *
    * @returns The found task or undefined.
    */
-  public findTask<TData, TResult, TError>(taskBuilder: TaskBuilder<TData, TResult, TError>) {
+  public findTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     for (let i = 0; i < this.tasks.length; i++) {
       const task: unknown = this.tasks[i];
       if (isTask(task, taskBuilder)) {
@@ -501,7 +502,7 @@ export class TaskManager extends TaskManagerBase {
    * @returns The retrieved task.
    * @throws If the task is not found.
    */
-  public getTask<TData, TResult, TError>(taskBuilder: TaskBuilder<TData, TResult, TError>) {
+  public getTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     const task = this.findTask(taskBuilder);
 
     if (!task) {
@@ -519,7 +520,7 @@ export class TaskManager extends TaskManagerBase {
    * @returns The result of the task.
    * @throws If the task is not found or if the result is empty.
    */
-  public getTaskResult<TData, TResult, TError>(taskBuilder: TaskBuilder<TData, TResult, TError>) {
+  public getTaskResult<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     const task = this.getTask(taskBuilder);
 
     if (task.result.isEmpty()) {
@@ -535,7 +536,7 @@ export class TaskManager extends TaskManagerBase {
    * @param taskBuilder - The builder of the task to find.
    * @returns The found task or undefined.
    */
-  public findLastTask<TData, TResult, TError>(taskBuilder: TaskBuilder<TData, TResult, TError>) {
+  public findLastTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     for (let i = this.tasks.length - 1; i >= 0; i--) {
       const task: unknown = this.tasks[i];
       if (isTask(task, taskBuilder)) {
@@ -552,7 +553,7 @@ export class TaskManager extends TaskManagerBase {
    * @returns The retrieved task.
    * @throws If the task is not found.
    */
-  public getLastTask<TData, TResult, TError>(taskBuilder: TaskBuilder<TData, TResult, TError>) {
+  public getLastTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     const task = this.findLastTask(taskBuilder);
 
     if (!task) {
@@ -570,7 +571,7 @@ export class TaskManager extends TaskManagerBase {
    * @returns The result of the task.
    * @throws If the task is not found or if the result is empty.
    */
-  public getLastTaskResult<TData, TResult, TError>(taskBuilder: TaskBuilder<TData, TResult, TError>) {
+  public getLastTaskResult<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     const task = this.getLastTask(taskBuilder);
 
     if (task.result.isEmpty()) {
@@ -587,8 +588,8 @@ export class TaskManager extends TaskManagerBase {
    *
    * @returns Array of found tasks.
    */
-  public findTasks<TData, TResult, TError>(taskBuilder: TaskBuilder<TData, TResult, TError>) {
-    return this.tasks.filter((task) => isTask(task, taskBuilder)) as Task<TData, TResult, TError>[];
+  public findTasks<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
+    return this.tasks.filter((task) => isTask(task, taskBuilder)) as Task<TSpec>[];
   }
 
   /**
@@ -599,10 +600,8 @@ export class TaskManager extends TaskManagerBase {
    * @returns Array of results.
    * @throws If any of the task results is empty.
    */
-  public getTasksResults<TData, TResult, TError>(
-    taskBuilder: TaskBuilder<TData, TResult, TError>
-  ): NonNullable<TResult>[] {
-    const results: NonNullable<TResult>[] = [];
+  public getTasksResults<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>): NonNullable<TSpec["TResult"]>[] {
+    const results: NonNullable<TSpec["TResult"]>[] = [];
 
     for (let i = 0; i < this.tasks.length; i++) {
       const task: unknown = this.tasks[i];
