@@ -84,6 +84,10 @@ A `Task` represents a single unit of work within the system.
 - `parse()`: Returns a UI-friendly representation of the task's state.
 - `clone()`: Clones the task for re-execution.
 
+## Documentation
+
+If you're looking for detailed API docs, check out the [full documentation](./docs/globals.md) generated via [Typedoc](https://typedoc.org/).
+
 ## Development
 
 This section provides a guide for developers to set up the project environment and utilize various npm scripts defined in the project for efficient development and release processes.
