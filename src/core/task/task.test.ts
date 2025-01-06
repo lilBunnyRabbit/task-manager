@@ -1,5 +1,5 @@
 import { isString } from "@lilbunnyrabbit/utils";
-import { Task, createTask } from "./";
+import { Task, createTask } from ".";
 
 describe("Task", () => {
   const taskBuilder = createTask<number, number>({

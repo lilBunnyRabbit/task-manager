@@ -1,6 +1,6 @@
+import { v4 as uuidv4 } from "uuid";
 import { Task } from "./task";
-import { createTaskId } from "./task.helper";
-import { ParsedTask, TaskSpec } from "./task.type";
+import type { ParsedTask, TaskSpec } from "./task.type";
 
 /**
  * Configuration interface for creating a {@link Task}.
@@ -69,10 +69,10 @@ export function createTask<TData = void, TResult = void, TError = Error>({
     return new Task<TaskSpec<TData, TResult, TError>>(builder, name, config, data);
   };
 
-  builder.id = createTaskId(name);
+  builder.id = uuidv4();
   builder.taskName = name;
   builder.toString = function () {
-    return `TaskBuilder { name: ${JSON.stringify(this.taskName)}, id: #${this.id} }`;
+    return `TaskBuilder {\n\tname: ${JSON.stringify(this.taskName)},\n\tid: "${this.id}"\n}`;
   };
 
   return builder;

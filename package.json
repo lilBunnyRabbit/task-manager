@@ -51,7 +51,8 @@
   "dependencies": {
     "@lilbunnyrabbit/event-emitter": "^0.1.0",
     "@lilbunnyrabbit/optional": "^0.0.1",
-    "@lilbunnyrabbit/utils": "^0.1.0"
+    "@lilbunnyrabbit/utils": "^0.1.0",
+    "uuid": "^11.0.4"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",

@@ -1,9 +1,9 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
-import { TaskManager } from "../task-manager";
-import { TaskBuilder, TaskConfig } from "./task-builder";
-import { createTaskId } from "./task.helper";
-import { ParsedTask, TaskSpec, TaskStatus } from "./task.type";
 import { Optional } from "@lilbunnyrabbit/optional";
+import { v4 as uuidv4 } from "uuid";
+import type { TaskManager } from "../task-manager";
+import type { TaskBuilder, TaskConfig } from "./task-builder";
+import type { ParsedTask, TaskEvents, TaskSpec, TaskStatus } from "./task.type";
 
 /**
  * Base class for managing core functionalities of a task, like status, progress, error handling, and event emission.
@@ -13,16 +13,7 @@ import { Optional } from "@lilbunnyrabbit/optional";
  *
  * @extends EventEmitter - Emits `change` and `progress` events.
  */
-class TaskBase<TSpec extends TaskSpec> extends EventEmitter<{
-  /**
-   * Emits when anything about the task changes (status, progress, etc.).
-   */
-  change: void;
-  /**
-   * Emits when task progress is updated.
-   */
-  progress: number;
-}> {
+class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   // Status
 
   /**
@@ -285,7 +276,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
     readonly data: TSpec["TData"]
   ) {
     super();
-    this.id = createTaskId(name);
+    this.id = uuidv4();
   }
 
   /**
@@ -365,7 +356,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * @returns String representing the task.
    */
   public toString() {
-    return `Task { name: ${JSON.stringify(this.name)}, id: #${this.id} }`;
+    return `Task {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
   }
 
   /**
