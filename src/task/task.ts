@@ -1,8 +1,9 @@
-import { EventEmitter, Optional } from "@lilbunnyrabbit/utils";
+import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { TaskManager } from "../task-manager";
 import { TaskBuilder, TaskConfig } from "./task-builder";
 import { createTaskId } from "./task.helper";
 import { ParsedTask, TaskSpec, TaskStatus } from "./task.type";
+import { Optional } from "@lilbunnyrabbit/optional";
 
 /**
  * Base class for managing core functionalities of a task, like status, progress, error handling, and event emission.

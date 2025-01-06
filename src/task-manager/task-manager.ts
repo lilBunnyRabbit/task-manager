@@ -1,7 +1,7 @@
-import { EventEmitter } from "@lilbunnyrabbit/utils";
 import { Task, TaskBuilder, isTask } from "../task";
 import { TaskManagerFlag, TaskManagerStatus } from "./task-manager.type";
 import { TaskSpec } from "../task/task.type";
+import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 
 /**
  * Base class for managing task statuses, progress, flags, and queue operations.
