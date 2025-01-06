@@ -258,7 +258,7 @@ class TaskBase<TSpec extends TaskSpec> extends EventEmitter<{
  *
  * @extends TaskBase - Inherits core functionalities like status, progress, and event emission.
  */
-export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
+export class Task<TSpec extends TaskSpec = TaskSpec, TParsed = unknown> extends TaskBase<TSpec> {
   /**
    * Unique identifier of the task.
    */
@@ -267,7 +267,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
    * {@link TaskManager} instance to which this task is bound.
    */
-  private _manager?: TaskManager;
+  private _manager?: TaskManager<TParsed>;
 
   /**
    * Creates an instance of {@link Task}.
@@ -278,9 +278,9 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * @param data - Data required to execute the task.
    */
   constructor(
-    readonly builder: TaskBuilder<TSpec>,
+    readonly builder: TaskBuilder<TSpec, TParsed>,
     readonly name: string,
-    private _config: Omit<TaskConfig<TSpec>, "name">,
+    private _config: Omit<TaskConfig<TSpec, TParsed>, "name">,
     readonly data: TSpec["TData"]
   ) {
     super();
@@ -292,7 +292,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    *
    * @param manager - {@link TaskManager} to bind this task to.
    */
-  public bind(manager: TaskManager) {
+  public bind(manager: TaskManager<TParsed>) {
     this._manager = manager;
   }
 
@@ -302,7 +302,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * @returns Associated {@link TaskManager}.
    * @throws If the task is not bound to a {@link TaskManager}.
    */
-  public get manager(): TaskManager {
+  public get manager(): TaskManager<TParsed> {
     if (!this._manager) {
       throw new Error("Missing TaskManager. Please use Task.bind(TaskManager).");
     }
@@ -340,7 +340,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    *
    * @returns Parsed representation of the task.
    */
-  public parse(): ParsedTask {
+  public parse(): ParsedTask<TParsed> {
     const parsed = this._config.parse?.bind(this)() ?? {};
 
     return {
@@ -364,7 +364,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * @returns String representing the task.
    */
   public toString() {
-    return `Task { name: ${JSON.stringify(this.name)}, id: #${this.id} }`;
+    return `Task {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
   }
 
   /**

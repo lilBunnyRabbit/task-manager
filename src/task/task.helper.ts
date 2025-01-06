@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { Task } from "./task";
 import { TaskBuilder } from "./task-builder";
 import { TaskSpec } from "./task.type";
@@ -19,7 +20,7 @@ export function createTaskId(name: string) {
   const nameHex = [...name].map((c) => c.charCodeAt(0).toString(16)).join("");
   const timeHex = Date.now().toString(16).padStart(12, "0");
 
-  return `${randomHex}-${nameHex}-${timeHex}`;
+  return uuidv4();
 }
 
 /**
@@ -34,6 +35,9 @@ export function createTaskId(name: string) {
  *
  * @returns `true` if the object is an instance of {@link Task}.
  */
-export function isTask<TSpec extends TaskSpec>(task: unknown, taskBuilder: TaskBuilder<TSpec>): task is Task<TSpec> {
+export function isTask<TSpec extends TaskSpec, TParsed>(
+  task: unknown,
+  taskBuilder: TaskBuilder<TSpec, TParsed>
+): task is Task<TSpec, TParsed> {
   return task instanceof Task && task.builder.id === taskBuilder.id;
 }

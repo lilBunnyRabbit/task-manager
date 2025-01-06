@@ -9,7 +9,7 @@ import { ParsedTask, TaskSpec } from "./task.type";
  * @template TResult - Result type the task produces.
  * @template TError - Error type that may be encountered during execution.
  */
-export interface TaskConfig<TSpec extends TaskSpec> {
+export interface TaskConfig<TSpec extends TaskSpec, TParsed> {
   /**
    * Name of the task.
    */
@@ -17,11 +17,11 @@ export interface TaskConfig<TSpec extends TaskSpec> {
   /**
    * Function to parse the task's outcome into a {@link ParsedTask} object.
    */
-  parse?: (this: Task<TSpec>) => ParsedTask;
+  parse?: (this: Task<TSpec, TParsed>) => ParsedTask<TParsed>;
   /**
    * Core function to execute the task, returning a result or a promise.
    */
-  execute: (this: Task<TSpec>, data: TSpec["TData"]) => TSpec["TResult"] | Promise<TSpec["TResult"]>;
+  execute: (this: Task<TSpec, TParsed>, data: TSpec["TData"]) => TSpec["TResult"] | Promise<TSpec["TResult"]>;
 }
 
 /**
@@ -31,7 +31,7 @@ export interface TaskConfig<TSpec extends TaskSpec> {
  * @template TResult - Result type the task produces.
  * @template TError - Error type that may be encountered during execution.
  */
-export interface TaskBuilder<TSpec extends TaskSpec> {
+export interface TaskBuilder<TSpec extends TaskSpec, TParsed> {
   /**
    * Function that builds {@link Task} instances.
    *
@@ -39,7 +39,7 @@ export interface TaskBuilder<TSpec extends TaskSpec> {
    *
    * @returns A new {@link Task} instance.
    */
-  (data: TSpec["TData"]): Task<TSpec>;
+  (data: TSpec["TData"]): Task<TSpec, TParsed>;
 
   /**
    * Unique identifier of the task builder.
@@ -61,18 +61,18 @@ export interface TaskBuilder<TSpec extends TaskSpec> {
  *
  * @returns A new task builder with the given configuration.
  */
-export function createTask<TData = void, TResult = void, TError = Error>({
+export function createTask<TData = void, TResult = void, TParsed = string, TError = Error>({
   name,
   ...config
-}: TaskConfig<TaskSpec<TData, TResult, TError>>) {
-  const builder: TaskBuilder<TaskSpec<TData, TResult, TError>> = function (data) {
-    return new Task<TaskSpec<TData, TResult, TError>>(builder, name, config, data);
+}: TaskConfig<TaskSpec<TData, TResult, TError>, TParsed>) {
+  const builder: TaskBuilder<TaskSpec<TData, TResult, TError>, TParsed> = function (data) {
+    return new Task<TaskSpec<TData, TResult, TError>, TParsed>(builder, name, config, data);
   };
 
   builder.id = createTaskId(name);
   builder.taskName = name;
   builder.toString = function () {
-    return `TaskBuilder { name: ${JSON.stringify(this.taskName)}, id: #${this.id} }`;
+    return `TaskBuilder {\n\tname: ${JSON.stringify(this.taskName)},\n\tid: "${this.id}"\n}`;
   };
 
   return builder;
