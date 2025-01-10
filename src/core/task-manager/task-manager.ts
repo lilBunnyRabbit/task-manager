@@ -1,10 +1,7 @@
-import { ExecutionManagerMixin } from "../execution-manager/execution-manager";
-import type { Task } from "../task";
+import { Task } from "../task";
+import { TaskQuery } from "../task-query/task-query";
 import { TaskManagerBase } from "./task-manager-base";
-import { TaskManagerFlag } from "./task-manager.type";
-import { TaskQueryMixin } from "../task-query";
-
-const MixedTaskManagerBase = ExecutionManagerMixin(TaskQueryMixin(TaskManagerBase));
+import { ExecutableTask, TaskManagerFlag } from "./task-manager.type";
 
 /**
  * Manages task execution, including adding tasks to the queue, controlling task progress, and handling task lifecycle events.
@@ -12,7 +9,9 @@ const MixedTaskManagerBase = ExecutionManagerMixin(TaskQueryMixin(TaskManagerBas
  *
  * @extends TaskManagerBase - Inherits core functionalities like status, progress, and event emission.
  */
-export class TaskManager extends MixedTaskManagerBase {
+export class TaskManager extends TaskManagerBase {
+  public query = new TaskQuery(this.tasks);
+
   /**
    * Adds an array of tasks to the task queue.
    *
@@ -21,10 +20,13 @@ export class TaskManager extends MixedTaskManagerBase {
    *
    * @returns The instance of the manager.
    */
-  public addTasks(tasks: Task[]) {
+  public addTasks(tasks: ExecutableTask[]) {
     this.queue.push(
       ...tasks.map((task) => {
-        task.bind(this);
+        if (task instanceof Task) {
+          task.bind(this.query);
+        }
+
         return task;
       })
     );
@@ -125,11 +127,11 @@ export class TaskManager extends MixedTaskManagerBase {
     if (!this.isStatus("idle", "stopped") && !(force && this.isStatus("fail"))) {
       switch (this.status) {
         case "fail":
-          return console.warn(`${TaskManager.name} failed.`);
+          return console.warn("TaskManager failed.");
         case "success":
-          return console.warn(`${TaskManager.name} succeeded.`);
+          return console.warn("TaskManager succeeded.");
         default:
-          return console.warn(`${TaskManager.name} is already in progress.`);
+          return console.warn("TaskManager is already in progress.");
       }
     }
 

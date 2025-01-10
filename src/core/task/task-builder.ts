@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import { BuilderIs } from "../task-group/task-group-builder";
 import { Task } from "./task";
+import { isTask } from "./task.helper";
 import type { ParsedTask, TaskSpec } from "./task.type";
 
 /**
@@ -31,7 +33,7 @@ export interface TaskConfig<TSpec extends TaskSpec> {
  * @template TResult - Result type the task produces.
  * @template TError - Error type that may be encountered during execution.
  */
-export interface TaskBuilder<TSpec extends TaskSpec> {
+export interface TaskBuilder<TSpec extends TaskSpec> extends BuilderIs<Task<TSpec>> {
   /**
    * Function that builds {@link Task} instances.
    *
@@ -74,6 +76,7 @@ export function createTask<TData = void, TResult = void, TError = Error>({
   builder.toString = function () {
     return `TaskBuilder {\n\tname: ${JSON.stringify(this.taskName)},\n\tid: "${this.id}"\n}`;
   };
+  builder.is = (task: unknown) => isTask(task, builder);
 
   return builder;
 }

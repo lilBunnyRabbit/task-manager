@@ -1,7 +1,10 @@
 import type { EventMap } from "@lilbunnyrabbit/event-emitter";
 import type { TaskError } from "../../helpers/task-error";
-import type { Task } from "../task/task";
+import type { Task, TaskSpec } from "../task";
 import type { TaskManager } from "./task-manager";
+import { TaskGroup } from "../task-group/task-group";
+
+export type ExecutableTask = Task<TaskSpec<any, any, any>> | TaskGroup<any[]>;
 
 /**
  * Possible statuses of a {@link TaskManager}.
@@ -40,7 +43,7 @@ export interface TaskManagerEvents extends EventMap {
   /**
    * Emits when a new task is in progress.
    */
-  task: Task;
+  task: ExecutableTask;
   /**
    * Emits when a task fails and `FAIL_ON_ERROR` flag is set.
    */

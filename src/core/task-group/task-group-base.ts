@@ -1,7 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import type { Task } from "../task";
-import type { ExecutableTask, TaskManagerEvents, TaskManagerStatus } from "./task-manager.type";
-import { TaskManagerFlag } from "./task-manager.type";
+import { TaskGroupEvents, TaskGroupFlag, TaskGroupStatus } from "./task-group.type";
+import { ExecutableTask } from "../task-manager/task-manager.type";
 
 /**
  * Base class for managing task statuses, progress, flags, and queue operations.
@@ -10,7 +10,7 @@ import { TaskManagerFlag } from "./task-manager.type";
  *
  * @extends EventEmitter - Emits `change`, `task`, `progress`, `fail`, `success` and `error` events.
  */
-export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
+export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   // Status
 
   /**
@@ -18,7 +18,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    *
    * @default "idle"
    */
-  protected _status: TaskManagerStatus = "idle";
+  protected _status: TaskGroupStatus = "idle";
 
   /**
    * Gets the current status.
@@ -119,12 +119,12 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    *
    * @default Set(TaskManagerFlag.FAIL_ON_ERROR)
    */
-  protected _flags: Set<TaskManagerFlag> = new Set([TaskManagerFlag.FAIL_ON_ERROR]);
+  protected _flags: Set<TaskGroupFlag> = new Set([TaskGroupFlag.FAIL_ON_ERROR]);
 
   /**
    * Gets the current array of flags.
    */
-  public get flags(): TaskManagerFlag[] {
+  public get flags(): TaskGroupFlag[] {
     return Array.from(this._flags);
   }
 
@@ -161,7 +161,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    *
    * @returns Instance of the manager for chaining.
    */
-  public addFlag(flag: TaskManagerFlag): this {
+  public addFlag(flag: TaskGroupFlag): this {
     this._flags.add(flag);
 
     this.emit("change");
@@ -176,7 +176,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    *
    * @returns Instance of the manager for chaining.
    */
-  public removeFlag(flag: TaskManagerFlag): this {
+  public removeFlag(flag: TaskGroupFlag): this {
     this._flags.delete(flag);
 
     this.emit("change");
@@ -190,7 +190,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    *
    * @returns `true` if the flag is set.
    */
-  public hasFlag(flag: TaskManagerFlag): boolean {
+  public hasFlag(flag: TaskGroupFlag): boolean {
     return this._flags.has(flag);
   }
 
@@ -200,7 +200,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * @param flags - Flags to check.
    * @returns `true` if all flags are set.
    */
-  public hasFlags(...flags: TaskManagerFlag[]): boolean {
+  public hasFlags(...flags: TaskGroupFlag[]): boolean {
     return flags.every((flag) => this.hasFlag(flag));
   }
 
@@ -209,7 +209,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   /**
    * Current queue of {@link Task Tasks}.
    */
-  protected _queue: ExecutableTask[] = [];
+  protected abstract _queue: ExecutableTask[];
 
   /**
    * Gets the current queue of {@link Task Tasks}.
