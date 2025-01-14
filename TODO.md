@@ -1,3 +1,3 @@
 [ ] event refactoring
 [ ] TaskError implementation
-[ ] enum -> objects
+[x] enum -> objects
