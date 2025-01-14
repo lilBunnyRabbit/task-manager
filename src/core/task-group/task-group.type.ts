@@ -10,12 +10,14 @@ export type TaskGroupStatus = "idle" | "in-progress" | "error" | "success";
 /**
  * Flags that control the behavior of a {@link TaskGroup}.
  */
-export enum TaskGroupFlag {
+export const TaskGroupFlag = {
   /**
    * Continues execution even if a task fails.
    */
-  CONTINUE_ON_ERROR = "CONTINUE_ON_ERROR",
-}
+  CONTINUE_ON_ERROR: "CONTINUE_ON_ERROR",
+} as const;
+
+export type TaskGroupFlag = (typeof TaskGroupFlag)[keyof typeof TaskGroupFlag];
 
 /**
  * Events emitted by a {@link TaskGroup}.

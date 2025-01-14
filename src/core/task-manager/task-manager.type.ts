@@ -10,17 +10,19 @@ export type TaskManagerStatus = "idle" | "in-progress" | "error" | "success" | "
 /**
  * Flags that control the behavior of a {@link TaskManager}.
  */
-export enum TaskManagerFlag {
+export const TaskManagerFlag = {
   /**
    * Indicates that the execution loop should stop.
    */
-  STOP = "STOP",
+  STOP: "STOP",
 
   /**
    * Continues execution even if a task fails.
    */
-  CONTINUE_ON_ERROR = "CONTINUE_ON_ERROR",
-}
+  CONTINUE_ON_ERROR: "CONTINUE_ON_ERROR",
+} as const;
+
+export type TaskManagerFlag = (typeof TaskManagerFlag)[keyof typeof TaskManagerFlag];
 
 /**
  * Events emitted by a {@link TaskManager}.
