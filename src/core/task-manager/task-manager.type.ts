@@ -15,7 +15,6 @@ export const TaskManagerFlag = {
    * Indicates that the execution loop should stop.
    */
   STOP: "STOP",
-
   /**
    * Continues execution even if a task fails.
    */
