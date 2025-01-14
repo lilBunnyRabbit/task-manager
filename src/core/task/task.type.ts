@@ -1,10 +1,9 @@
 import type { EventMap } from "@lilbunnyrabbit/event-emitter";
 import type { Task } from "./task";
 
-export type TaskSpec<TData = any, TResult = any, TError = any> = {
+export type TaskSpec<TData = any, TResult = any> = {
   TData: TData;
   TResult: TResult;
-  TError: TError;
 };
 
 /**
@@ -20,14 +19,6 @@ export interface ParsedTask {
    * {@link Task}'s current status as a string.
    */
   status: string;
-  /**
-   * Optional array of warnings related to the {@link Task}.
-   */
-  warnings?: string[];
-  /**
-   * Optional array of errors related to the {@link Task}.
-   */
-  errors?: string[];
   /**
    * Optional string representing the {@link Task}'s result.
    */

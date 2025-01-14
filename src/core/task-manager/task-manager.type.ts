@@ -4,7 +4,7 @@ import type { Task, TaskSpec } from "../task";
 import type { TaskManager } from "./task-manager";
 import { TaskGroup } from "../task-group/task-group";
 
-export type ExecutableTask = Task<TaskSpec<any, any, any>> | TaskGroup<any[]>;
+export type ExecutableTask = Task<TaskSpec<any, any>> | TaskGroup<any[]>;
 
 /**
  * Possible statuses of a {@link TaskManager}.

@@ -5,6 +5,7 @@ import { TaskBase } from "./task-base";
 import type { TaskBuilder, TaskConfig } from "./task-builder";
 import type { ParsedTask, TaskSpec } from "./task.type";
 import { TaskQuery } from "../task-query/task-query";
+import { Logger } from "../logger/logger";
 
 /**
  * Represents a single task in the task manager system.
@@ -22,6 +23,12 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * Unique identifier of the task.
    */
   readonly id!: string;
+
+  protected logger = new Logger();
+
+  public get logs() {
+    return this.logger.logs;
+  }
 
   /**
    * {@link TaskManager} instance to which this task is bound.
@@ -88,7 +95,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
 
       return this.result;
     } catch (error) {
-      this.addError(error as TSpec["TError"]);
+      this.logger.error(String(error));
       this.setStatus("error");
       throw error;
     }
@@ -103,14 +110,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
     const parsed = this._config.parse?.bind(this)() ?? {};
 
     return {
-      status: `${this.name} - ${this.status}`,
-      warnings: this.warnings,
-      errors: this.errors?.map((error: any) => {
-        if (error instanceof Error) {
-          return error.message;
-        }
-        return `${error}`;
-      }),
+      status: this.status,
       result: this.result.isPresent() ? `${this.result.get()}` : undefined,
 
       ...parsed,

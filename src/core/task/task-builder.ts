@@ -63,12 +63,12 @@ export interface TaskBuilder<TSpec extends TaskSpec> extends BuilderIs<Task<TSpe
  *
  * @returns A new task builder with the given configuration.
  */
-export function createTask<TData = void, TResult = void, TError = Error>({
+export function createTask<TData = void, TResult = void>({
   name,
   ...config
-}: TaskConfig<TaskSpec<TData, TResult, TError>>) {
-  const builder: TaskBuilder<TaskSpec<TData, TResult, TError>> = function (data) {
-    return new Task<TaskSpec<TData, TResult, TError>>(builder, name, config, data);
+}: TaskConfig<TaskSpec<TData, TResult>>) {
+  const builder: TaskBuilder<TaskSpec<TData, TResult>> = function (data) {
+    return new Task<TaskSpec<TData, TResult>>(builder, name, config, data);
   };
 
   builder.id = uuidv4();
