@@ -1,37 +1,38 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
-import type { Task } from "../task";
-import { TaskGroupEvents, TaskGroupFlag, TaskGroupStatus } from "./task-group.type";
-import { ExecutableTask } from "../task-manager/task-manager.type";
+import type { Task } from "../";
+import type { ExecutableTask } from "../../common";
+import type { TaskGroupEvents, TaskGroupStatus } from "./task-group.type";
+import { TaskGroupFlag } from "./task-group.type";
 
 /**
  * Base class for managing task statuses, progress, flags, and queue operations.
  *
  * Emits events related to task lifecycle and status changes.
  *
- * @extends EventEmitter - Emits `change`, `task`, `progress`, `fail`, `success` and `error` events.
+ * @extends EventEmitter
  */
 export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   // Status
 
   /**
-   * Current status of the task manager.
+   * Current status of the task group.
    *
    * @default "idle"
    */
   protected _status: TaskGroupStatus = "idle";
 
   /**
-   * Gets the current status.
+   * Gets the current status of the task group.
    */
   public get status() {
     return this._status;
   }
 
   /**
-   * Updates the task manager's status.
+   * Updates the status of the task group.
    *
    * @param status - New status to set.
-   * @emits change - If the status changes.
+   * @emits change - When the status changes.
    */
   protected set status(status: typeof this._status) {
     if (status !== this.status) {
@@ -42,12 +43,11 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   }
 
   /**
-   * Sets the status.
+   * Sets the status of the task group.
    *
    * @param status - Status to set.
-   * @emits change - If the status changes.
-   *
-   * @returns Instance of the manager for chaining.
+   * @emits change - When the status changes.
+   * @returns The instance for chaining.
    */
   protected setStatus(status: typeof this._status) {
     this.status = status;
@@ -57,9 +57,8 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   /**
    * Checks if the current status matches any of the provided statuses.
    *
-   * @param statuses - Array of statuses to check against.
-   *
-   * @returns `true` if the current status is among the provided statuses.
+   * @param statuses - Statuses to check.
+   * @returns `true` if the current status matches.
    */
   public isStatus(...statuses: Array<typeof this._status>) {
     return statuses.includes(this.status);
@@ -84,9 +83,9 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   /**
    * Updates the progress of tasks.
    *
-   * @param progress - New progress value (must be between 0 and 1).
-   * @emits progress - If the progress changes.
-   * @emits change - If the progress changes.
+   * @param progress - New progress value.
+   * @emits progress - When progress changes.
+   * @emits change - When progress changes.
    */
   protected set progress(progress: typeof this._progress) {
     const validProgress = progress > 1 ? 1 : progress < 0 ? 0 : progress;
@@ -102,10 +101,9 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
    * Sets the progress of tasks.
    *
    * @param progress - Progress value to set.
-   * @emits progress - If the progress changes.
-   * @emits change - If the progress changes.
-   *
-   * @returns Instance of the manager for chaining.
+   * @emits progress - When progress changes.
+   * @emits change - When progress changes.
+   * @returns The instance for chaining.
    */
   protected setProgress(progress: typeof this._progress) {
     this.progress = progress;
@@ -115,11 +113,11 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   // Flags
 
   /**
-   * Current flags for the task manager.
+   * Current flags for the task group.
    *
-   * @default Set(TaskManagerFlag.FAIL_ON_ERROR)
+   * @default Empty set of flags.
    */
-  protected _flags: Set<TaskGroupFlag> = new Set([TaskGroupFlag.FAIL_ON_ERROR]);
+  protected _flags: Set<TaskGroupFlag> = new Set([]);
 
   /**
    * Gets the current array of flags.
@@ -129,37 +127,35 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   }
 
   /**
-   * Updates the flags for the task manager.
+   * Updates the flags for the task group.
    *
    * @param flags - New set of flags to apply.
-   * @emits change
+   * @emits change - When the flags are updated.
    */
-  protected set flags(flags: typeof this._flags) {
+  public set flags(flags: typeof this._flags) {
     this._flags = flags;
 
     this.emit("change");
   }
 
   /**
-   * Sets the flags for the manager.
+   * Sets the flags for the task group.
    *
    * @param flags - Flags to set.
-   * @emits change
-   *
-   * @returns Instance of the manager for chaining.
+   * @emits change - When the flags are updated.
+   * @returns The instance for chaining.
    */
-  protected setFlags(flags: typeof this._flags) {
+  public setFlags(flags: typeof this._flags) {
     this.flags = flags;
     return this;
   }
 
   /**
-   * Adds a flag to the task manager.
+   * Adds a flag to the task group.
    *
    * @param flag - Flag to add.
-   * @emits change
-   *
-   * @returns Instance of the manager for chaining.
+   * @emits change - When the flags are updated.
+   * @returns The instance for chaining.
    */
   public addFlag(flag: TaskGroupFlag): this {
     this._flags.add(flag);
@@ -169,12 +165,11 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   }
 
   /**
-   * Removes a flag from the task manager.
+   * Removes a flag from the task group.
    *
    * @param flag - Flag to remove.
-   * @emits change
-   *
-   * @returns Instance of the manager for chaining.
+   * @emits change - When the flags are updated.
+   * @returns The instance for chaining.
    */
   public removeFlag(flag: TaskGroupFlag): this {
     this._flags.delete(flag);
@@ -187,7 +182,6 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
    * Checks if a flag is set.
    *
    * @param flag - Flag to check.
-   *
    * @returns `true` if the flag is set.
    */
   public hasFlag(flag: TaskGroupFlag): boolean {
@@ -235,7 +229,7 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   protected _tasks: ExecutableTask[] = [];
 
   /**
-   * Current list of executed {@link Task Tasks}.
+   * Gets the current list of executed {@link Task Tasks}.
    */
   public get tasks() {
     return this._tasks;

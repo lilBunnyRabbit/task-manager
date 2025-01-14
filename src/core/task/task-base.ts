@@ -3,35 +3,31 @@ import { Optional } from "@lilbunnyrabbit/optional";
 import type { TaskEvents, TaskSpec, TaskStatus } from "./task.type";
 
 /**
- * Base class for managing core functionalities of a task, like status, progress, error handling, and event emission.
+ * Base class for managing task status, progress, error handling, and event emission.
  *
- * @template TResult - Result type the task produces when it finishes.
- * @template TError - Error type that might pop up during execution.
- *
- * @extends EventEmitter - Emits `change` and `progress` events.
+ * @template TSpec - Task specification type.
+ * @extends EventEmitter<TaskEvents>
  */
 export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   // Status
 
   /**
-   * Current status of the task.
-   *
+   * Current task status.
    * @default "idle"
    */
   protected _status: TaskStatus = "idle";
 
   /**
-   * Gets the current status.
+   * Task status.
    */
   public get status() {
     return this._status;
   }
 
   /**
-   * Updates the task status.
-   *
-   * @param status - New status to set.
-   * @emits change - If the status changes.
+   * Updates task status.
+   * @param status - New status.
+   * @emits change - When status changes.
    */
   public set status(status: typeof this._status) {
     if (status !== this.status) {
@@ -42,12 +38,10 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   }
 
   /**
-   * Sets the status.
-   *
-   * @param status - The status to set.
-   * @emits change - If the status changes.
-   *
-   * @returns The instance of the task.
+   * Updates task status.
+   * @param status - New status.
+   * @emits change - When status changes.
+   * @returns Task instance.
    */
   public setStatus(status: typeof this._status): this {
     this.status = status;
@@ -57,25 +51,23 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   // Progress
 
   /**
-   * Current progress of the task (between 0 and 1).
-   *
+   * Task progress (0 to 1).
    * @default 0
    */
   protected _progress: number = 0;
 
   /**
-   * Gets the current progress (between 0 and 1).
+   * Task progress (0 to 1).
    */
   public get progress() {
     return this._progress;
   }
 
   /**
-   * Sets the progress.
-   *
-   * @param progress - New progress value (should be between 0 and 1).
-   * @emits progress - If the progress changes.
-   * @emits change - If the progress changes.
+   * Updates task progress.
+   * @param progress - New progress value (0 to 1).
+   * @emits progress - When progress changes.
+   * @emits change - When progress changes.
    */
   public set progress(progress: typeof this._progress) {
     const validProgress = progress > 1 ? 1 : progress < 0 ? 0 : progress;
@@ -88,13 +80,11 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   }
 
   /**
-   * Sets the progress.
-   *
-   * @param progress - New progress value (should be between 0 and 1).
-   * @emits progress - If the progress changes.
-   * @emits change - If the progress changes.
-   *
-   * @returns The instance of the task.
+   * Updates task progress.
+   * @param progress - New progress value (0 to 1).
+   * @emits progress - When progress changes.
+   * @emits change - When progress changes.
+   * @returns Task instance.
    */
   public setProgress(progress: typeof this._progress) {
     this.progress = progress;
@@ -104,23 +94,22 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   // Result
 
   /**
-   * Result of the task, encapsulated in an Optional object.
+   * Task result wrapped in an Optional.
    */
   protected _result: Optional<TSpec["TResult"]> = Optional.empty();
 
   /**
-   * The result of the task, encapsulated in an Optional object.
+   * Task result wrapped in an Optional.
    */
   public get result() {
     return this._result;
   }
 
   /**
-   * Sets the result of the task. Also updates the task status to 'success' and sets progress to 1.
-   *
-   * @param result - Result to set.
-   * @emits progress - If the result changes and progress is completed.
-   * @emits change - If the result is updated.
+   * Updates task result, sets status to "success," and progress to 1.
+   * @param result - Task result.
+   * @emits progress - When result is updated and progress is completed.
+   * @emits change - When result is updated.
    */
   protected set result(result: typeof this._result) {
     this._result = result;
@@ -131,13 +120,11 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   }
 
   /**
-   * Sets the result of the task. Also updates the task status to 'success' and sets progress to 1.
-   *
-   * @param result - Result to set.
-   * @emits progress - If the result changes and progress is completed.
-   * @emits change - If the result is updated.
-   *
-   * @returns The instance of the task.
+   * Updates task result, sets status to "success," and progress to 1.
+   * @param result - Task result.
+   * @emits progress - When result is updated and progress is completed.
+   * @emits change - When result is updated.
+   * @returns Task instance.
    */
   protected setResult(result: typeof this._result): this {
     this.result = result;

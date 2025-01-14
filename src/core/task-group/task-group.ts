@@ -1,29 +1,42 @@
 import { v4 as uuidv4 } from "uuid";
-import { TaskQuery } from "../task-query/task-query";
-import { Task } from "../task/task";
+import { Task, TaskQuery } from "../";
+import type { ExecutableTask } from "../../common";
+import { ExecutionMode } from "../../common";
 import { TaskGroupBase } from "./task-group-base";
 import { TaskGroupBuilder } from "./task-group-builder";
-import { ExecutableTask } from "../task-manager/task-manager.type";
-import { TaskGroupFlag, TaskGroupMode } from "./task-group.type";
+import { TaskGroupFlag } from "./task-group.type";
 
+/**
+ * Represents a group of tasks that can be executed in different modes.
+ *
+ * @template TArgs - Arguments used to create the task group.
+ * @extends TaskGroupBase
+ */
 export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBase {
+  /**
+   * Unique identifier for the task group.
+   */
   readonly id!: string;
 
+  /**
+   * Query interface for accessing tasks in the group.
+   */
   public query = new TaskQuery(this.tasks);
 
   /**
-   * Creates an instance of {@link Task}.
+   * Creates a new {@link TaskGroup}.
    *
-   * @param builder - Task builder function used to create new task instances.
-   * @param name - Name of the task.
-   * @param _config - Configuration object for the task.
-   * @param data - Data required to execute the task.
+   * @param builder - Builder for creating the task group.
+   * @param args - Arguments for the task group.
+   * @param name - Name of the task group.
+   * @param mode - Execution mode (linear or parallel).
+   * @param _queue - Queue of tasks to be executed.
    */
   constructor(
     readonly builder: TaskGroupBuilder<TArgs>,
     private args: TArgs,
     readonly name: string,
-    readonly mode: TaskGroupMode = TaskGroupMode.LINEAR,
+    readonly mode: ExecutionMode = ExecutionMode.LINEAR,
     protected _queue: ExecutableTask[]
   ) {
     super();
@@ -37,9 +50,9 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   }
 
   /**
-   * Calculates the overall progress of the tasks.
+   * Calculates the overall progress of tasks in the group.
    *
-   * @returns The calculated progress based on the task's execution status.
+   * @returns Overall progress as a number between 0 and 1.
    */
   private calculateProgress() {
     const tasksProgress = this.tasks.reduce((progress, task) => progress + task.progress, 0);
@@ -47,10 +60,10 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   }
 
   /**
-   * Executes the task, updating its status and handling the result or error.
+   * Executes the task group based on the specified execution mode.
    *
-   * @returns Result of the task execution.
-   * @throws If the task is not in the "idle" state or if the execution fails.
+   * @returns A promise that resolves when execution is complete.
+   * @throws If the task group is not in the "idle" state or execution fails.
    */
   public async execute() {
     if (this.status !== "idle") {
@@ -61,16 +74,18 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
 
     try {
       switch (this.mode) {
-        case TaskGroupMode.LINEAR:
+        case ExecutionMode.LINEAR: {
           await this.executeLinear();
           break;
+        }
 
-        case TaskGroupMode.PARALLEL:
+        case ExecutionMode.PARALLEL: {
           await this.executeParallel();
           break;
+        }
 
         default:
-          throw new Error(`Invalid TaskGroup mode "${this.mode}"`);
+          throw new Error(`Invalid ExecutionMode mode "${this.mode}"`);
       }
     } catch (error) {
       // this.addError(error as TSpec["TError"]);
@@ -82,13 +97,12 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   }
 
   /**
-   * Executes tasks in a linear sequence.
+   * Executes tasks sequentially (linear mode).
    *
    * @emits task - When a task is picked for execution.
-   * @emits change - When the task manager state changes (new task in progress).
-   * @emits progress - When task progress is updated.
-   *
-   * @returns A promise that resolves when all tasks in the queue have been executed linearly.
+   * @emits change - When the task group state changes.
+   * @emits progress - When progress updates.
+   * @returns A promise that resolves when all tasks are executed linearly.
    */
   private async executeLinear() {
     while (this.queue.length > 0) {
@@ -108,13 +122,12 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   }
 
   /**
-   * Executes tasks in parallel.
+   * Executes tasks concurrently (parallel mode).
    *
    * @emits task - When a task is picked for execution.
-   * @emits change - When the task manager state changes (new task in progress).
-   * @emits progress - When task progress is updated.
-   *
-   * @returns A promise that resolves when all tasks in the queue have been executed in parallel.
+   * @emits change - When the task group state changes.
+   * @emits progress - When progress updates.
+   * @returns A promise that resolves when all tasks are executed in parallel.
    */
   private async executeParallel() {
     const queueTasks = [...this.queue];
@@ -137,29 +150,26 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
       });
     };
 
-    if (this.hasFlag(TaskGroupFlag.FAIL_ON_ERROR)) {
-      return await Promise.all(executeTasks());
+    if (this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
+      return await Promise.allSettled(executeTasks());
     }
 
-    return await Promise.allSettled(executeTasks());
+    return await Promise.all(executeTasks());
   }
 
   /**
-   * Returns a string representation of the {@link Task} instance.
+   * Returns a string representation of the task group.
    *
-   * @returns String representing the task.
+   * @returns A string representing the task group.
    */
   public toString() {
-    return `TaskGroup {
-\tname: ${JSON.stringify(this.name)},
-\tid: "${this.id}"
-}`;
+    return `TaskGroup {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
   }
 
   /**
-   * Creates a clone of the current task.
+   * Creates a clone of the task group.
    *
-   * @returns New {@link Task} instance with the same configuration and data.
+   * @returns A new {@link TaskGroup} instance with the same configuration.
    */
   public clone() {
     return this.builder(...this.args);

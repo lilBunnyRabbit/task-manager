@@ -1,8 +1,6 @@
 import type { EventMap } from "@lilbunnyrabbit/event-emitter";
-import type { TaskError } from "../../helpers/task-error";
-import type { Task } from "../task";
+import type { ExecutableTask, TaskError } from "../../common";
 import type { TaskGroup } from "./task-group";
-import { ExecutableTask } from "../task-manager/task-manager.type";
 
 /**
  * Possible statuses of a {@link TaskGroup}.
@@ -10,45 +8,43 @@ import { ExecutableTask } from "../task-manager/task-manager.type";
 export type TaskGroupStatus = "idle" | "in-progress" | "error" | "success";
 
 /**
- * Flags that control the behavior of the {@link TaskGroup}.
+ * Flags that control the behavior of a {@link TaskGroup}.
  */
 export enum TaskGroupFlag {
   /**
-   * Stops execution if any task fails.
+   * Continues execution even if a task fails.
    */
-  FAIL_ON_ERROR = "FAIL_ON_ERROR",
+  CONTINUE_ON_ERROR = "CONTINUE_ON_ERROR",
 }
 
-export enum TaskGroupMode {
-  /**
-   * Enables parallel execution of tasks.
-   */
-  PARALLEL = "PARALLEL",
-  /**
-   * Enables parallel execution of tasks.
-   */
-  LINEAR = "PARALLEL",
-}
-
+/**
+ * Events emitted by a {@link TaskGroup}.
+ */
 export interface TaskGroupEvents extends EventMap {
   /**
-   * Emits when any state (status, progress, or flags) of the manager changes.
+   * Emitted when any state (status, progress, or flags) of the task group changes.
    */
   change: void;
   /**
-   * Emits when task progress is updated.
+   * Emitted when task progress is updated.
+   *
+   * @type {number} The new progress value.
    */
   progress: number;
   /**
-   * Emits when a new task is in progress.
+   * Emitted when a new task is in progress.
+   *
+   * @type {ExecutableTask} The task that is now in progress.
    */
   task: ExecutableTask;
   /**
-   * Emits when all tasks in the queue are executed successfully.
+   * Emitted when all tasks in the queue are executed successfully.
    */
   success: void;
   /**
-   * Emits when task throws.
+   * Emitted when a task or the task group encounters an error.
+   *
+   * @type {TaskError | Error} The encountered error.
    */
   error: TaskError | Error;
 }

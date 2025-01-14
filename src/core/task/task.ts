@@ -1,47 +1,52 @@
 import { Optional } from "@lilbunnyrabbit/optional";
 import { v4 as uuidv4 } from "uuid";
-import type { TaskManager } from "../task-manager";
+import type { TaskManager } from "../";
+import { TaskQuery } from "../";
+import { Logger } from "../../common";
 import { TaskBase } from "./task-base";
 import type { TaskBuilder, TaskConfig } from "./task-builder";
 import type { ParsedTask, TaskSpec } from "./task.type";
-import { TaskQuery } from "../task-query/task-query";
-import { Logger } from "../logger/logger";
 
 /**
- * Represents a single task in the task manager system.
+ * Single task in the task manager system.
  *
- * Handles task execution, progress tracking, and status updates.
- *
- * @template TData - Type of data the task requires.
- * @template TResult - Type of result the task produces.
- * @template TError - Type of error the task may encounter.
- *
- * @extends TaskBase - Inherits core functionalities like status, progress, and event emission.
+ * @template TData - Type of input data.
+ * @template TResult - Type of result data.
+ * @template TError - Type of possible error.
+ * @extends TaskBase
  */
 export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
-   * Unique identifier of the task.
+   * Unique task identifier.
    */
   readonly id!: string;
 
+  /**
+   * Task logger.
+   */
   protected logger = new Logger();
 
+  /**
+   * Task logs.
+   */
   public get logs() {
     return this.logger.logs;
   }
 
   /**
-   * {@link TaskManager} instance to which this task is bound.
+   * {@link TaskQuery} instance bound to the task.
+   *
+   * This query originates from either a {@link TaskManager} or {@link TaskGroup}.
    */
   private _query?: TaskQuery;
 
   /**
-   * Creates an instance of {@link Task}.
+   * Creates a {@link Task} instance.
    *
-   * @param builder - Task builder function used to create new task instances.
-   * @param name - Name of the task.
-   * @param _config - Configuration object for the task.
-   * @param data - Data required to execute the task.
+   * @param builder - Task builder function.
+   * @param name - Task name.
+   * @param _config - Task configuration.
+   * @param data - Input data for the task.
    */
   constructor(
     readonly builder: TaskBuilder<TSpec>,
@@ -54,19 +59,23 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   }
 
   /**
-   * Binds the task to a {@link TaskManager}.
+   * Binds the task to a {@link TaskQuery}.
    *
-   * @param manager - {@link TaskManager} to bind this task to.
+   * The query originates from either a {@link TaskManager} or a {@link TaskGroup}.
+   *
+   * @param query - TaskQuery instance.
    */
   public bind(query: TaskQuery) {
     this._query = query;
   }
 
   /**
-   * Retrieves the {@link TaskManager} to which this task is bound.
+   * Retrieves the {@link TaskQuery} to which this task is bound.
    *
-   * @returns Associated {@link TaskManager}.
-   * @throws If the task is not bound to a {@link TaskManager}.
+   * The query originates from either a {@link TaskManager} or a {@link TaskGroup}.
+   *
+   * @returns Associated {@link TaskQuery}.
+   * @throws If the task is not bound to a {@link TaskQuery}.
    */
   public get query(): TaskQuery {
     if (!this._query) {
@@ -77,10 +86,10 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   }
 
   /**
-   * Executes the task, updating its status and handling the result or error.
+   * Executes the task.
    *
    * @returns Result of the task execution.
-   * @throws If the task is not in the "idle" state or if the execution fails.
+   * @throws If not in "idle" state or if execution fails.
    */
   public async execute(): Promise<Optional<TSpec["TResult"]>> {
     if (this.status !== "idle") {
@@ -102,7 +111,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   }
 
   /**
-   * Parses the task, providing a structured representation suitable for UI rendering.
+   * Parses the task for UI rendering.
    *
    * @returns Parsed representation of the task.
    */
@@ -118,18 +127,17 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   }
 
   /**
-   * Returns a string representation of the {@link Task} instance.
+   * String representation of the task.
    *
-   * @returns String representing the task.
-   */
-  public toString() {
+   * @returns Task as a string.
+   */ public toString() {
     return `Task {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
   }
 
   /**
-   * Creates a clone of the current task.
+   * Clones the task.
    *
-   * @returns New {@link Task} instance with the same configuration and data.
+   * @returns New task instance with the same configuration and data.
    */
   public clone() {
     return this.builder(this.data);

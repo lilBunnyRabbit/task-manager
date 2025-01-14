@@ -1,24 +1,28 @@
-import { Task } from "../task";
-import { TaskQuery } from "../task-query/task-query";
+import { Task, TaskQuery } from "../";
+import type { ExecutableTask } from "../../common";
+import { ExecutionMode } from "../../common";
 import { TaskManagerBase } from "./task-manager-base";
-import { ExecutableTask, TaskManagerFlag } from "./task-manager.type";
+import { TaskManagerFlag } from "./task-manager.type";
 
 /**
  * Manages task execution, including adding tasks to the queue, controlling task progress, and handling task lifecycle events.
+ *
  * Supports executing tasks sequentially or in parallel and provides methods to query, retrieve, and manage task results.
  *
- * @extends TaskManagerBase - Inherits core functionalities like status, progress, and event emission.
+ * @extends TaskManagerBase
  */
 export class TaskManager extends TaskManagerBase {
+  /**
+   * Query interface for accessing and managing tasks.
+   */
   public query = new TaskQuery(this.tasks);
 
   /**
    * Adds an array of tasks to the task queue.
    *
    * @param tasks - An array of tasks to add to the queue.
-   * @emits change
-   *
-   * @returns The instance of the manager.
+   * @emits change - When the task queue is updated.
+   * @returns The instance of the task manager.
    */
   public addTasks(tasks: ExecutableTask[]) {
     this.queue.push(
@@ -39,7 +43,7 @@ export class TaskManager extends TaskManagerBase {
   /**
    * Calculates the overall progress of the tasks.
    *
-   * @returns The calculated progress based on the task's execution status.
+   * @returns The calculated progress as a value between 0 and 1.
    */
   private calculateProgress() {
     const tasksProgress = this.tasks.reduce((progress, task) => progress + task.progress, 0);
@@ -47,13 +51,74 @@ export class TaskManager extends TaskManagerBase {
   }
 
   /**
+   * Starts the execution of tasks in the task manager.
+   *
+   * @param force - Force start even if in "fail" status.
+   * @emits fail - When a task fails and the `FAIL_ON_ERROR` flag is set.
+   * @emits success - When all tasks are successfully executed.
+   * @emits progress - When task progress is updated.
+   * @emits change - When the task manager state changes.
+   * @returns A promise that resolves when task execution starts.
+   */
+  public async start(force?: boolean) {
+    if (!this.queue.length) {
+      return console.warn("TaskManager empty queue.");
+    }
+
+    if (!this.isStatus("idle", "stopped") && !(force && this.isStatus("error"))) {
+      switch (this.status) {
+        case "error":
+          return console.warn("TaskManager failed.");
+        case "success":
+          return console.warn("TaskManager succeeded.");
+        default:
+          return console.warn("TaskManager is already in progress.");
+      }
+    }
+
+    if (this.hasFlag(TaskManagerFlag.STOP)) {
+      this.removeFlag(TaskManagerFlag.STOP);
+    }
+
+    this.setStatus("in-progress");
+
+    while (this.queue.length > 0) {
+      try {
+        switch (this.mode) {
+          case ExecutionMode.LINEAR: {
+            await this.executeLinear();
+            break;
+          }
+
+          case ExecutionMode.PARALLEL: {
+            await this.executeParallel();
+            break;
+          }
+
+          default:
+            throw new Error(`Invalid ExecutionMode mode "${this.mode}"`);
+        }
+      } catch (error: any) {
+        if (!this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
+          return this.setStatus("error").emit("fail", error);
+        }
+      }
+
+      if (this.hasFlag(TaskManagerFlag.STOP) && this.queue.length) {
+        return this.removeFlag(TaskManagerFlag.STOP).setStatus("stopped");
+      }
+    }
+
+    return this.setStatus("success").emit("success");
+  }
+
+  /**
    * Executes tasks in a linear sequence.
    *
    * @emits task - When a task is picked for execution.
-   * @emits change - When the task manager state changes (new task in progress).
+   * @emits change - When the task manager state changes.
    * @emits progress - When task progress is updated.
-   *
-   * @returns A promise that resolves when all tasks in the queue have been executed linearly.
+   * @returns A promise that resolves when all tasks in the queue are executed sequentially.
    */
   private async executeLinear() {
     const task = this.queue.shift();
@@ -74,14 +139,13 @@ export class TaskManager extends TaskManagerBase {
    * Executes tasks in parallel.
    *
    * @emits task - When a task is picked for execution.
-   * @emits change - When the task manager state changes (new task in progress).
+   * @emits change - When the task manager state changes.
    * @emits progress - When task progress is updated.
-   *
-   * @returns A promise that resolves when all tasks in the queue have been executed in parallel.
+   * @returns A promise that resolves when all tasks in the queue are executed concurrently.
    */
   private async executeParallel() {
     const queueTasks = [...this.queue];
-    this.clearQueue();
+    this.queue = [];
 
     this.tasks.push(...queueTasks);
 
@@ -101,71 +165,17 @@ export class TaskManager extends TaskManagerBase {
       });
     };
 
-    if (this.hasFlag(TaskManagerFlag.FAIL_ON_ERROR)) {
-      return await Promise.all(executeTasks());
+    if (this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
+      return await Promise.allSettled(executeTasks());
     }
 
-    return await Promise.allSettled(executeTasks());
-  }
-
-  /**
-   * Starts the execution of tasks in the task manager.
-   *
-   * @param force - Force start even if in "fail" status.
-   * @emits fail - When a task fails and the `FAIL_ON_ERROR` flag is set.
-   * @emits success - When all tasks are successfully executed.
-   * @emits progress - When task progress is updated.
-   * @emits change - When the task manager state changes.
-   *
-   * @returns A promise that resolves when task execution starts.
-   */
-  public async start(force?: boolean) {
-    if (!this.queue.length) {
-      return console.warn("TaskManager empty queue.");
-    }
-
-    if (!this.isStatus("idle", "stopped") && !(force && this.isStatus("fail"))) {
-      switch (this.status) {
-        case "fail":
-          return console.warn("TaskManager failed.");
-        case "success":
-          return console.warn("TaskManager succeeded.");
-        default:
-          return console.warn("TaskManager is already in progress.");
-      }
-    }
-
-    if (this.hasFlag(TaskManagerFlag.STOP)) {
-      this.removeFlag(TaskManagerFlag.STOP);
-    }
-
-    this.setStatus("in-progress");
-
-    while (this.queue.length > 0) {
-      try {
-        if (this.hasFlag(TaskManagerFlag.PARALLEL_EXECUTION)) {
-          await this.executeParallel();
-        } else {
-          await this.executeLinear();
-        }
-      } catch (error: any) {
-        if (this.hasFlag(TaskManagerFlag.FAIL_ON_ERROR)) {
-          return this.setStatus("fail").emit("fail", error);
-        }
-      }
-
-      if (this.hasFlag(TaskManagerFlag.STOP)) {
-        return this.removeFlag(TaskManagerFlag.STOP).setStatus("stopped");
-      }
-    }
-
-    return this.setStatus("success").emit("success");
+    return await Promise.all(executeTasks());
   }
 
   /**
    * Stops the execution of tasks in the task manager.
    *
-   * @emits change
+   * @emits change - When the task manager is stopped.
    */
   public stop() {
     if (!this.isStatus("in-progress")) {
@@ -177,8 +187,9 @@ export class TaskManager extends TaskManagerBase {
 
   /**
    * Resets the task manager to its initial state.
+   *
    * @emits change - When the task manager is reset.
-   * @emits progress - When the task manager progress is reset.
+   * @emits progress - When the task progress is reset.
    */
   public reset() {
     if (this.isStatus("in-progress")) {
@@ -203,14 +214,13 @@ export class TaskManager extends TaskManagerBase {
   /**
    * Clears the task queue.
    *
-   * @emits change
-   *
-   * @returns The instance of the manager.
+   * @emits change - When the queue is cleared.
+   * @returns The instance of the task manager.
    */
   public clearQueue(): this {
     this.queue = [];
 
-    this.emit("change");
+    this.setStatus("success").emit("change");
     return this;
   }
 }

@@ -1,6 +1,11 @@
 import type { EventMap } from "@lilbunnyrabbit/event-emitter";
 import type { Task } from "./task";
 
+/**
+ * Structure of a task specification.
+ * @template TData - Type of the task input data.
+ * @template TResult - Type of the task result data.
+ */
 export type TaskSpec<TData = any, TResult = any> = {
   TData: TData;
   TResult: TResult;
@@ -12,26 +17,30 @@ export type TaskSpec<TData = any, TResult = any> = {
 export type TaskStatus = "idle" | "in-progress" | "error" | "success";
 
 /**
- * Represents a parsed version of a {@link Task}, typically used for rendering in a UI.
+ * Parsed version of a {@link Task}, used for UI rendering.
  */
 export interface ParsedTask {
   /**
-   * {@link Task}'s current status as a string.
+   * Current status of the {@link Task}.
    */
   status: string;
   /**
-   * Optional string representing the {@link Task}'s result.
+   * Optional result of the {@link Task}.
    */
   result?: string;
 }
 
+/**
+ * Events emitted by a {@link Task}.
+ */
 export interface TaskEvents extends EventMap {
   /**
-   * Emits when anything about the task changes (status, progress, etc.).
+   * Emitted when task status or progress changes.
    */
   change: void;
   /**
-   * Emits when task progress is updated.
+   * Emitted when task progress updates.
+   * @type {number} - New progress value.
    */
   progress: number;
 }

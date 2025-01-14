@@ -1,15 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
-import { BuilderIs } from "../task-group/task-group-builder";
+import { BuilderIs } from "../../common";
 import { Task } from "./task";
 import { isTask } from "./task.helper";
 import type { ParsedTask, TaskSpec } from "./task.type";
 
 /**
- * Configuration interface for creating a {@link Task}.
+ * Configuration for creating a {@link Task}.
  *
- * @template TData - Input data type for the task.
- * @template TResult - Result type the task produces.
- * @template TError - Error type that may be encountered during execution.
+ * @template TSpec - Task specification type.
  */
 export interface TaskConfig<TSpec extends TaskSpec> {
   /**
@@ -17,11 +15,11 @@ export interface TaskConfig<TSpec extends TaskSpec> {
    */
   name: string;
   /**
-   * Function to parse the task's outcome into a {@link ParsedTask} object.
+   * Function to parse the task's outcome into a {@link ParsedTask}.
    */
   parse?: (this: Task<TSpec>) => ParsedTask;
   /**
-   * Core function to execute the task, returning a result or a promise.
+   * Function to execute the task, returning a result or a promise.
    */
   execute: (this: Task<TSpec>, data: TSpec["TData"]) => TSpec["TResult"] | Promise<TSpec["TResult"]>;
 }
@@ -29,16 +27,13 @@ export interface TaskConfig<TSpec extends TaskSpec> {
 /**
  * Interface for a function that builds {@link Task} instances.
  *
- * @template TData - Input data type for the task.
- * @template TResult - Result type the task produces.
- * @template TError - Error type that may be encountered during execution.
+ * @template TSpec - Task specification type.
  */
 export interface TaskBuilder<TSpec extends TaskSpec> extends BuilderIs<Task<TSpec>> {
   /**
-   * Function that builds {@link Task} instances.
+   * Builds a new {@link Task} instance.
    *
-   * @param data - Data to be passed to the task for execution.
-   *
+   * @param data - Input data for the task.
    * @returns A new {@link Task} instance.
    */
   (data: TSpec["TData"]): Task<TSpec>;
@@ -58,15 +53,10 @@ export interface TaskBuilder<TSpec extends TaskSpec> extends BuilderIs<Task<TSpe
  *
  * @template TData - Type of input data the task requires.
  * @template TResult - Type of result the task produces.
- * @template TError - Type of error the task may encounter.
  * @param config - Configuration object for creating the task.
- *
- * @returns A new task builder with the given configuration.
+ * @returns A new {@link TaskBuilder} instance with the given configuration.
  */
-export function createTask<TData = void, TResult = void>({
-  name,
-  ...config
-}: TaskConfig<TaskSpec<TData, TResult>>) {
+export function createTask<TData = void, TResult = void>({ name, ...config }: TaskConfig<TaskSpec<TData, TResult>>) {
   const builder: TaskBuilder<TaskSpec<TData, TResult>> = function (data) {
     return new Task<TaskSpec<TData, TResult>>(builder, name, config, data);
   };

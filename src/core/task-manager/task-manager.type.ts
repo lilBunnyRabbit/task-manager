@@ -1,18 +1,14 @@
 import type { EventMap } from "@lilbunnyrabbit/event-emitter";
-import type { TaskError } from "../../helpers/task-error";
-import type { Task, TaskSpec } from "../task";
+import type { ExecutableTask, TaskError } from "../../common";
 import type { TaskManager } from "./task-manager";
-import { TaskGroup } from "../task-group/task-group";
-
-export type ExecutableTask = Task<TaskSpec<any, any>> | TaskGroup<any[]>;
 
 /**
  * Possible statuses of a {@link TaskManager}.
  */
-export type TaskManagerStatus = "idle" | "in-progress" | "fail" | "success" | "stopped";
+export type TaskManagerStatus = "idle" | "in-progress" | "error" | "success" | "stopped";
 
 /**
- * Flags that control the behavior of the {@link TaskManager}.
+ * Flags that control the behavior of a {@link TaskManager}.
  */
 export enum TaskManagerFlag {
   /**
@@ -21,39 +17,45 @@ export enum TaskManagerFlag {
   STOP = "STOP",
 
   /**
-   * Stops execution if any task fails.
+   * Continues execution even if a task fails.
    */
-  FAIL_ON_ERROR = "FAIL_ON_ERROR",
-
-  /**
-   * Enables parallel execution of tasks.
-   */
-  PARALLEL_EXECUTION = "PARALLEL_EXECUTION",
+  CONTINUE_ON_ERROR = "CONTINUE_ON_ERROR",
 }
 
+/**
+ * Events emitted by a {@link TaskManager}.
+ */
 export interface TaskManagerEvents extends EventMap {
   /**
-   * Emits when any state (status, progress, or flags) of the manager changes.
+   * Emitted when any state (status, progress, or flags) of the manager changes.
    */
   change: void;
   /**
-   * Emits when task progress is updated.
+   * Emitted when task progress is updated.
+   *
+   * @type {number} - The new progress value.
    */
   progress: number;
   /**
-   * Emits when a new task is in progress.
+   * Emitted when a new task starts execution.
+   *
+   * @type {ExecutableTask} - The task currently in progress.
    */
   task: ExecutableTask;
   /**
-   * Emits when a task fails and `FAIL_ON_ERROR` flag is set.
+   * Emitted when a task fails and the `CONTINUE_ON_ERROR` flag is not set.
+   *
+   * @type {TaskError | Error} - The error that caused the failure.
    */
   fail: TaskError | Error;
   /**
-   * Emits when all tasks in the queue are executed successfully.
+   * Emitted when all tasks in the queue are executed successfully.
    */
   success: void;
   /**
-   * Emits when task throws.
+   * Emitted when a task or the task manager encounters an error.
+   *
+   * @type {TaskError | Error} - The error that occurred.
    */
   error: TaskError | Error;
 }

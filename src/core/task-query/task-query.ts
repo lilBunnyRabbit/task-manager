@@ -1,10 +1,24 @@
-import { isTask, Task, TaskBuilder, TaskSpec } from "../task";
-import { TaskGroup } from "../task-group/task-group";
-import { BuilderIs } from "../task-group/task-group-builder";
+import type { Task, TaskBuilder, TaskGroup, TaskSpec } from "../";
+import type { BuilderIs } from "../../common";
 
+/**
+ * Provides methods to query, retrieve, and manage tasks and their results from a collection.
+ */
 export class TaskQuery {
+  /**
+   * Initializes the query interface with a list of tasks or task groups.
+   *
+   * @param tasks - An array of {@link Task} or {@link TaskGroup} instances.
+   */
   constructor(readonly tasks: Array<Task | TaskGroup>) {}
 
+  /**
+   * Finds the first task that matches the provided builder.
+   *
+   * @template T - Type of the task.
+   * @param builder - Builder used to identify the task.
+   * @returns The matching task, or `undefined` if not found.
+   */
   public find<T>(builder: BuilderIs<T>) {
     for (let i = 0; i < this.tasks.length; i++) {
       const task: unknown = this.tasks[i];
@@ -14,6 +28,14 @@ export class TaskQuery {
     }
   }
 
+  /**
+   * Retrieves the first task that matches the provided builder.
+   *
+   * @template T - Type of the task.
+   * @param builder - Builder used to identify the task.
+   * @returns The matching task.
+   * @throws If the task is not found.
+   */
   public get<T>(builder: BuilderIs<T>) {
     const task = this.find(builder);
 
@@ -24,6 +46,13 @@ export class TaskQuery {
     return task;
   }
 
+  /**
+   * Finds the last task that matches the provided builder.
+   *
+   * @template T - Type of the task.
+   * @param builder - Builder used to identify the task.
+   * @returns The matching task, or `undefined` if not found.
+   */
   public findLast<T>(builder: BuilderIs<T>) {
     for (let i = this.tasks.length - 1; i >= 0; i--) {
       const task: unknown = this.tasks[i];
@@ -33,6 +62,14 @@ export class TaskQuery {
     }
   }
 
+  /**
+   * Retrieves the last task that matches the provided builder.
+   *
+   * @template T - Type of the task.
+   * @param builder - Builder used to identify the task.
+   * @returns The matching task.
+   * @throws If the task is not found.
+   */
   public getLast<T>(builder: BuilderIs<T>) {
     const task = this.findLast(builder);
 
@@ -43,11 +80,27 @@ export class TaskQuery {
     return task;
   }
 
+  /**
+   * Retrieves all tasks that match the provided builder.
+   *
+   * @template T - Type of the task.
+   * @param builder - Builder used to identify the tasks.
+   * @returns An array of matching tasks.
+   */
   public getAll<T>(builder: BuilderIs<T>) {
     return this.tasks.filter((task) => builder.is(task)) as T[];
   }
 
   // Task
+
+  /**
+   * Retrieves the result of the first task that matches the provided builder.
+   *
+   * @template TSpec - Specification of the task.
+   * @param taskBuilder - Builder used to identify the task.
+   * @returns The result of the task.
+   * @throws If the task is not found or its result is empty.
+   */
   public getResult<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     const task = this.get(taskBuilder);
 
@@ -58,6 +111,14 @@ export class TaskQuery {
     return task.result.get();
   }
 
+  /**
+   * Retrieves the result of the last task that matches the provided builder.
+   *
+   * @template TSpec - Specification of the task.
+   * @param taskBuilder - Builder used to identify the task.
+   * @returns The result of the task.
+   * @throws If the task is not found or its result is empty.
+   */
   public getLastResult<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
     const task = this.getLast(taskBuilder);
 
@@ -68,148 +129,15 @@ export class TaskQuery {
     return task.result.get();
   }
 
+  /**
+   * Retrieves the results of all tasks that match the provided builder.
+   *
+   * @template TSpec - Specification of the task.
+   * @param taskBuilder - Builder used to identify the tasks.
+   * @returns An array of results from the matching tasks.
+   * @throws If any task result is empty.
+   */
   public getResults<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>): NonNullable<TSpec["TResult"]>[] {
-    const results: NonNullable<TSpec["TResult"]>[] = [];
-
-    for (let i = 0; i < this.tasks.length; i++) {
-      const task: unknown = this.tasks[i];
-      if (taskBuilder.is(task)) {
-        if (task.result.isEmpty()) {
-          throw new Error(`${task} result is empty.`);
-        }
-
-        results.push(task.result.get());
-      }
-    }
-
-    return results;
-  }
-
-  // OLD
-
-  /**
-   * Finds a task in the list of tasks.
-   *
-   * @param taskBuilder - The builder of the task to find.
-   *
-   * @returns The found task or undefined.
-   */
-  public __findTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
-    for (let i = 0; i < this.tasks.length; i++) {
-      const task: unknown = this.tasks[i];
-      if (taskBuilder.is(task)) {
-        return task;
-      }
-    }
-  }
-
-  /**
-   * Retrieves a task from the list of tasks.
-   *
-   * @param taskBuilder - The builder of the task to retrieve.
-   *
-   * @returns The retrieved task.
-   * @throws If the task is not found.
-   */
-  public __getTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
-    const task = this.__findTask(taskBuilder);
-
-    if (!task) {
-      throw new Error(`Task by ${taskBuilder} not found.`);
-    }
-
-    return task;
-  }
-
-  /**
-   * Retrieves the result of a task.
-   *
-   * @param taskBuilder - The builder of the task whose result to retrieve.
-   *
-   * @returns The result of the task.
-   * @throws If the task is not found or if the result is empty.
-   */
-  public __getTaskResult<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
-    const task = this.get(taskBuilder);
-
-    if (task.result.isEmpty()) {
-      throw new Error(`${task} result is empty.`);
-    }
-
-    return task.result.get();
-  }
-
-  /**
-   * Finds the last task of a specific type in the list of tasks.
-   *
-   * @param taskBuilder - The builder of the task to find.
-   * @returns The found task or undefined.
-   */
-  public __findLastTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
-    for (let i = this.tasks.length - 1; i >= 0; i--) {
-      const task: unknown = this.tasks[i];
-      if (isTask(task, taskBuilder)) {
-        return task;
-      }
-    }
-  }
-
-  /**
-   * Retrieves the last task of a specific type from the list of tasks.
-   *
-   * @param taskBuilder - The builder of the task to retrieve.
-   *
-   * @returns The retrieved task.
-   * @throws If the task is not found.
-   */
-  public __getLastTask<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
-    const task = this.__findLastTask(taskBuilder);
-
-    if (!task) {
-      throw new Error(`Task by ${taskBuilder} not found.`);
-    }
-
-    return task;
-  }
-
-  /**
-   * Retrieves the result of the last task of a specific type.
-   *
-   * @param taskBuilder - The builder of the task whose result to retrieve.
-   *
-   * @returns The result of the task.
-   * @throws If the task is not found or if the result is empty.
-   */
-  public __getLastTaskResult<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
-    const task = this.getLast(taskBuilder);
-
-    if (task.result.isEmpty()) {
-      throw new Error(`${task} result is empty.`);
-    }
-
-    return task.result.get();
-  }
-
-  /**
-   * Finds all tasks of a specific type in the list of tasks.
-   *
-   * @param taskBuilder - The builder of the task type to find.
-   *
-   * @returns Array of found tasks.
-   */
-  public __findTasks<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>) {
-    return this.tasks.filter((task) => isTask(task, taskBuilder)) as Task<TSpec>[];
-  }
-
-  /**
-   * Retrieves the results of all tasks of a specific type.
-   *
-   * @param taskBuilder - The builder of the task type whose results to retrieve.
-   *
-   * @returns Array of results.
-   * @throws If any of the task results is empty.
-   */
-  public __getTasksResults<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>): NonNullable<TSpec["TResult"]>[] {
     const results: NonNullable<TSpec["TResult"]>[] = [];
 
     for (let i = 0; i < this.tasks.length; i++) {
