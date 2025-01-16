@@ -1,26 +1,28 @@
-import { TaskManager } from "@package/index";
+import { TaskManager } from "@lilbunnyrabbit/task-manager";
 
 import calculationExample from "./calculation-example";
 import calculationExampleRaw from "./calculation-example?raw";
+import groupParallelExample from "./group-parallel-example";
+import groupParallelExampleFail from "./group-parallel-example-fail";
+import groupParallelExampleFailRaw from "./group-parallel-example-fail?raw";
+import groupParallelExampleRaw from "./group-parallel-example?raw";
 import prallelExample from "./prallel-example";
-import prallelExampleRaw from "./prallel-example?raw";
 import prallelExampleFail from "./prallel-example-fail";
 import prallelExampleFailRaw from "./prallel-example-fail?raw";
-import groupParallelExample from "./group-parallel-example";
-import groupParallelExampleRaw from "./group-parallel-example?raw";
+import prallelExampleRaw from "./prallel-example?raw";
 
 export interface TaskManagerExampleCreate {
   title: string;
   description: string;
   create: () => TaskManager;
-  raw: string;
+  source: string;
 }
 
 export interface TaskManagerExample {
   title: string;
   description: string;
   taskManager: TaskManager;
-  raw: string;
+  source: string;
 }
 
 export const examples: TaskManagerExampleCreate[] = [
@@ -28,24 +30,30 @@ export const examples: TaskManagerExampleCreate[] = [
     title: "Calculation Example",
     description: "",
     create: calculationExample,
-    raw: calculationExampleRaw,
+    source: calculationExampleRaw,
   },
   {
     title: "Parallel Example",
     description: "",
     create: prallelExample,
-    raw: prallelExampleRaw,
+    source: prallelExampleRaw,
   },
   {
     title: "Parallel Example (Fail)",
     description: "",
     create: prallelExampleFail,
-    raw: prallelExampleFailRaw,
+    source: prallelExampleFailRaw,
   },
   {
     title: "Group Parallel Example",
     description: "",
     create: groupParallelExample,
-    raw: groupParallelExampleRaw,
+    source: groupParallelExampleRaw,
+  },
+  {
+    title: "Group Parallel Example (Fail)",
+    description: "",
+    create: groupParallelExampleFail,
+    source: groupParallelExampleFailRaw,
   },
 ];

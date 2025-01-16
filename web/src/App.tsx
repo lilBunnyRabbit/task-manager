@@ -1,7 +1,8 @@
 import React from "react";
 import { Button } from "./components/ui/button";
 import { examples, TaskManagerExample } from "./examples";
-import { TaskManagerRender } from "./lib/task-manager-render";
+import { Manager } from "./lib/manager";
+import { ChevronRightIcon } from "lucide-react";
 
 function App() {
   const [example, setExample] = React.useState<TaskManagerExample>({
@@ -15,14 +16,14 @@ function App() {
 
   return (
     <>
-      <div className="fixed top-0 left-0 bottom-0 w-[300px] border-r bg-foreground p-4 text-background flex flex-col gap-y-1">
-        <h3 className="mb-4 border-b border-b-background">Examples</h3>
+      <div className="fixed top-0 left-0 bottom-0 w-[300px] border-r border-foreground bg-foreground p-4 text-background flex flex-col gap-y-1">
+        <h4 className="mb-4 border-b border-b-background px-4 pb-2">Examples</h4>
 
-        {examples.map((example) => {
+        {examples.map((example, i) => {
           return (
             <Button
-              variant="ghost"
-              className="justify-start"
+              key={`example-${i}`}
+              variant="nav"
               onClick={() =>
                 setExample({
                   ...example,
@@ -30,13 +31,14 @@ function App() {
                 })
               }
             >
-              {example.title}
+              <div className="truncate">{example.title}</div>
+              <ChevronRightIcon />
             </Button>
           );
         })}
       </div>
 
-      <TaskManagerRender className="min-h-dvh ml-[299px]" example={example} />
+      <Manager key={`example-${example.title}`} className="min-h-dvh ml-[299px]" example={example} />
     </>
   );
 }

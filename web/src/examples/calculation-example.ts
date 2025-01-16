@@ -1,4 +1,4 @@
-import { createTask, createTaskGroup, TaskManager } from "@package/index";
+import { createTask, createTaskGroup, TaskManager } from "@lilbunnyrabbit/task-manager";
 import { sleep } from "../utils/dummy.util";
 
 const createNumberTask = createTask<Record<"min" | "max", number>, number>({
@@ -55,6 +55,8 @@ const createNumberTask = createTask<Record<"min" | "max", number>, number>({
 
 const createNumbersGroup = createTaskGroup({
   name: "Create Random Numbers",
+
+  mode: "parallel",
 
   create(min: number, max: number) {
     const minCeiled = Math.ceil(min);

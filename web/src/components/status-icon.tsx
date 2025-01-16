@@ -1,5 +1,5 @@
 import { cn } from "@/utils/ui.util";
-import { TaskGroupStatus, TaskManagerStatus, TaskStatus } from "@package/index";
+import { TaskGroupStatus, TaskManagerStatus, TaskStatus } from "@lilbunnyrabbit/task-manager";
 import { AlertCircleIcon, CheckCircleIcon, ClockIcon, LoaderIcon, PauseIcon } from "lucide-react";
 import React from "react";
 

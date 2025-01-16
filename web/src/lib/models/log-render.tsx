@@ -1,6 +1,6 @@
-import { LogEntry } from "@package/index";
+import { LogEntry } from "@lilbunnyrabbit/task-manager";
 import React from "react";
-import { cn } from "../utils/ui.util";
+import { cn } from "../../utils/ui.util";
 
 interface LogRenderProps {
   log: LogEntry;

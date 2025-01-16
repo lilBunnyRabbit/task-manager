@@ -24,7 +24,7 @@
 
     "baseUrl": ".",
     "paths": {
-      "@package/*": ["../src/*"],
+      "@lilbunnyrabbit/task-manager": ["../src/index.ts"],
       "@/*": ["./src/*"]
     }
   },

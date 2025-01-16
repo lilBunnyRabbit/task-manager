@@ -1,4 +1,4 @@
-import { createTask, createTaskGroup, ExecutionMode, TaskGroupFlag, TaskManager } from "@package/index";
+import { createTask, createTaskGroup, ExecutionMode, TaskGroupFlag, TaskManager } from "@lilbunnyrabbit/task-manager";
 import { randomInt, sleep } from "../utils/dummy.util";
 
 const getUserTask = createTask<{ id: number }, { id: number; username: string; email: string }>({

@@ -1,4 +1,4 @@
-import { ExecutableTask, Task } from "@package/index";
+import { ExecutableTask, Task } from "@lilbunnyrabbit/task-manager";
 import { TaskGroupRender } from "./task-group-render";
 import { TaskRender } from "./task-render";
 

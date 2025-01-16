@@ -9,16 +9,19 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "hover:bg-foreground/10 data-[active=true]:bg-foreground/10",
+        default: "border-foreground bg-foreground text-background hover:bg-foreground/10 hover:text-foreground",
+        action: "active:translate-y-px border",
         destructive:
           "bg-red-500 text-neutral-50 shadow-sm hover:bg-red-500/90 dark:bg-red-900 dark:text-neutral-50 dark:hover:bg-red-900/90",
         outline:
           "border border-neutral-200 bg-white shadow-sm hover:bg-neutral-100 hover:text-neutral-900 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50",
         secondary:
           "bg-neutral-100 text-neutral-900 shadow-sm hover:bg-neutral-100/80 dark:bg-neutral-800 dark:text-neutral-50 dark:hover:bg-neutral-800/80",
-        ghost: "hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-50",
+        ghost: "hover:bg-foreground/10 hover:foreground active:translate-y-px",
+        nav: "justify-between hover:bg-background hover:text-foreground gap-4",
         link: "text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-50",
-        chevron: "",
+        chevron: "hover:bg-primary/10 data-[active=true]:bg-primary/10 border border-transparent data-[active=true]:border-primary/50",
+        transparent: "",
       },
       size: {
         default: "h-9 px-4 py-2",

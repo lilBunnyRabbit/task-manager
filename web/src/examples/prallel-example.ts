@@ -1,4 +1,4 @@
-import { createTask, ExecutionMode, TaskManager, TaskManagerFlag } from "@package/index";
+import { createTask, ExecutionMode, TaskManager, TaskManagerFlag } from "@lilbunnyrabbit/task-manager";
 import { randomInt, sleep } from "../utils/dummy.util";
 
 const getUserTask = createTask<{ id: number }, { id: number; username: string; email: string }>({
@@ -52,6 +52,29 @@ const getUserTask = createTask<{ id: number }, { id: number; username: string; e
   },
 });
 
+const infoTask = createTask<void, string>({
+  name: "Info",
+
+  async execute() {
+    this.logger.info("Waiting for 2600ms...");
+    await sleep(2600);
+
+    const tasks = this.query.getAll(getUserTask);
+
+    const results: string[] = [];
+
+    for (const task of tasks) {
+      if (task.result.isPresent()) {
+        results.push(`User #${task.id}: ${JSON.stringify(task.result.get())}`);
+      } else {
+        results.push(`User #${task.id}: No result...`);
+      }
+    }
+
+    return results.join("\n");
+  },
+});
+
 export default function () {
   const manager = new TaskManager();
 
@@ -60,6 +83,7 @@ export default function () {
       .fill(0)
       .map((_, i) => getUserTask({ id: i }))
   );
+  manager.addTasks([infoTask()]);
 
   manager.setMode(ExecutionMode.PARALLEL);
   manager.addFlag(TaskManagerFlag.CONTINUE_ON_ERROR);

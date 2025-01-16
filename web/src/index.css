@@ -80,7 +80,7 @@ body {
 }
 
 :root {
-  font-family: Consolas;
+  font-family: theme("fontFamily.mono");
   line-height: 1.5;
   font-weight: 400;
 
@@ -92,4 +92,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  scrollbar-color: theme("colors.background") theme("colors.foreground");
 }

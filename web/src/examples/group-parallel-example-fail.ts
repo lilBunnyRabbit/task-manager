@@ -1,4 +1,4 @@
-import { createTask, ExecutionMode, TaskManager } from "@lilbunnyrabbit/task-manager";
+import { createTask, createTaskGroup, ExecutionMode, TaskManager } from "@lilbunnyrabbit/task-manager";
 import { randomInt, sleep } from "../utils/dummy.util";
 
 const getUserTask = createTask<{ id: number }, { id: number; username: string; email: string }>({
@@ -52,16 +52,42 @@ const getUserTask = createTask<{ id: number }, { id: number; username: string; e
   },
 });
 
+const getUsersGroup = createTaskGroup({
+  name: "Get Users",
+
+  mode: ExecutionMode.PARALLEL,
+
+  create(count: number) {
+    return Array(count)
+      .fill(0)
+      .map((_, i) => getUserTask({ id: i }));
+  },
+});
+
+const infoTask = createTask<void, string>({
+  name: "Info",
+
+  execute() {
+    const tasks = this.query.get(getUsersGroup).query.getAll(getUserTask);
+
+    const results: string[] = [];
+
+    for (const task of tasks) {
+      if (task.result.isPresent()) {
+        results.push(`User #${task.id}: ${JSON.stringify(task.result.get())}`);
+      } else {
+        results.push(`User #${task.id}: No result...`);
+      }
+    }
+
+    return results.join("\n");
+  },
+});
+
 export default function () {
   const manager = new TaskManager();
 
-  manager.addTasks(
-    Array(10)
-      .fill(0)
-      .map((_, i) => getUserTask({ id: i }))
-  );
-
-  manager.setMode(ExecutionMode.PARALLEL);
+  manager.addTasks([getUsersGroup(10), infoTask()]);
 
   return manager;
 }

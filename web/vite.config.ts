@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@package": path.resolve(__dirname, "../src"),
+      "@lilbunnyrabbit/task-manager": path.resolve(__dirname, "../src/index.ts"),
       "@": path.resolve(__dirname, "./src"),
     },
   },
