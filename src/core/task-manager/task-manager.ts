@@ -46,7 +46,14 @@ export class TaskManager extends TaskManagerBase {
    * @returns The calculated progress as a value between 0 and 1.
    */
   private calculateProgress() {
-    const tasksProgress = this.tasks.reduce((progress, task) => progress + task.progress, 0);
+    const tasksProgress = this.tasks.reduce((progress, task) => {
+      if (task.isStatus("error") && this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
+        return progress + 1;
+      }
+
+      return progress + task.progress;
+    }, 0);
+
     return tasksProgress / (this.queue.length + this.tasks.length);
   }
 
@@ -109,7 +116,7 @@ export class TaskManager extends TaskManagerBase {
       }
     }
 
-    return this.setStatus("success").emit("success");
+    return this.setProgress(1).setStatus("success").emit("success");
   }
 
   /**
@@ -207,7 +214,6 @@ export class TaskManager extends TaskManagerBase {
     this.status = "idle";
     this.progress = 0;
 
-    this.emit("progress", this.progress);
     this.addTasks(tmp.map((task) => task.clone()));
   }
 
@@ -220,6 +226,7 @@ export class TaskManager extends TaskManagerBase {
   public clearQueue(): this {
     this.queue = [];
 
+    this.setProgress(this.calculateProgress());
     this.setStatus("success").emit("change");
     return this;
   }

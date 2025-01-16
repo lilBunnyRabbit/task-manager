@@ -55,7 +55,13 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * @returns Overall progress as a number between 0 and 1.
    */
   private calculateProgress() {
-    const tasksProgress = this.tasks.reduce((progress, task) => progress + task.progress, 0);
+    const tasksProgress = this.tasks.reduce((progress, task) => {
+      if (task.isStatus("error") && this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
+        return progress + 1;
+      }
+
+      return progress + task.progress;
+    }, 0);
     return tasksProgress / (this.queue.length + this.tasks.length);
   }
 

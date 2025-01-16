@@ -48,6 +48,16 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
     return this;
   }
 
+  /**
+   * Checks if the current status matches any of the provided statuses.
+   *
+   * @param statuses - Array of statuses to check against.
+   * @returns `true` if the current status matches any provided status.
+   */
+  public isStatus(...statuses: Array<typeof this._status>) {
+    return statuses.includes(this.status);
+  }
+
   // Progress
 
   /**
