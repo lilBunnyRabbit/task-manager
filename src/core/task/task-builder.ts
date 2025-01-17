@@ -46,6 +46,7 @@ export interface TaskBuilder<TSpec extends TaskSpec> extends BuilderIs<Task<TSpe
    * Name of the task.
    */
   taskName: string;
+  toString(pretty?: boolean): string;
 }
 
 /**
@@ -63,8 +64,12 @@ export function createTask<TData = void, TResult = void>({ name, ...config }: Ta
 
   builder.id = uuidv4();
   builder.taskName = name;
-  builder.toString = function () {
-    return `TaskBuilder {\n\tname: ${JSON.stringify(this.taskName)},\n\tid: "${this.id}"\n}`;
+  builder.toString = function (pretty?: boolean) {
+    if (pretty === true) {
+      return `TaskBuilder {\n\tname: ${JSON.stringify(this.taskName)},\n\tid: "${this.id}"\n}`;
+    }
+
+    return `TaskBuilder { name: ${JSON.stringify(this.taskName)}, id: "${this.id}" }`;
   };
   builder.is = (task: unknown) => isTask(task, builder);
 

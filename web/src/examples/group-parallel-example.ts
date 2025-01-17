@@ -88,7 +88,7 @@ const infoTask = createTask<void, string>({
 export default function () {
   const manager = new TaskManager();
 
-  manager.addTasks([getUsersGroup(10), infoTask()]);
+  manager.addTasks(getUsersGroup(10), infoTask());
 
   return manager;
 }

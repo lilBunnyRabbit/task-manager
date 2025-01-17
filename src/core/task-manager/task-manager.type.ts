@@ -1,5 +1,5 @@
-import type { EventMap } from "@lilbunnyrabbit/event-emitter";
-import type { ExecutableTask, TaskError } from "../../common";
+import type { ExecutableTask, TasksError } from "../../common";
+import { FlowControllerEvents, FlowState } from "../flow-controller";
 import type { TaskManager } from "./task-manager";
 
 /**
@@ -26,7 +26,7 @@ export type TaskManagerFlag = (typeof TaskManagerFlag)[keyof typeof TaskManagerF
 /**
  * Events emitted by a {@link TaskManager}.
  */
-export interface TaskManagerEvents extends EventMap {
+export type TaskManagerEvents = {
   /**
    * Emitted when any state (status, progress, or flags) of the manager changes.
    */
@@ -46,9 +46,9 @@ export interface TaskManagerEvents extends EventMap {
   /**
    * Emitted when a task fails and the `CONTINUE_ON_ERROR` flag is not set.
    *
-   * @type {TaskError | Error} - The error that caused the failure.
+   * @type {TasksError | Error} - The error that caused the failure.
    */
-  fail: TaskError | Error;
+  fail: TasksError | Error;
   /**
    * Emitted when all tasks in the queue are executed successfully.
    */
@@ -56,7 +56,9 @@ export interface TaskManagerEvents extends EventMap {
   /**
    * Emitted when a task or the task manager encounters an error.
    *
-   * @type {TaskError | Error} - The error that occurred.
+   * @type {TasksError | Error} - The error that occurred.
    */
-  error: TaskError | Error;
-}
+  error: TasksError | Error;
+
+  transition: { from?: FlowState; to?: FlowState; task: ExecutableTask };
+};

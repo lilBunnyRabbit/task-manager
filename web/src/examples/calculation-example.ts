@@ -176,13 +176,13 @@ ${groups
 export default function () {
   const manager = new TaskManager();
 
-  manager.addTasks([
+  manager.addTasks(
     helloTask(),
     calculationGruoup(1, 9),
     calculationGruoup(1, 9),
     calculationGruoup(1, 9),
-    summaryTask(),
-  ]);
+    summaryTask()
+  );
 
   return manager;
 }

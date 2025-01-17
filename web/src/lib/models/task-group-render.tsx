@@ -58,20 +58,18 @@ export const TaskGroupRender: React.FC<TaskGroupRenderProps> = ({ taskGroup }) =
 
       <LabelSection label="Objects">
         <div className="grid grid-cols-[repeat(2,minmax(0px,500px))] gap-x-4">
-          <pre className="overflow-x-auto border border-foreground rounded-md bg-foreground/20 p-4 text-sm">
-            {taskGroup.toString()}
-          </pre>
+          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+            <pre className="overflow-x-auto p-4 text-sm h-full">{taskGroup.toString(true)}</pre>
+          </div>
 
-          <pre className="overflow-x-auto border border-foreground rounded-md  bg-foreground/20 p-4 text-sm">
-            {taskGroup.builder.toString()}
-          </pre>
+          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+            <pre className="overflow-x-auto p-4 text-sm h-full">{taskGroup.builder.toString(true)}</pre>
+          </div>
         </div>
       </LabelSection>
 
       <LabelSection label={<LiveText>Events</LiveText>}>
-        <div className="overflow-x-auto border border-foreground rounded-md bg-foreground/10 text-sm">
-          <EventsRender events={events} />
-        </div>
+        <EventsRender events={events} />
       </LabelSection>
     </div>
   );

@@ -57,9 +57,7 @@ export const TaskManagerRender: React.FC<TaskManagerRenderProps> = ({ taskManage
       </LabelSection>
 
       <LabelSection label={<LiveText>Events</LiveText>}>
-        <div className="overflow-x-auto border border-foreground rounded-md bg-foreground/10 text-sm">
-          <EventsRender events={events} />
-        </div>
+        <EventsRender events={events} />
       </LabelSection>
     </div>
   );

@@ -1,4 +1,3 @@
-import type { EventMap } from "@lilbunnyrabbit/event-emitter";
 import type { Task } from "./task";
 
 /**
@@ -33,7 +32,7 @@ export interface ParsedTask {
 /**
  * Events emitted by a {@link Task}.
  */
-export interface TaskEvents extends EventMap {
+export type TaskEvents = {
   /**
    * Emitted when task status or progress changes.
    */
@@ -43,4 +42,4 @@ export interface TaskEvents extends EventMap {
    * @type {number} - New progress value.
    */
   progress: number;
-}
+};

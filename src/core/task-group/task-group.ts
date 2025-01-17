@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
-import { Task, TaskQuery } from "../";
+import { Task } from "../";
 import type { ExecutableTask } from "../../common";
-import { ExecutionMode } from "../../common";
+import { ExecutionMode, TaskError, TasksError } from "../../common";
 import { TaskGroupBase } from "./task-group-base";
 import { TaskGroupBuilder } from "./task-group-builder";
 import { TaskGroupFlag } from "./task-group.type";
@@ -19,11 +19,6 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   readonly id!: string;
 
   /**
-   * Query interface for accessing tasks in the group.
-   */
-  public query = new TaskQuery(this.tasks);
-
-  /**
    * Creates a new {@link TaskGroup}.
    *
    * @param builder - Builder for creating the task group.
@@ -37,16 +32,26 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
     private args: TArgs,
     readonly name: string,
     readonly mode: ExecutionMode = ExecutionMode.LINEAR,
-    protected _queue: ExecutableTask[]
+    tasks: ExecutableTask[]
   ) {
     super();
 
     this.id = uuidv4();
-    _queue.forEach((task) => {
-      if (task instanceof Task) {
-        task.bind(this.query);
-      }
+
+    this.flowController.on("transition", (transition) => {
+      this.emit("transition", transition);
+      this.calculateProgress();
     });
+
+    this.flowController.addTasks(
+      ...tasks.map((task) => {
+        if (task instanceof Task) {
+          task.bind(this.query);
+        }
+
+        return task;
+      })
+    );
   }
 
   /**
@@ -55,14 +60,27 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * @returns Overall progress as a number between 0 and 1.
    */
   private calculateProgress() {
-    const tasksProgress = this.tasks.reduce((progress, task) => {
-      if (task.isStatus("error") && this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
-        return progress + 1;
-      }
+    let progressSum = 0;
 
-      return progress + task.progress;
-    }, 0);
-    return tasksProgress / (this.queue.length + this.tasks.length);
+    const activeTasks = this.flowController.active.values();
+    for (const task of activeTasks) {
+      if (task.isStatus("error") && this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
+        progressSum += 1;
+      } else {
+        progressSum += task.progress;
+      }
+    }
+
+    const completedTasks = this.flowController.completed.values();
+    for (const task of completedTasks) {
+      if (task.isStatus("error") && this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
+        progressSum += 1;
+      } else {
+        progressSum += task.progress;
+      }
+    }
+
+    return progressSum / this.flowController.tasks.length;
   }
 
   /**
@@ -111,19 +129,37 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * @returns A promise that resolves when all tasks are executed linearly.
    */
   private async executeLinear() {
-    while (this.queue.length > 0) {
-      const task = this.queue.shift();
+    while (this.flowController.hasPending) {
+      const task = this.flowController.startNext();
       if (!task) return;
 
-      this.tasks.push(task);
+      this.emit("task", task);
 
-      this.emit("task", task).emit("change");
-
-      task.on("progress", () => {
+      const onProgress = () => {
         this.setProgress(this.calculateProgress());
-      });
+      };
 
-      await task.execute();
+      // Workaround
+      if (task instanceof Task) {
+        task.on("progress", onProgress);
+      } else {
+        task.on("progress", onProgress);
+      }
+
+      try {
+        await task.execute();
+      } catch (error) {
+        throw new TaskError(task, error);
+      } finally {
+        // Workaround
+        if (task instanceof Task) {
+          task.off("progress", onProgress);
+        } else {
+          task.off("progress", onProgress);
+        }
+
+        this.flowController.complete(task.id);
+      }
     }
   }
 
@@ -136,31 +172,64 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * @returns A promise that resolves when all tasks are executed in parallel.
    */
   private async executeParallel() {
-    const queueTasks = [...this.queue];
-    this.queue = [];
-    this.tasks.push(...queueTasks);
+    const executeTask = async (task: ExecutableTask) => {
+      this.emit("task", task).emit("change");
 
-    const executeTasks = () => {
-      return queueTasks.map(async (task) => {
-        this.emit("task", task).emit("change");
+      const onProgress = () => {
+        this.setProgress(this.calculateProgress());
+      };
 
-        task.on("progress", () => {
-          this.setProgress(this.calculateProgress());
-        });
+      // Workaround
+      if (task instanceof Task) {
+        task.on("progress", onProgress);
+      } else {
+        task.on("progress", onProgress);
+      }
 
-        try {
-          await task.execute();
-        } catch (error: any) {
-          throw { task, error };
+      try {
+        await task.execute();
+      } catch (error: any) {
+        throw new TaskError(task, error);
+      } finally {
+        // Workaround
+        if (task instanceof Task) {
+          task.off("progress", onProgress);
+        } else {
+          task.off("progress", onProgress);
         }
-      });
+      }
     };
 
-    if (this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
-      return await Promise.allSettled(executeTasks());
-    }
+    const executionPromises: Promise<void>[] = [];
+    const completeAll = this.flowController.startAll((task) => {
+      executionPromises.push(executeTask(task));
+    });
 
-    return await Promise.all(executeTasks());
+    try {
+      const results = await Promise.allSettled(executionPromises);
+
+      if (this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
+        return;
+      }
+
+      const errors: Error[] = [];
+      for (const result of results) {
+        if (result.status === "rejected") {
+          errors.push(result.reason);
+          if ("toString" in result.reason) {
+            console.log(result.reason.toString());
+          }
+        }
+      }
+
+      if (errors.length) {
+        throw new TasksError(errors);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      completeAll();
+    }
   }
 
   /**
@@ -168,8 +237,12 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    *
    * @returns A string representing the task group.
    */
-  public toString() {
-    return `TaskGroup {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
+  public toString(pretty?: boolean) {
+    if (pretty === true) {
+      return `TaskGroup {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
+    }
+
+    return `TaskGroup { name: ${JSON.stringify(this.name)}, id: "${this.id}" }`;
   }
 
   /**

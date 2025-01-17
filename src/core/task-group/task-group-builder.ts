@@ -49,6 +49,7 @@ export interface TaskGroupBuilder<TArgs extends unknown[] = []> extends BuilderI
    * Name of the task group.
    */
   taskGroupName: string;
+  toString(pretty?: boolean): string;
 }
 
 /**
@@ -69,8 +70,12 @@ export function createTaskGroup<TArgs extends unknown[] = []>({ name, ...config 
 
   builder.id = uuidv4();
   builder.taskGroupName = name;
-  builder.toString = function () {
-    return `TaskGroupBuilder {\n\tname: ${JSON.stringify(this.taskGroupName)},\n\tid: "${this.id}"\n}`;
+  builder.toString = function (pretty?: boolean) {
+    if (pretty === true) {
+      return `TaskGroupBuilder {\n\tname: ${JSON.stringify(this.taskGroupName)},\n\tid: "${this.id}"\n}`;
+    }
+
+    return `TaskGroupBuilder { name: ${JSON.stringify(this.taskGroupName)}, id: "${this.id}" }`;
   };
   builder.is = (taskGroup: unknown) => isTaskGroup(taskGroup, builder);
 

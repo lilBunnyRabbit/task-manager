@@ -1,6 +1,6 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
-import type { Task } from "../";
-import type { ExecutableTask } from "../../common";
+import { TaskQuery } from "../";
+import { FlowController } from "../flow-controller";
 import type { TaskGroupEvents, TaskGroupStatus } from "./task-group.type";
 import { TaskGroupFlag } from "./task-group.type";
 
@@ -9,7 +9,7 @@ import { TaskGroupFlag } from "./task-group.type";
  *
  * Emits events related to task lifecycle and status changes.
  *
- * @extends EventEmitter
+ * @extends EventEmitter<TaskGroupEvents>
  */
 export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   // Status
@@ -198,49 +198,17 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
     return flags.every((flag) => this.hasFlag(flag));
   }
 
-  // Queue
-
   /**
-   * Current queue of {@link Task Tasks}.
+   * TODO: Update docs
    */
-  protected abstract _queue: ExecutableTask[];
+  protected flowController: FlowController = new FlowController();
 
-  /**
-   * Gets the current queue of {@link Task Tasks}.
-   */
-  public get queue() {
-    return this._queue;
-  }
-
-  /**
-   * Updates the task queue.
-   *
-   * @param queue - New task queue to set.
-   */
-  protected set queue(queue: typeof this._queue) {
-    this._queue = queue;
-  }
-
-  // Tasks
-
-  /**
-   * List of executed {@link Task Tasks}.
-   */
-  protected _tasks: ExecutableTask[] = [];
-
-  /**
-   * Gets the current list of executed {@link Task Tasks}.
-   */
   public get tasks() {
-    return this._tasks;
+    return this.flowController.tasks;
   }
 
   /**
-   * Sets the list of executed tasks.
-   *
-   * @param tasks - List of tasks to set.
+   * Query interface for accessing and managing tasks.
    */
-  protected set tasks(tasks: typeof this._tasks) {
-    this._tasks = tasks;
-  }
+  public query: TaskQuery = new TaskQuery(this.flowController);
 }

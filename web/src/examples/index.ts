@@ -10,6 +10,8 @@ import prallelExample from "./prallel-example";
 import prallelExampleFail from "./prallel-example-fail";
 import prallelExampleFailRaw from "./prallel-example-fail?raw";
 import prallelExampleRaw from "./prallel-example?raw";
+import filesUploadExample from "./files-upload-example";
+import filesUploadExampleRaw from "./files-upload-example?raw";
 
 export interface TaskManagerExampleCreate {
   title: string;
@@ -55,5 +57,11 @@ export const examples: TaskManagerExampleCreate[] = [
     description: "",
     create: groupParallelExampleFail,
     source: groupParallelExampleFailRaw,
+  },
+  {
+    title: "Files Upload Example",
+    description: "",
+    create: filesUploadExample,
+    source: filesUploadExampleRaw,
   },
 ];

@@ -124,9 +124,9 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   protected set result(result: typeof this._result) {
     this._result = result;
     this._status = "success";
-    this._progress = 1;
+    this.progress = 1;
 
-    this.emit("progress", this.progress).emit("change");
+    this.emit("change");
   }
 
   /**

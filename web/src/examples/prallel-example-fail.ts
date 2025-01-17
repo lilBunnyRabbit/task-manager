@@ -56,7 +56,7 @@ export default function () {
   const manager = new TaskManager();
 
   manager.addTasks(
-    Array(10)
+    ...Array(10)
       .fill(0)
       .map((_, i) => getUserTask({ id: i }))
   );

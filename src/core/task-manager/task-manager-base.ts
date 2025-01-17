@@ -1,6 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
-import type { ExecutableTask } from "../../common";
 import { ExecutionMode } from "../../common";
+import { FlowController } from "../flow-controller";
+import { TaskQuery } from "../task-query";
 import type { TaskManagerEvents, TaskManagerStatus } from "./task-manager.type";
 import { TaskManagerFlag } from "./task-manager.type";
 
@@ -9,7 +10,7 @@ import { TaskManagerFlag } from "./task-manager.type";
  *
  * Emits events related to task lifecycle and status changes.
  *
- * @extends EventEmitter
+ * @extends EventEmitter<TaskManagerEvents>
  */
 export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   // Status
@@ -198,51 +199,19 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
     return flags.every((flag) => this.hasFlag(flag));
   }
 
-  // Queue
-
   /**
-   * Current queue of executable tasks.
+   * TODO: Update docs
    */
-  protected _queue: ExecutableTask[] = [];
+  protected flowController: FlowController = new FlowController();
 
-  /**
-   * Gets the current queue of executable tasks.
-   */
-  public get queue() {
-    return this._queue;
-  }
-
-  /**
-   * Updates the task queue.
-   *
-   * @param queue - New task queue to set.
-   */
-  protected set queue(queue: typeof this._queue) {
-    this._queue = queue;
-  }
-
-  // Tasks
-
-  /**
-   * List of executed tasks.
-   */
-  protected _tasks: ExecutableTask[] = [];
-
-  /**
-   * Gets the current list of executed tasks.
-   */
   public get tasks() {
-    return this._tasks;
+    return this.flowController.tasks;
   }
 
   /**
-   * Sets the list of executed tasks.
-   *
-   * @param tasks - List of tasks to set.
+   * Query interface for accessing and managing tasks.
    */
-  protected set tasks(tasks: typeof this._tasks) {
-    this._tasks = tasks;
-  }
+  public query: TaskQuery = new TaskQuery(this.flowController);
 
   // Execution Mode
 

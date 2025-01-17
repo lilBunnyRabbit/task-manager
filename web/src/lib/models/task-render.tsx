@@ -1,14 +1,15 @@
 import { LabelSection } from "@/components/label-section";
+import { LiveText } from "@/components/live-text";
 import { StatusBadge } from "@/components/status-icon";
 import { TypeBadge } from "@/components/type-badge";
 import { Progress } from "@/components/ui/progress";
 import { parseProgress } from "@/utils/misc.util";
 import { GlobalEvent } from "@lilbunnyrabbit/event-emitter";
 import { ParsedTask, Task, TaskEvents } from "@lilbunnyrabbit/task-manager";
+import { isUndefined } from "@lilbunnyrabbit/utils";
 import React from "react";
 import { EventsRender } from "./events-render";
-import { LogRender } from "./log-render";
-import { LiveText } from "@/components/live-text";
+import { LogsRender } from "./logs-render";
 
 interface TaskRenderProps {
   task: Task;
@@ -57,42 +58,30 @@ export const TaskRender: React.FC<TaskRenderProps> = ({ task }) => {
 
       <LabelSection label="Objects">
         <div className="grid grid-cols-[repeat(2,minmax(0px,500px))] gap-x-4">
-          <pre className="overflow-x-auto border border-foreground rounded-md bg-foreground/10 p-4 text-sm">
-            {task.toString()}
-          </pre>
+          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+            <pre className="overflow-x-auto p-4 text-sm h-full">{task.toString(true)}</pre>
+          </div>
 
-          <pre className="overflow-x-auto border border-foreground rounded-md  bg-foreground/10 p-4 text-sm">
-            {task.builder.toString()}
-          </pre>
+          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+            <pre className="overflow-x-auto p-4 text-sm h-full">{task.builder.toString(true)}</pre>
+          </div>
         </div>
       </LabelSection>
 
-      {parsed.result && (
+      {!isUndefined(parsed.result) && (
         <LabelSection label="Result">
-          <pre className="overflow-x-auto border border-foreground rounded-md bg-foreground/10 p-4 text-sm">
-            {parsed.result}
-          </pre>
+          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+            <pre className="overflow-x-auto p-4 text-sm">{parsed.result}</pre>
+          </div>
         </LabelSection>
       )}
 
       <LabelSection label="Logs">
-        <div className="overflow-x-auto border border-foreground rounded-md bg-foreground/10 text-sm">
-          <pre className="p-4 w-fit h-fit">
-            {task.logs.map((log, i) => {
-              return (
-                <div key={i}>
-                  <LogRender log={log} />
-                </div>
-              );
-            })}
-          </pre>
-        </div>
+        <LogsRender logs={task.logs} />
       </LabelSection>
 
       <LabelSection label={<LiveText>Events</LiveText>}>
-        <div className="overflow-x-auto border border-foreground rounded-md bg-foreground/10 text-sm">
-          <EventsRender events={events} />
-        </div>
+        <EventsRender events={events} />
       </LabelSection>
     </div>
   );

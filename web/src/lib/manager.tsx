@@ -20,7 +20,6 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
   const [selected, setSelected] = React.useState<ExecutableTask | undefined>();
   const taskManager = React.useMemo(() => example.taskManager, [example]);
 
-  const [, setHasError] = React.useState(false);
   const counterState = React.useState(0);
 
   const onSelect = React.useCallback((selected?: ExecutableTask) => {
@@ -34,20 +33,15 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
   }, []);
 
   React.useEffect(() => {
-    function onChange(this: TaskManager) {
+    function onAll(this: TaskManager, ...args: unknown[]) {
       counterState[1]((c) => c + 1);
+      // console.log(...args);
     }
 
-    function onFail() {
-      setHasError(true);
-    }
-
-    taskManager.on("change", onChange);
-    taskManager.on("fail", onFail);
+    taskManager.onAll(onAll);
 
     return () => {
-      taskManager.off("change", onChange);
-      taskManager.off("fail", onFail);
+      taskManager.offAll(onAll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskManager]);
@@ -92,7 +86,7 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
           disabled={
             taskManager.isStatus("success") ||
             (taskManager.hasFlag(TaskManagerFlag.STOP) && taskManager.isStatus("in-progress")) ||
-            (taskManager.isStatus("error") && !taskManager.queue.length)
+            (taskManager.isStatus("error") && taskManager.isEmptyQueue)
           }
           onClick={() => {
             if (taskManager.isStatus("in-progress")) {
@@ -123,7 +117,7 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
         <Button
           variant="action"
           className="bg-blue-200 border-blue-700 text-blue-700"
-          disabled={!taskManager.queue.length}
+          disabled={taskManager.isEmptyQueue}
           onClick={() => taskManager.clearQueue()}
         >
           Clear Queue
@@ -148,10 +142,6 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
           >
             {taskManager.tasks.map((task) => (
               <TreeRender key={`task-${task.id}`} task={task} selected={selected} onSelect={onSelect} />
-            ))}
-
-            {taskManager.queue.map((task) => (
-              <TreeRender key={`queue-${task.id}`} task={task} selected={selected} onSelect={onSelect} />
             ))}
           </NodeList>
         </div>
@@ -208,10 +198,6 @@ const TreeRender: React.FC<TreeRenderProps> = ({ task, selected, onSelect }) => 
     >
       {task.tasks.map((task) => (
         <TreeRender key={`task-${task.id}`} task={task} selected={selected} onSelect={onSelect} />
-      ))}
-
-      {task.queue.map((task) => (
-        <TreeRender key={`queue-${task.id}`} task={task} selected={selected} onSelect={onSelect} />
       ))}
     </NodeList>
   );

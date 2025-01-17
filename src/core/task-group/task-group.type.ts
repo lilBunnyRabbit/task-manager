@@ -1,5 +1,5 @@
-import type { EventMap } from "@lilbunnyrabbit/event-emitter";
-import type { ExecutableTask, TaskError } from "../../common";
+import type { ExecutableTask, TasksError } from "../../common";
+import type { FlowState } from "../flow-controller";
 import type { TaskGroup } from "./task-group";
 
 /**
@@ -22,7 +22,7 @@ export type TaskGroupFlag = (typeof TaskGroupFlag)[keyof typeof TaskGroupFlag];
 /**
  * Events emitted by a {@link TaskGroup}.
  */
-export interface TaskGroupEvents extends EventMap {
+export type TaskGroupEvents = {
   /**
    * Emitted when any state (status, progress, or flags) of the task group changes.
    */
@@ -46,7 +46,9 @@ export interface TaskGroupEvents extends EventMap {
   /**
    * Emitted when a task or the task group encounters an error.
    *
-   * @type {TaskError | Error} The encountered error.
+   * @type {TasksError | Error} The encountered error.
    */
-  error: TaskError | Error;
-}
+  error: TasksError | Error;
+
+  transition: { from?: FlowState; to?: FlowState; task: ExecutableTask };
+};

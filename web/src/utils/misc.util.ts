@@ -5,6 +5,7 @@ export function parseProgress(value: number) {
 export function safelyParseJson(value: unknown) {
   try {
     return JSON.stringify(value);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
     return String(value);
   }

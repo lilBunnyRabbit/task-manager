@@ -130,8 +130,13 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * String representation of the task.
    *
    * @returns Task as a string.
-   */ public toString() {
-    return `Task {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
+   */
+  public toString(pretty?: boolean) {
+    if (pretty === true) {
+      return `Task {\n\tname: ${JSON.stringify(this.name)},\n\tid: "${this.id}"\n}`;
+    }
+
+    return `Task { name: ${JSON.stringify(this.name)}, id: "${this.id}" }`;
   }
 
   /**

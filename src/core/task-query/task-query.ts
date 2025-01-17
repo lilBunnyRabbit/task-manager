@@ -1,16 +1,15 @@
-import type { Task, TaskBuilder, TaskGroup, TaskSpec } from "../";
+import type { TaskBuilder, TaskSpec } from "../";
 import type { BuilderIs } from "../../common";
+import { FlowController } from "../flow-controller";
 
 /**
  * Provides methods to query, retrieve, and manage tasks and their results from a collection.
  */
 export class TaskQuery {
   /**
-   * Initializes the query interface with a list of tasks or task groups.
-   *
-   * @param tasks - An array of {@link Task} or {@link TaskGroup} instances.
+   * TODO: Update docs
    */
-  constructor(readonly tasks: Array<Task | TaskGroup>) {}
+  constructor(private controller: FlowController) {}
 
   /**
    * Finds the first task that matches the provided builder.
@@ -20,8 +19,8 @@ export class TaskQuery {
    * @returns The matching task, or `undefined` if not found.
    */
   public find<T>(builder: BuilderIs<T>) {
-    for (let i = 0; i < this.tasks.length; i++) {
-      const task: unknown = this.tasks[i];
+    const completedTasks = this.controller.completed.values();
+    for (const task of completedTasks) {
       if (builder.is(task)) {
         return task;
       }
@@ -54,12 +53,17 @@ export class TaskQuery {
    * @returns The matching task, or `undefined` if not found.
    */
   public findLast<T>(builder: BuilderIs<T>) {
-    for (let i = this.tasks.length - 1; i >= 0; i--) {
-      const task: unknown = this.tasks[i];
+    // TODO: No optimal way of reverse looping?
+    let lastTask: T | undefined;
+
+    const completedTasks = this.controller.completed.values();
+    for (const task of completedTasks) {
       if (builder.is(task)) {
-        return task;
+        lastTask = task;
       }
     }
+
+    return lastTask;
   }
 
   /**
@@ -88,7 +92,16 @@ export class TaskQuery {
    * @returns An array of matching tasks.
    */
   public getAll<T>(builder: BuilderIs<T>) {
-    return this.tasks.filter((task) => builder.is(task)) as T[];
+    const tasks: T[] = [];
+
+    const completedTasks = this.controller.completed.values();
+    for (const task of completedTasks) {
+      if (builder.is(task)) {
+        tasks.push(task);
+      }
+    }
+
+    return tasks;
   }
 
   // Task
@@ -140,8 +153,8 @@ export class TaskQuery {
   public getResults<TSpec extends TaskSpec>(taskBuilder: TaskBuilder<TSpec>): NonNullable<TSpec["TResult"]>[] {
     const results: NonNullable<TSpec["TResult"]>[] = [];
 
-    for (let i = 0; i < this.tasks.length; i++) {
-      const task: unknown = this.tasks[i];
+    const completedTasks = this.controller.completed.values();
+    for (const task of completedTasks) {
       if (taskBuilder.is(task)) {
         if (task.result.isEmpty()) {
           throw new Error(`${task} result is empty.`);

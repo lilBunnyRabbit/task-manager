@@ -1,6 +1,6 @@
-import { Task, TaskQuery } from "../";
+import { Task } from "../";
 import type { ExecutableTask } from "../../common";
-import { ExecutionMode } from "../../common";
+import { ExecutionMode, TaskError, TasksError } from "../../common";
 import { TaskManagerBase } from "./task-manager-base";
 import { TaskManagerFlag } from "./task-manager.type";
 
@@ -12,51 +12,76 @@ import { TaskManagerFlag } from "./task-manager.type";
  * @extends TaskManagerBase
  */
 export class TaskManager extends TaskManagerBase {
-  /**
-   * Query interface for accessing and managing tasks.
-   */
-  public query = new TaskQuery(this.tasks);
+  constructor() {
+    super();
 
-  /**
-   * Adds an array of tasks to the task queue.
-   *
-   * @param tasks - An array of tasks to add to the queue.
-   * @emits change - When the task queue is updated.
-   * @returns The instance of the task manager.
-   */
-  public addTasks(tasks: ExecutableTask[]) {
-    this.queue.push(
-      ...tasks.map((task) => {
-        if (task instanceof Task) {
-          task.bind(this.query);
-        }
+    this.flowController.on("transition", (transition) => {
+      this.emit("transition", transition);
+      this.calculateProgress();
+    });
+  }
 
-        return task;
-      })
-    );
+  public get isEmptyQueue() {
+    return !this.flowController.hasPending;
+  }
 
-    this.emit("change");
+  public addTask(task: ExecutableTask) {
+    if (task instanceof Task) {
+      task.bind(this.query);
+    }
+
+    this.flowController.addTask(task);
 
     return this;
   }
 
+  // TODO: Update docs
+  /**
+   * Adds an array of tasks to the task queue.
+   *
+   * @param tasks - An array of tasks to add to the queue.
+   *
+   * @returns The instance of the task manager.
+   */
+  public addTasks(...tasks: ExecutableTask[]) {
+    for (const task of tasks) {
+      this.addTask(task);
+    }
+
+    return this;
+  }
+
+  // TODO: Update docs
   /**
    * Calculates the overall progress of the tasks.
    *
    * @returns The calculated progress as a value between 0 and 1.
    */
   private calculateProgress() {
-    const tasksProgress = this.tasks.reduce((progress, task) => {
+    let progressSum = 0;
+
+    const activeTasks = this.flowController.active.values();
+    for (const task of activeTasks) {
       if (task.isStatus("error") && this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
-        return progress + 1;
+        progressSum += 1;
+      } else {
+        progressSum += task.progress;
       }
+    }
 
-      return progress + task.progress;
-    }, 0);
+    const completedTasks = this.flowController.completed.values();
+    for (const task of completedTasks) {
+      if (task.isStatus("error") && this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
+        progressSum += 1;
+      } else {
+        progressSum += task.progress;
+      }
+    }
 
-    return tasksProgress / (this.queue.length + this.tasks.length);
+    return progressSum / this.flowController.tasks.length;
   }
 
+  // TODO: Update docs
   /**
    * Starts the execution of tasks in the task manager.
    *
@@ -68,8 +93,8 @@ export class TaskManager extends TaskManagerBase {
    * @returns A promise that resolves when task execution starts.
    */
   public async start(force?: boolean) {
-    if (!this.queue.length) {
-      return console.warn("TaskManager empty queue.");
+    if (!this.flowController.hasPending) {
+      return console.warn("No pending tasks.");
     }
 
     if (!this.isStatus("idle", "stopped") && !(force && this.isStatus("error"))) {
@@ -89,7 +114,7 @@ export class TaskManager extends TaskManagerBase {
 
     this.setStatus("in-progress");
 
-    while (this.queue.length > 0) {
+    while (this.flowController.hasPending) {
       try {
         switch (this.mode) {
           case ExecutionMode.LINEAR: {
@@ -111,7 +136,7 @@ export class TaskManager extends TaskManagerBase {
         }
       }
 
-      if (this.hasFlag(TaskManagerFlag.STOP) && this.queue.length) {
+      if (this.hasFlag(TaskManagerFlag.STOP) && this.flowController.hasPending) {
         return this.removeFlag(TaskManagerFlag.STOP).setStatus("stopped");
       }
     }
@@ -119,6 +144,7 @@ export class TaskManager extends TaskManagerBase {
     return this.setProgress(1).setStatus("success").emit("success");
   }
 
+  // TODO: Update docs
   /**
    * Executes tasks in a linear sequence.
    *
@@ -128,20 +154,39 @@ export class TaskManager extends TaskManagerBase {
    * @returns A promise that resolves when all tasks in the queue are executed sequentially.
    */
   private async executeLinear() {
-    const task = this.queue.shift();
+    const task = this.flowController.startNext();
     if (!task) return;
 
-    this.tasks.push(task);
+    this.emit("task", task);
 
-    this.emit("task", task).emit("change");
-
-    task.on("progress", () => {
+    const onProgress = () => {
       this.setProgress(this.calculateProgress());
-    });
+    };
 
-    return await task.execute();
+    // Workaround
+    if (task instanceof Task) {
+      task.on("progress", onProgress);
+    } else {
+      task.on("progress", onProgress);
+    }
+
+    try {
+      await task.execute();
+    } catch (error) {
+      throw new TaskError(task, error);
+    } finally {
+      // Workaround
+      if (task instanceof Task) {
+        task.off("progress", onProgress);
+      } else {
+        task.off("progress", onProgress);
+      }
+
+      this.flowController.complete(task.id);
+    }
   }
 
+  // TODO: Update docs
   /**
    * Executes tasks in parallel.
    *
@@ -151,32 +196,61 @@ export class TaskManager extends TaskManagerBase {
    * @returns A promise that resolves when all tasks in the queue are executed concurrently.
    */
   private async executeParallel() {
-    const queueTasks = [...this.queue];
-    this.queue = [];
+    const executeTask = async (task: ExecutableTask) => {
+      this.emit("task", task).emit("change");
 
-    this.tasks.push(...queueTasks);
+      const onProgress = () => {
+        this.setProgress(this.calculateProgress());
+      };
 
-    const executeTasks = () => {
-      return queueTasks.map(async (task) => {
-        this.emit("task", task).emit("change");
+      // Workaround
+      if (task instanceof Task) {
+        task.on("progress", onProgress);
+      } else {
+        task.on("progress", onProgress);
+      }
 
-        task.on("progress", () => {
-          this.setProgress(this.calculateProgress());
-        });
-
-        try {
-          await task.execute();
-        } catch (error: any) {
-          throw { task, error };
+      try {
+        await task.execute();
+      } catch (error: any) {
+        throw new TaskError(task, error);
+      } finally {
+        // Workaround
+        if (task instanceof Task) {
+          task.off("progress", onProgress);
+        } else {
+          task.off("progress", onProgress);
         }
-      });
+      }
     };
 
-    if (this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
-      return await Promise.allSettled(executeTasks());
-    }
+    const executionPromises: Promise<void>[] = [];
+    const completeAll = this.flowController.startAll((task) => {
+      executionPromises.push(executeTask(task));
+    });
 
-    return await Promise.all(executeTasks());
+    try {
+      const results = await Promise.allSettled(executionPromises);
+
+      if (this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
+        return;
+      }
+
+      const errors: Error[] = [];
+      for (const result of results) {
+        if (result.status === "rejected") {
+          errors.push(result.reason);
+        }
+      }
+
+      if (errors.length) {
+        throw new TasksError(errors);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      completeAll();
+    }
   }
 
   /**
@@ -192,6 +266,7 @@ export class TaskManager extends TaskManagerBase {
     this.addFlag(TaskManagerFlag.STOP);
   }
 
+  // TODO: Update docs
   /**
    * Resets the task manager to its initial state.
    *
@@ -207,27 +282,29 @@ export class TaskManager extends TaskManagerBase {
       return console.warn(`${TaskManager.name} is already idle.`);
     }
 
-    const tmp = [...this.tasks, ...this.queue];
-
-    this.queue = [];
-    this.tasks = [];
     this.status = "idle";
     this.progress = 0;
 
-    this.addTasks(tmp.map((task) => task.clone()));
+    const clearedTasks = this.flowController.reset();
+    for (const task of clearedTasks) {
+      this.addTask(task.clone());
+    }
   }
 
   /**
+   * TODO: Update docs
+   *
+   *
    * Clears the task queue.
    *
    * @emits change - When the queue is cleared.
    * @returns The instance of the task manager.
    */
   public clearQueue(): this {
-    this.queue = [];
+    this.flowController.clearQueue();
 
     this.setProgress(this.calculateProgress());
-    this.setStatus("success").emit("change");
-    return this;
+
+    return this.setStatus("success");
   }
 }
