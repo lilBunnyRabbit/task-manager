@@ -1,3 +1,4 @@
+import { LogEntry } from "../../common";
 import type { Task } from "./task";
 
 /**
@@ -33,13 +34,13 @@ export interface ParsedTask {
  * Events emitted by a {@link Task}.
  */
 export type TaskEvents = {
-  /**
-   * Emitted when task status or progress changes.
-   */
-  change: void;
+  param: "status" | "progress" | "result";
+  log: LogEntry;
   /**
    * Emitted when task progress updates.
    * @type {number} - New progress value.
    */
   progress: number;
+  success: void;
+  error: any;
 };

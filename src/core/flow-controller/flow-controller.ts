@@ -199,4 +199,28 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
       this.emit("transition", { from: "pending", task });
     }
   }
+
+  public calculateProgress(errorSuccess?: boolean) {
+    let progressSum = 0;
+
+    const activeTasks = this.active.values();
+    for (const task of activeTasks) {
+      if (task.isStatus("error") && errorSuccess) {
+        progressSum += 1;
+      } else {
+        progressSum += task.progress;
+      }
+    }
+
+    const completedTasks = this.completed.values();
+    for (const task of completedTasks) {
+      if (task.isStatus("error") && errorSuccess) {
+        progressSum += 1;
+      } else {
+        progressSum += task.progress;
+      }
+    }
+
+    return progressSum / this.tasks.length;
+  }
 }

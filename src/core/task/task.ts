@@ -1,8 +1,9 @@
+import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { Optional } from "@lilbunnyrabbit/optional";
 import { v4 as uuidv4 } from "uuid";
 import type { TaskManager } from "../";
 import { TaskQuery } from "../";
-import { Logger } from "../../common";
+import { LogEntry, Logger, TaskError } from "../../common";
 import { TaskBase } from "./task-base";
 import type { TaskBuilder, TaskConfig } from "./task-builder";
 import type { ParsedTask, TaskSpec } from "./task.type";
@@ -24,7 +25,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
    * Task logger.
    */
-  protected logger = new Logger();
+  protected logger = new Logger(this as unknown as EventEmitter<{ log: LogEntry }>);
 
   /**
    * Task logs.
@@ -102,11 +103,15 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
       const result = await Promise.resolve(this._config.execute.bind(this)(this.data));
       this.result = Optional(result);
 
+      this.setProgress(1).setStatus("success").emit("success");
+
       return this.result;
     } catch (error) {
       this.logger.error(String(error));
-      this.setStatus("error");
-      throw error;
+
+      this.setStatus("error").emit("error", error);
+
+      throw new TaskError(this, error);
     }
   }
 

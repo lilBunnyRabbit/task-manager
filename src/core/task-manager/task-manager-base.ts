@@ -1,5 +1,6 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { ExecutionMode } from "../../common";
+import { clamp01 } from "../../utils";
 import { FlowController } from "../flow-controller";
 import { TaskQuery } from "../task-query";
 import type { TaskManagerEvents, TaskManagerStatus } from "./task-manager.type";
@@ -39,7 +40,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
     if (status !== this.status) {
       this._status = status;
 
-      this.emit("change");
+      this.emit("param", "status");
     }
   }
 
@@ -52,6 +53,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    */
   protected setStatus(status: typeof this._status) {
     this.status = status;
+
     return this;
   }
 
@@ -89,12 +91,12 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * @emits change - When the progress changes.
    */
   protected set progress(progress: typeof this._progress) {
-    const validProgress = progress > 1 ? 1 : progress < 0 ? 0 : progress;
+    const validProgress = clamp01(progress);
 
     if (validProgress !== this.progress) {
       this._progress = validProgress;
 
-      this.emit("progress", this.progress).emit("change");
+      this.emit("progress", this.progress).emit("param", "progress");
     }
   }
 
@@ -108,6 +110,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    */
   protected setProgress(progress: typeof this._progress) {
     this.progress = progress;
+
     return this;
   }
 
@@ -136,7 +139,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   public set flags(flags: typeof this._flags) {
     this._flags = flags;
 
-    this.emit("change");
+    this.emit("param", "flags");
   }
 
   /**
@@ -148,6 +151,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    */
   public setFlags(flags: typeof this._flags) {
     this.flags = flags;
+
     return this;
   }
 
@@ -161,7 +165,8 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   public addFlag(flag: TaskManagerFlag): this {
     this._flags.add(flag);
 
-    this.emit("change");
+    this.emit("param", "flags");
+
     return this;
   }
 
@@ -175,7 +180,8 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   public removeFlag(flag: TaskManagerFlag): this {
     this._flags.delete(flag);
 
-    this.emit("change");
+    this.emit("param", "flags");
+
     return this;
   }
 
@@ -236,6 +242,8 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    */
   public set mode(mode: ExecutionMode) {
     this._mode = mode;
+
+    this.emit("param", "mode");
   }
 
   /**

@@ -3,6 +3,7 @@ import { TaskQuery } from "../";
 import { FlowController } from "../flow-controller";
 import type { TaskGroupEvents, TaskGroupStatus } from "./task-group.type";
 import { TaskGroupFlag } from "./task-group.type";
+import { clamp01 } from "../../utils";
 
 /**
  * Base class for managing task statuses, progress, flags, and queue operations.
@@ -38,7 +39,7 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
     if (status !== this.status) {
       this._status = status;
 
-      this.emit("change");
+      this.emit("param", "status");
     }
   }
 
@@ -51,6 +52,7 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
    */
   protected setStatus(status: typeof this._status) {
     this.status = status;
+
     return this;
   }
 
@@ -88,12 +90,12 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
    * @emits change - When progress changes.
    */
   protected set progress(progress: typeof this._progress) {
-    const validProgress = progress > 1 ? 1 : progress < 0 ? 0 : progress;
+    const validProgress = clamp01(progress);
 
     if (validProgress !== this.progress) {
       this._progress = validProgress;
 
-      this.emit("progress", this.progress).emit("change");
+      this.emit("progress", this.progress).emit("param", "progress");
     }
   }
 
@@ -107,6 +109,7 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
    */
   protected setProgress(progress: typeof this._progress) {
     this.progress = progress;
+
     return this;
   }
 
@@ -135,7 +138,7 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   public set flags(flags: typeof this._flags) {
     this._flags = flags;
 
-    this.emit("change");
+    this.emit("param", "flags");
   }
 
   /**
@@ -147,6 +150,7 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
    */
   public setFlags(flags: typeof this._flags) {
     this.flags = flags;
+
     return this;
   }
 
@@ -160,7 +164,8 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   public addFlag(flag: TaskGroupFlag): this {
     this._flags.add(flag);
 
-    this.emit("change");
+    this.emit("param", "flags");
+
     return this;
   }
 
@@ -174,7 +179,8 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   public removeFlag(flag: TaskGroupFlag): this {
     this._flags.delete(flag);
 
-    this.emit("change");
+    this.emit("param", "flags");
+
     return this;
   }
 

@@ -16,7 +16,7 @@ const config: Record<AllStatus, { label: string; className: string }> = {
   },
   success: {
     label: "success",
-    className: "bg-green-500/20 !text-green-800",
+    className: "bg-success/40 !text-foreground",
   },
   stopped: {
     label: "stopped",
@@ -24,16 +24,16 @@ const config: Record<AllStatus, { label: string; className: string }> = {
   },
   error: {
     label: "error",
-    className: "bg-red-500/20 !text-red-800",
+    className: "bg-error/20 !text-error",
   },
 };
 
 const icons: Record<AllStatus, React.ReactNode> = {
   idle: <ClockIcon className="text-foreground" />,
   "in-progress": <LoaderIcon className="text-foreground animate-spin" />,
-  success: <CheckCircleIcon className="text-green-500" />,
+  success: <CheckCircleIcon className="text-success" />,
   stopped: <PauseIcon className="text-foreground" />,
-  error: <AlertCircleIcon className="text-red-500" />,
+  error: <AlertCircleIcon className="text-error" />,
 };
 
 interface StatusIconProps {
@@ -50,7 +50,7 @@ export const StatusBadge: React.FC<StatusIconProps> = ({ status }) => {
   return (
     <div
       className={cn(
-        "px-2 py-0.5 rounded-md text-xs flex items-center gap-2 whitespace-nowrap [&>svg]:h-4 [&>svg]:w-4 [&>svg]:flex-shrink-0",
+        "px-2 py-0.5 rounded-md text-xs flex items-center gap-2 whitespace-nowrap [&_svg]:h-4 [&_svg]:w-4 [&_svg]:flex-shrink-0 [&_svg]:text-current",
         className
       )}
     >

@@ -1,9 +1,12 @@
+import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import type { LogEntry, LogEntryInput, LogMessage } from "./logger.type";
 
 /**
  * Logger utility for capturing and managing log entries.
  */
 export class Logger {
+  constructor(private emitter: EventEmitter<{ log: LogEntry }>) {}
+
   /**
    * Array of logged entries.
    */
@@ -35,6 +38,7 @@ export class Logger {
     }
 
     this.logs.push(logEntry);
+    this.emitter.emit("log", logEntry);
 
     return this;
   }

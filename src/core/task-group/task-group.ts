@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { Task } from "../";
 import type { ExecutableTask } from "../../common";
-import { ExecutionMode, TaskError, TasksError } from "../../common";
+import { ExecutionMode, TasksError } from "../../common";
 import { TaskGroupBase } from "./task-group-base";
 import { TaskGroupBuilder } from "./task-group-builder";
 import { TaskGroupFlag } from "./task-group.type";
@@ -40,7 +40,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
 
     this.flowController.on("transition", (transition) => {
       this.emit("transition", transition);
-      this.calculateProgress();
+
+      this.updateProgress();
     });
 
     this.flowController.addTasks(
@@ -54,33 +55,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
     );
   }
 
-  /**
-   * Calculates the overall progress of tasks in the group.
-   *
-   * @returns Overall progress as a number between 0 and 1.
-   */
-  private calculateProgress() {
-    let progressSum = 0;
-
-    const activeTasks = this.flowController.active.values();
-    for (const task of activeTasks) {
-      if (task.isStatus("error") && this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
-        progressSum += 1;
-      } else {
-        progressSum += task.progress;
-      }
-    }
-
-    const completedTasks = this.flowController.completed.values();
-    for (const task of completedTasks) {
-      if (task.isStatus("error") && this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
-        progressSum += 1;
-      } else {
-        progressSum += task.progress;
-      }
-    }
-
-    return progressSum / this.flowController.tasks.length;
+  private updateProgress() {
+    return this.setProgress(this.flowController.calculateProgress(this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)));
   }
 
   /**
@@ -90,7 +66,7 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * @throws If the task group is not in the "idle" state or execution fails.
    */
   public async execute() {
-    if (this.status !== "idle") {
+    if (!this.isStatus("idle")) {
       throw new Error('TaskGroup is not in "idle" state.');
     }
 
@@ -111,13 +87,17 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
         default:
           throw new Error(`Invalid ExecutionMode mode "${this.mode}"`);
       }
-    } catch (error) {
-      // this.addError(error as TSpec["TError"]);
-      this.setStatus("error");
-      throw error;
+    } catch (error: any) {
+      if (this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
+        this.emit("error", error);
+      } else {
+        this.setStatus("error").emit("error", error);
+
+        throw error;
+      }
     }
 
-    return this.setStatus("success").emit("success");
+    return this.setProgress(1).setStatus("success").emit("success");
   }
 
   /**
@@ -133,10 +113,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
       const task = this.flowController.startNext();
       if (!task) return;
 
-      this.emit("task", task);
-
       const onProgress = () => {
-        this.setProgress(this.calculateProgress());
+        this.updateProgress();
       };
 
       // Workaround
@@ -148,8 +126,12 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
 
       try {
         await task.execute();
-      } catch (error) {
-        throw new TaskError(task, error);
+      } catch (error: any) {
+        if (!this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
+          throw error;
+        }
+
+        this.emit("error", error);
       } finally {
         // Workaround
         if (task instanceof Task) {
@@ -173,10 +155,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    */
   private async executeParallel() {
     const executeTask = async (task: ExecutableTask) => {
-      this.emit("task", task).emit("change");
-
       const onProgress = () => {
-        this.setProgress(this.calculateProgress());
+        this.updateProgress();
       };
 
       // Workaround
@@ -188,8 +168,6 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
 
       try {
         await task.execute();
-      } catch (error: any) {
-        throw new TaskError(task, error);
       } finally {
         // Workaround
         if (task instanceof Task) {
@@ -208,25 +186,16 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
     try {
       const results = await Promise.allSettled(executionPromises);
 
-      if (this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
-        return;
-      }
-
       const errors: Error[] = [];
       for (const result of results) {
         if (result.status === "rejected") {
           errors.push(result.reason);
-          if ("toString" in result.reason) {
-            console.log(result.reason.toString());
-          }
         }
       }
 
       if (errors.length) {
         throw new TasksError(errors);
       }
-    } catch (error) {
-      throw error;
     } finally {
       completeAll();
     }

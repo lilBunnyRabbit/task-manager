@@ -17,7 +17,8 @@ export class TaskManager extends TaskManagerBase {
 
     this.flowController.on("transition", (transition) => {
       this.emit("transition", transition);
-      this.calculateProgress();
+
+      this.updateProgress();
     });
   }
 
@@ -51,34 +52,8 @@ export class TaskManager extends TaskManagerBase {
     return this;
   }
 
-  // TODO: Update docs
-  /**
-   * Calculates the overall progress of the tasks.
-   *
-   * @returns The calculated progress as a value between 0 and 1.
-   */
-  private calculateProgress() {
-    let progressSum = 0;
-
-    const activeTasks = this.flowController.active.values();
-    for (const task of activeTasks) {
-      if (task.isStatus("error") && this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
-        progressSum += 1;
-      } else {
-        progressSum += task.progress;
-      }
-    }
-
-    const completedTasks = this.flowController.completed.values();
-    for (const task of completedTasks) {
-      if (task.isStatus("error") && this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
-        progressSum += 1;
-      } else {
-        progressSum += task.progress;
-      }
-    }
-
-    return progressSum / this.flowController.tasks.length;
+  private updateProgress() {
+    return this.setProgress(this.flowController.calculateProgress(this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)));
   }
 
   // TODO: Update docs
@@ -131,13 +106,15 @@ export class TaskManager extends TaskManagerBase {
             throw new Error(`Invalid ExecutionMode mode "${this.mode}"`);
         }
       } catch (error: any) {
-        if (!this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
-          return this.setStatus("error").emit("fail", error);
+        if (this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
+          this.emit("error", error);
+        } else {
+          return this.setStatus("error").emit("error", error).emit("fail", error);
         }
       }
 
       if (this.hasFlag(TaskManagerFlag.STOP) && this.flowController.hasPending) {
-        return this.removeFlag(TaskManagerFlag.STOP).setStatus("stopped");
+        return this.setStatus("stopped");
       }
     }
 
@@ -157,10 +134,8 @@ export class TaskManager extends TaskManagerBase {
     const task = this.flowController.startNext();
     if (!task) return;
 
-    this.emit("task", task);
-
     const onProgress = () => {
-      this.setProgress(this.calculateProgress());
+      this.updateProgress();
     };
 
     // Workaround
@@ -197,10 +172,8 @@ export class TaskManager extends TaskManagerBase {
    */
   private async executeParallel() {
     const executeTask = async (task: ExecutableTask) => {
-      this.emit("task", task).emit("change");
-
       const onProgress = () => {
-        this.setProgress(this.calculateProgress());
+        this.updateProgress();
       };
 
       // Workaround
@@ -232,10 +205,6 @@ export class TaskManager extends TaskManagerBase {
     try {
       const results = await Promise.allSettled(executionPromises);
 
-      if (this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)) {
-        return;
-      }
-
       const errors: Error[] = [];
       for (const result of results) {
         if (result.status === "rejected") {
@@ -246,8 +215,6 @@ export class TaskManager extends TaskManagerBase {
       if (errors.length) {
         throw new TasksError(errors);
       }
-    } catch (error) {
-      throw error;
     } finally {
       completeAll();
     }
@@ -282,8 +249,7 @@ export class TaskManager extends TaskManagerBase {
       return console.warn(`${TaskManager.name} is already idle.`);
     }
 
-    this.status = "idle";
-    this.progress = 0;
+    this.setProgress(0).setStatus("idle");
 
     const clearedTasks = this.flowController.reset();
     for (const task of clearedTasks) {
@@ -303,8 +269,12 @@ export class TaskManager extends TaskManagerBase {
   public clearQueue(): this {
     this.flowController.clearQueue();
 
-    this.setProgress(this.calculateProgress());
+    this.updateProgress();
 
-    return this.setStatus("success");
+    if (this.isStatus("idle", "in-progress", "stopped")) {
+      this.setStatus("success");
+    }
+
+    return this;
   }
 }

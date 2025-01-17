@@ -53,7 +53,11 @@ export const TaskManagerRender: React.FC<TaskManagerRenderProps> = ({ taskManage
           </div>
         }
       >
-        <Progress value={taskManager.progress * 100} max={100} />
+        <Progress
+          value={taskManager.progress * 100}
+          max={100}
+          status={taskManager.isStatus("success", "error") ? (taskManager.status as "success" | "error") : undefined}
+        />
       </LabelSection>
 
       <LabelSection label={<LiveText>Events</LiveText>}>

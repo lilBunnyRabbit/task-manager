@@ -1,5 +1,5 @@
-import type { ExecutableTask, TasksError } from "../../common";
-import { FlowControllerEvents, FlowState } from "../flow-controller";
+import type { ExecutableTask, TaskError, TasksError } from "../../common";
+import { FlowState } from "../flow-controller";
 import type { TaskManager } from "./task-manager";
 
 /**
@@ -27,28 +27,15 @@ export type TaskManagerFlag = (typeof TaskManagerFlag)[keyof typeof TaskManagerF
  * Events emitted by a {@link TaskManager}.
  */
 export type TaskManagerEvents = {
-  /**
-   * Emitted when any state (status, progress, or flags) of the manager changes.
-   */
-  change: void;
+  param: "status" | "progress" | "flags" | "mode";
+
+  transition: { from?: FlowState; to?: FlowState; task: ExecutableTask };
   /**
    * Emitted when task progress is updated.
    *
    * @type {number} - The new progress value.
    */
   progress: number;
-  /**
-   * Emitted when a new task starts execution.
-   *
-   * @type {ExecutableTask} - The task currently in progress.
-   */
-  task: ExecutableTask;
-  /**
-   * Emitted when a task fails and the `CONTINUE_ON_ERROR` flag is not set.
-   *
-   * @type {TasksError | Error} - The error that caused the failure.
-   */
-  fail: TasksError | Error;
   /**
    * Emitted when all tasks in the queue are executed successfully.
    */
@@ -58,7 +45,11 @@ export type TaskManagerEvents = {
    *
    * @type {TasksError | Error} - The error that occurred.
    */
-  error: TasksError | Error;
-
-  transition: { from?: FlowState; to?: FlowState; task: ExecutableTask };
+  error: TaskError | TasksError | Error;
+  /**
+   * Emitted when a task fails and the `CONTINUE_ON_ERROR` flag is not set.
+   *
+   * @type {TasksError | Error} - The error that caused the failure.
+   */
+  fail: TaskError | TasksError | Error;
 };

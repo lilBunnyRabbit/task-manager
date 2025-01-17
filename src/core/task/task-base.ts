@@ -1,5 +1,6 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { Optional } from "@lilbunnyrabbit/optional";
+import { clamp01 } from "../../utils";
 import type { TaskEvents, TaskSpec, TaskStatus } from "./task.type";
 
 /**
@@ -33,7 +34,7 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
     if (status !== this.status) {
       this._status = status;
 
-      this.emit("change");
+      this.emit("param", "status");
     }
   }
 
@@ -45,6 +46,7 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
    */
   public setStatus(status: typeof this._status): this {
     this.status = status;
+
     return this;
   }
 
@@ -80,12 +82,12 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
    * @emits change - When progress changes.
    */
   public set progress(progress: typeof this._progress) {
-    const validProgress = progress > 1 ? 1 : progress < 0 ? 0 : progress;
+    const validProgress = clamp01(progress);
 
     if (validProgress !== this._progress) {
       this._progress = validProgress;
 
-      this.emit("progress", validProgress).emit("change");
+      this.emit("progress", this.progress).emit("param", "progress");
     }
   }
 
@@ -98,6 +100,7 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
    */
   public setProgress(progress: typeof this._progress) {
     this.progress = progress;
+
     return this;
   }
 
@@ -123,10 +126,7 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
    */
   protected set result(result: typeof this._result) {
     this._result = result;
-    this._status = "success";
-    this.progress = 1;
-
-    this.emit("change");
+    this.emit("param", "result");
   }
 
   /**
@@ -138,6 +138,7 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
    */
   protected setResult(result: typeof this._result): this {
     this.result = result;
+
     return this;
   }
 }

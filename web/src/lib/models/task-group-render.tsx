@@ -53,7 +53,11 @@ export const TaskGroupRender: React.FC<TaskGroupRenderProps> = ({ taskGroup }) =
           </div>
         }
       >
-        <Progress value={taskGroup.progress * 100} max={100} />
+        <Progress
+          value={taskGroup.progress * 100}
+          max={100}
+          status={taskGroup.isStatus("success", "error") ? (taskGroup.status as "success" | "error") : undefined}
+        />
       </LabelSection>
 
       <LabelSection label="Objects">

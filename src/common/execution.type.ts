@@ -19,7 +19,7 @@ export type ExecutionMode = (typeof ExecutionMode)[keyof typeof ExecutionMode];
 /**
  * Represents a task that can be executed, which could be a single {@link Task} or a {@link TaskGroup}.
  */
-export type ExecutableTask = Task<TaskSpec<any, any>> | TaskGroup<any[]>;
+export type ExecutableTask = Task<any> | TaskGroup<any[]>;
 
 /**
  * Interface for builder type-checking.

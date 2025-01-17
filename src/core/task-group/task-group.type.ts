@@ -23,22 +23,15 @@ export type TaskGroupFlag = (typeof TaskGroupFlag)[keyof typeof TaskGroupFlag];
  * Events emitted by a {@link TaskGroup}.
  */
 export type TaskGroupEvents = {
-  /**
-   * Emitted when any state (status, progress, or flags) of the task group changes.
-   */
-  change: void;
+  param: "status" | "progress" | "flags";
+  transition: { from?: FlowState; to?: FlowState; task: ExecutableTask };
   /**
    * Emitted when task progress is updated.
    *
    * @type {number} The new progress value.
    */
   progress: number;
-  /**
-   * Emitted when a new task is in progress.
-   *
-   * @type {ExecutableTask} The task that is now in progress.
-   */
-  task: ExecutableTask;
+
   /**
    * Emitted when all tasks in the queue are executed successfully.
    */
@@ -48,7 +41,5 @@ export type TaskGroupEvents = {
    *
    * @type {TasksError | Error} The encountered error.
    */
-  error: TasksError | Error;
-
-  transition: { from?: FlowState; to?: FlowState; task: ExecutableTask };
+  error: TasksError | TasksError | Error;
 };

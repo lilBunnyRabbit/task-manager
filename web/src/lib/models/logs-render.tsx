@@ -18,10 +18,10 @@ export const LogsRender: React.FC<LogsRenderProps> = ({ logs }) => {
                 key={i}
                 className={cn(
                   {
-                    debug: "text-foreground",
-                    info: "text-info",
-                    warn: "text-warn",
-                    error: "text-error",
+                    debug: "text-cyan-600",
+                    info: "text-foreground",
+                    warn: "text-amber-600",
+                    error: "text-red-600",
                   }[log.level]
                 )}
               >

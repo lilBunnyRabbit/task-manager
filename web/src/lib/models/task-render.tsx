@@ -53,7 +53,11 @@ export const TaskRender: React.FC<TaskRenderProps> = ({ task }) => {
           </div>
         }
       >
-        <Progress value={task.progress * 100} max={100} />
+        <Progress
+          value={task.progress * 100}
+          max={100}
+          status={task.isStatus("success", "error") ? (task.status as "success" | "error") : undefined}
+        />
       </LabelSection>
 
       <LabelSection label="Objects">

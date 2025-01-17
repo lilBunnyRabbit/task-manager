@@ -1,11 +1,11 @@
 [ ] event refactoring
-[ ] TaskError implementation
+[x] TaskError implementation
 [x] enum -> objects
-[ ] manager add tasks ...tasks
-[ ] TaskFlowController - manager, query
+[x] manager add tasks ...tasks
+[x] TaskFlowController - manager, query
 [ ] Nested stop
 [ ] Serialize
-[ ] Controller
+[ ] Controller - pass controller to task (stop)
 [ ] Retries, timeout
 [ ] Query filtering
 [ ] Dynamic group tasks - define before execute with query options
