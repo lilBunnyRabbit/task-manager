@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { BuilderIs } from "../../common";
+import type { BuilderIs } from "../../common";
 import { Task } from "./task";
 import { isTask } from "./task.helper";
 import type { ParsedTask, TaskSpec } from "./task.type";
@@ -25,27 +25,32 @@ export interface TaskConfig<TSpec extends TaskSpec> {
 }
 
 /**
- * Interface for a function that builds {@link Task} instances.
+ * Builder interface for creating {@link Task} instances.
  *
  * @template TSpec - Task specification type.
  */
 export interface TaskBuilder<TSpec extends TaskSpec> extends BuilderIs<Task<TSpec>> {
   /**
-   * Builds a new {@link Task} instance.
+   * Creates a new {@link Task} instance.
    *
    * @param data - Input data for the task.
    * @returns A new {@link Task} instance.
    */
   (data: TSpec["TData"]): Task<TSpec>;
-
   /**
-   * Unique identifier of the task builder.
+   * Unique identifier for the task builder.
    */
   id: string;
   /**
    * Name of the task.
    */
   taskName: string;
+  /**
+   * String representation of the task builder.
+   *
+   * @param pretty - If `true`, outputs a prettified string.
+   * @returns String representing the task builder.
+   */
   toString(pretty?: boolean): string;
 }
 

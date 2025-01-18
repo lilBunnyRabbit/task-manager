@@ -1,10 +1,10 @@
-import { LogEntry } from "../../common";
+import type { LogEntry } from "../../common";
 import type { Task } from "./task";
 
 /**
- * Structure of a task specification.
- * @template TData - Type of the task input data.
- * @template TResult - Type of the task result data.
+ * Structure for a task specification.
+ * @template TData - Input data type.
+ * @template TResult - Result data type.
  */
 export type TaskSpec<TData = any, TResult = any> = {
   TData: TData;
@@ -31,16 +31,28 @@ export interface ParsedTask {
 }
 
 /**
- * Events emitted by a {@link Task}.
+ * Events emitted by {@link Task}.
  */
 export type TaskEvents = {
+  /**
+   * Emitted when a parameter changes.
+   */
   param: "status" | "progress" | "result";
+  /**
+   * Log entry for task events.
+   */
   log: LogEntry;
   /**
-   * Emitted when task progress updates.
+   * Emitted when progress updates.
    * @type {number} - New progress value.
    */
   progress: number;
+  /**
+   * Emitted when the task completes successfully.
+   */
   success: void;
+  /**
+   * Emitted when the task encounters an error.
+   */
   error: any;
 };

@@ -1,15 +1,14 @@
-import type { Task } from "../core";
-import { ExecutableTask } from "./execution.type";
+import type { ExecutableTask } from "./execution.type";
 
 /**
- * Represents an error associated with a specific {@link Task}.
+ * Error linked to a specific {@link ExecutableTask}.
  */
 export class TaskError extends Error {
   /**
-   * Creates a new {@link TasksError}.
+   * Creates a new `TaskError`.
    *
-   * @param task - The {@link Task} instance that caused the error.
-   * @param error - The original error object or message.
+   * @param task - Task instance that caused the error.
+   * @param error - Original error object or message.
    */
   constructor(readonly task: ExecutableTask, readonly error: any) {
     super(`${task} error.`);
@@ -19,10 +18,10 @@ export class TaskError extends Error {
 }
 
 /**
- * Type guard to check if an object is an instance of {@link TasksError}.
+ * Checks if an object is an instance of {@link TaskError}.
  *
  * @param error - Object to check.
- * @returns `true` if the object is a {@link TasksError}, otherwise `false`.
+ * @returns `true` if the object is a {@link TaskError}, otherwise `false`.
  */
 export function isTaskError(error: unknown): error is TaskError {
   return error instanceof TaskError;

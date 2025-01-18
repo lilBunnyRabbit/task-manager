@@ -1,21 +1,22 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { isNullable, isUndefined } from "@lilbunnyrabbit/utils";
-import { ExecutableTask } from "../../common";
-import { FlowControllerEvents, FlowState } from "./flow-controller.type";
+import type { ExecutableTask } from "../../common";
+import type { FlowControllerEvents, FlowState } from "./flow-controller.type";
 
 /**
- * Manages the execution flow of tasks by organizing them into states (`pending`, `active`, and `completed`).
+ * Manages task execution flow by organizing tasks into states (`pending`, `active`, and `completed`).
  *
- * The states are part of the internal structure of the {@link FlowController} and are used to manage task progression,
- * not properties of the tasks themselves.
+ * These states are part of the {@link FlowController} structure and do not belong to the tasks themselves.
  */
 export class FlowController extends EventEmitter<FlowControllerEvents> {
   /**
-   * List of all tasks managed by the controller.
+   * Internal list of all tasks managed by the controller.
    */
   private _tasks: ExecutableTask[] = [];
 
-  // TODO: Update docs
+  /**
+   * All tasks managed by the controller.
+   */
   public get tasks() {
     return this._tasks;
   }
@@ -25,33 +26,33 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   }
 
   /**
-   * Collection of tasks that are ready to start but have not yet begun execution.
+   * Tasks ready to start but not yet executed.
    */
   readonly pending: Map<string, ExecutableTask> = new Map();
 
   /**
-   * Collection of tasks that are currently in progress.
+   * Tasks currently in progress.
    */
   readonly active: Map<string, ExecutableTask> = new Map();
 
   /**
-   * Collection of tasks that have finished execution.
+   * Tasks that have completed execution.
    */
   readonly completed: Map<string, ExecutableTask> = new Map();
 
   /**
-   * Checks if there are any tasks in the `pending` collection.
+   * Checks if there are tasks in the `pending` collection.
    */
   public get hasPending() {
     return this.pending.size > 0;
   }
 
   /**
-   * Validates if a state transition for a task is allowed within the {@link FlowController}.
+   * Validates whether a task can transition between states.
    *
-   * @param taskId - The ID of the task to validate.
-   * @param from - The current state in the controller (optional).
-   * @param to - The desired state in the controller (optional).
+   * @param taskId - ID of the task to validate.
+   * @param from - Current state (optional).
+   * @param to - Target state (optional).
    * @returns `true` if the transition is valid, otherwise `false`.
    */
   private validTransition(taskId: string, from?: FlowState | null, to?: FlowState | null): boolean {
@@ -69,7 +70,10 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   }
 
   /**
-   * TODO: update docs
+   * Adds a single task to the `pending` collection.
+   *
+   * @param task - Task to add.
+   * @emits transition - Task transitions to the `pending` state.
    */
   public addTask(task: ExecutableTask) {
     if (!this.validTransition(task.id, null, "pending")) {
@@ -83,13 +87,10 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   }
 
   /**
+   * Adds multiple tasks to the `pending` collection.
    *
-   * TODO: update docs
-   *
-   *
-   * Adds tasks to the `pending` collection of the {@link FlowController}.
-   *
-   * @param tasks - Tasks to add to the controller.
+   * @param tasks - Tasks to add.
+   * @emits transition - For each task added, emits a transition to the `pending` state.
    */
   public addTasks(...tasks: ExecutableTask[]) {
     for (const task of tasks) {
@@ -98,9 +99,10 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   }
 
   /**
-   * Moves the next task from the `pending` collection to the `active` collection.
+   * Moves the next task from `pending` to `active`.
    *
    * @returns The task that was started, or `null` if no tasks are pending.
+   * @emits transition - Task transitions from `pending` to `active`.
    */
   public startNext() {
     if (!this.hasPending) {
@@ -121,9 +123,11 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   }
 
   /**
-   * Moves all tasks from the `pending` collection to the `active` collection and executes a callback for each task.
+   * Moves all tasks from `pending` to `active` and executes a callback for each task.
    *
-   * @param callback - Function to execute for each task that is started.
+   * @param callback - Function to execute for each task.
+   * @emits transition - For each task, emits a transition from `pending` to `active`.
+   * @returns A cleanup function to mark tasks as completed.
    */
   public startAll(callback: (task: ExecutableTask) => void) {
     const pendingTasks = Array.from(this.pending.values());
@@ -145,9 +149,10 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   }
 
   /**
-   * Moves tasks from the `active` collection to the `completed` collection.
+   * Moves tasks from `active` to `completed`.
    *
-   * @param taskIds - IDs of the tasks to mark as completed.
+   * @param taskIds - IDs of tasks to complete.
+   * @emits transition - For each task, emits a transition from `active` to `completed`.
    */
   public complete(...taskIds: string[]) {
     for (const taskId of taskIds) {
@@ -169,7 +174,9 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   }
 
   /**
-   * TODO: Update docs
+   * Resets the flow controller, clearing all states.
+   *
+   * @returns Array of tasks before the reset.
    */
   public reset() {
     const tmp = [...this.tasks];
@@ -182,7 +189,11 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
     return tmp;
   }
 
-  // TODO: Update docs
+  /**
+   * Clears the `pending` collection.
+   *
+   * @emits transition - For each cleared task, emits a transition from `pending`.
+   */
   public clearQueue() {
     if (!this.pending.size) {
       return console.warn("Empty queue.");
@@ -200,6 +211,12 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
     }
   }
 
+  /**
+   * Calculates the progress of tasks.
+   *
+   * @param errorSuccess - Whether tasks with errors should count as fully progressed.
+   * @returns Progress as a number between 0 and 1.
+   */
   public calculateProgress(errorSuccess?: boolean) {
     let progressSum = 0;
 

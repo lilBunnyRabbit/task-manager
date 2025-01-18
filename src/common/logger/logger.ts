@@ -2,30 +2,36 @@ import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import type { LogEntry, LogEntryInput, LogMessage } from "./logger.type";
 
 /**
- * Logger utility for capturing and managing log entries.
+ * Utility for managing and emitting log entries.
  */
 export class Logger {
+  /**
+   * Creates a new logger instance.
+   *
+   * @param emitter - Event emitter for emitting log-related events.
+   */
   constructor(private emitter: EventEmitter<{ log: LogEntry }>) {}
 
   /**
-   * Array of logged entries.
+   * Logged entries.
    */
   readonly logs: LogEntry[] = [];
 
   /**
-   * Retrieves the current stack trace.
+   * Stack trace of the current execution.
    *
-   * @returns The stack trace as a string, or `undefined` if unavailable.
+   * @returns Stack trace as a string, or `undefined` if unavailable.
    */
   private getStack() {
     return new Error().stack?.replace(/^\w*\n\s*/, "")?.replace(/\n\s*/g, "\n");
   }
 
   /**
-   * Logs a new entry with the specified details.
+   * Adds a log entry.
    *
-   * @param log - The log entry input, including level, message, and optional metadata.
-   * @returns The instance of the logger for chaining.
+   * @param log - Log details including level, message, and metadata.
+   * @returns Logger instance for chaining.
+   * @emits log - Emits the created log entry.
    */
   public log(log: LogEntryInput) {
     const logEntry: LogEntry = {
@@ -44,53 +50,58 @@ export class Logger {
   }
 
   /**
-   * Logs a debug-level message.
+   * Adds a debug-level log entry.
    *
-   * @param message - The log message.
-   * @param meta - Optional metadata associated with the log.
-   * @returns The instance of the logger for chaining.
+   * @param message - Log message.
+   * @param meta - Optional metadata.
+   * @returns Logger instance for chaining.
+   * @emits log - Emits the created log entry.
    */
   public debug(message?: LogMessage, meta?: any) {
     return this.log({ level: "debug", message, meta });
   }
 
   /**
-   * Logs an info-level message.
+   * Adds an info-level log entry.
    *
-   * @param message - The log message.
-   * @param meta - Optional metadata associated with the log.
-   * @returns The instance of the logger for chaining.
+   * @param message - Log message.
+   * @param meta - Optional metadata.
+   * @returns Logger instance for chaining.
+   * @emits log - Emits the created log entry.
    */
   public info(message?: LogMessage, meta?: any) {
     return this.log({ level: "info", message, meta });
   }
 
   /**
-   * Logs a warning-level message.
+   * Adds a warning-level log entry.
    *
-   * @param message - The log message.
-   * @param meta - Optional metadata associated with the log.
-   * @returns The instance of the logger for chaining.
+   * @param message - Log message.
+   * @param meta - Optional metadata.
+   * @returns Logger instance for chaining.
+   * @emits log - Emits the created log entry.
    */
   public warn(message?: LogMessage, meta?: any) {
     return this.log({ level: "warn", message, meta });
   }
 
   /**
-   * Logs an error-level message.
+   * Adds an error-level log entry.
    *
-   * @param message - The log message.
-   * @param meta - Optional metadata associated with the log.
-   * @returns The instance of the logger for chaining.
+   * @param message - Log message.
+   * @param meta - Optional metadata.
+   * @returns Logger instance for chaining.
+   * @emits log - Emits the created log entry.
    */
   public error(message?: LogMessage, meta?: any) {
     return this.log({ level: "error", message, meta });
   }
 
   /**
-   * Clears all log entries.
+   * Clears all logged entries.
    *
-   * @returns The instance of the logger for chaining.
+   * @returns Logger instance for chaining.
+   * @emits log - Emits the created log entry.
    */
   public clear() {
     this.logs.length = 0;

@@ -1,5 +1,5 @@
 /**
- * Represents a log message, which can be a string, number, boolean, or null/undefined.
+ * Log message, which can be a string, number, boolean, or null/undefined.
  */
 export type LogMessage = string | number | boolean | null | undefined;
 
@@ -16,21 +16,21 @@ export interface LogEntryInput {
    */
   message: LogMessage;
   /**
-   * Optional metadata associated with the log entry.
+   * Optional metadata for the log entry.
    */
   meta?: any;
 }
 
 /**
- * Represents a complete log entry, including a timestamp and optional stack trace.
+ * Complete log entry with a timestamp and optional stack trace.
  */
 export interface LogEntry extends LogEntryInput {
   /**
-   * ISO-formatted timestamp indicating when the log was created.
+   * ISO-formatted timestamp when the log was created.
    */
   timestamp: string;
   /**
-   * Stack trace information, available for "debug" and "error" levels.
+   * Stack trace for "debug" and "error" levels.
    */
   stack?: string;
 }

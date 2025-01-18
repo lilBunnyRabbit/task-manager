@@ -1,18 +1,20 @@
 import type { TaskBuilder, TaskSpec } from "../";
 import type { BuilderIs } from "../../common";
-import { FlowController } from "../flow-controller";
+import type { FlowController } from "../flow-controller";
 
 /**
- * Provides methods to query, retrieve, and manage tasks and their results from a collection.
+ * Provides methods to query, retrieve, and manage tasks and their results within a {@link FlowController}.
  */
 export class TaskQuery {
   /**
-   * TODO: Update docs
+   * Initializes the TaskQuery with a {@link FlowController}.
+   *
+   * @param controller - The flow controller managing the tasks.
    */
   constructor(private controller: FlowController) {}
 
   /**
-   * Finds the first task that matches the provided builder.
+   * Finds the first task in the `completed` collection that matches the provided builder.
    *
    * @template T - Type of the task.
    * @param builder - Builder used to identify the task.
@@ -28,12 +30,12 @@ export class TaskQuery {
   }
 
   /**
-   * Retrieves the first task that matches the provided builder.
+   * Retrieves the first task in the `completed` collection that matches the provided builder.
    *
    * @template T - Type of the task.
    * @param builder - Builder used to identify the task.
    * @returns The matching task.
-   * @throws If the task is not found.
+   * @throws If no task is found.
    */
   public get<T>(builder: BuilderIs<T>) {
     const task = this.find(builder);
@@ -46,7 +48,7 @@ export class TaskQuery {
   }
 
   /**
-   * Finds the last task that matches the provided builder.
+   * Finds the last task in the `completed` collection that matches the provided builder.
    *
    * @template T - Type of the task.
    * @param builder - Builder used to identify the task.
@@ -67,12 +69,12 @@ export class TaskQuery {
   }
 
   /**
-   * Retrieves the last task that matches the provided builder.
+   * Retrieves the last task in the `completed` collection that matches the provided builder.
    *
    * @template T - Type of the task.
    * @param builder - Builder used to identify the task.
    * @returns The matching task.
-   * @throws If the task is not found.
+   * @throws If no task is found.
    */
   public getLast<T>(builder: BuilderIs<T>) {
     const task = this.findLast(builder);
@@ -85,7 +87,7 @@ export class TaskQuery {
   }
 
   /**
-   * Retrieves all tasks that match the provided builder.
+   * Retrieves all tasks in the `completed` collection that match the provided builder.
    *
    * @template T - Type of the task.
    * @param builder - Builder used to identify the tasks.
@@ -107,7 +109,7 @@ export class TaskQuery {
   // Task
 
   /**
-   * Retrieves the result of the first task that matches the provided builder.
+   * Retrieves the result of the first task in the `completed` collection that matches the provided builder.
    *
    * @template TSpec - Specification of the task.
    * @param taskBuilder - Builder used to identify the task.
@@ -125,7 +127,7 @@ export class TaskQuery {
   }
 
   /**
-   * Retrieves the result of the last task that matches the provided builder.
+   * Retrieves the result of the last task in the `completed` collection that matches the provided builder.
    *
    * @template TSpec - Specification of the task.
    * @param taskBuilder - Builder used to identify the task.
@@ -143,7 +145,7 @@ export class TaskQuery {
   }
 
   /**
-   * Retrieves the results of all tasks that match the provided builder.
+   * Retrieves the results of all tasks in the `completed` collection that match the provided builder.
    *
    * @template TSpec - Specification of the task.
    * @param taskBuilder - Builder used to identify the tasks.

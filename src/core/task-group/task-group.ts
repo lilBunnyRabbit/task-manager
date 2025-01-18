@@ -25,7 +25,7 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * @param args - Arguments for the task group.
    * @param name - Name of the task group.
    * @param mode - Execution mode (linear or parallel).
-   * @param _queue - Queue of tasks to be executed.
+   * @param tasks - List of tasks to be executed.
    */
   constructor(
     readonly builder: TaskGroupBuilder<TArgs>,
@@ -55,6 +55,9 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
     );
   }
 
+  /**
+   * Updates the progress of the task group.
+   */
   private updateProgress() {
     return this.setProgress(this.flowController.calculateProgress(this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)));
   }
@@ -103,10 +106,9 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   /**
    * Executes tasks sequentially (linear mode).
    *
-   * @emits task - When a task is picked for execution.
-   * @emits change - When the task group state changes.
-   * @emits progress - When progress updates.
-   * @returns A promise that resolves when all tasks are executed linearly.
+   * @emits transition - When a task transitions states.
+   * @emits progress - When progress is updated.
+   * @emits error - When task fails.
    */
   private async executeLinear() {
     while (this.flowController.hasPending) {
@@ -148,10 +150,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   /**
    * Executes tasks concurrently (parallel mode).
    *
-   * @emits task - When a task is picked for execution.
-   * @emits change - When the task group state changes.
-   * @emits progress - When progress updates.
-   * @returns A promise that resolves when all tasks are executed in parallel.
+   * @emits transition - When a task transitions states.
+   * @emits progress - When progress is updated.
    */
   private async executeParallel() {
     const executeTask = async (task: ExecutableTask) => {
@@ -202,9 +202,10 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   }
 
   /**
-   * Returns a string representation of the task group.
+   * Converts the task group to a string representation.
    *
-   * @returns A string representing the task group.
+   * @param pretty - If `true`, formats the string for readability.
+   * @returns String representation of the task group.
    */
   public toString(pretty?: boolean) {
     if (pretty === true) {
@@ -215,7 +216,7 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   }
 
   /**
-   * Creates a clone of the task group.
+   * Clones the task group.
    *
    * @returns A new {@link TaskGroup} instance with the same configuration.
    */

@@ -5,13 +5,16 @@ import { TaskManagerBase } from "./task-manager-base";
 import { TaskManagerFlag } from "./task-manager.type";
 
 /**
- * Manages task execution, including adding tasks to the queue, controlling task progress, and handling task lifecycle events.
+ * Manages task execution, including queue management, progress control, and event handling.
  *
- * Supports executing tasks sequentially or in parallel and provides methods to query, retrieve, and manage task results.
+ * Supports sequential and parallel execution modes and provides methods to query, retrieve, and manage task results.
  *
  * @extends TaskManagerBase
  */
 export class TaskManager extends TaskManagerBase {
+  /**
+   * Initializes a new `TaskManager` instance.
+   */
   constructor() {
     super();
 
@@ -22,10 +25,19 @@ export class TaskManager extends TaskManagerBase {
     });
   }
 
+  /**
+   * Checks if the task queue is empty.
+   */
   public get isEmptyQueue() {
     return !this.flowController.hasPending;
   }
 
+  /**
+   * Adds a task to the task queue.
+   *
+   * @param task - Task to add.
+   * @returns The instance of the task manager for chaining.
+   */
   public addTask(task: ExecutableTask) {
     if (task instanceof Task) {
       task.bind(this.query);
@@ -36,13 +48,11 @@ export class TaskManager extends TaskManagerBase {
     return this;
   }
 
-  // TODO: Update docs
   /**
-   * Adds an array of tasks to the task queue.
+   * Adds multiple tasks to the task queue.
    *
-   * @param tasks - An array of tasks to add to the queue.
-   *
-   * @returns The instance of the task manager.
+   * @param tasks - Array of tasks to add.
+   * @returns The instance of the task manager for chaining.
    */
   public addTasks(...tasks: ExecutableTask[]) {
     for (const task of tasks) {
@@ -56,16 +66,15 @@ export class TaskManager extends TaskManagerBase {
     return this.setProgress(this.flowController.calculateProgress(this.hasFlag(TaskManagerFlag.CONTINUE_ON_ERROR)));
   }
 
-  // TODO: Update docs
   /**
-   * Starts the execution of tasks in the task manager.
+   * Starts executing tasks in the queue.
    *
-   * @param force - Force start even if in "fail" status.
-   * @emits fail - When a task fails and the `FAIL_ON_ERROR` flag is set.
-   * @emits success - When all tasks are successfully executed.
-   * @emits progress - When task progress is updated.
-   * @emits change - When the task manager state changes.
-   * @returns A promise that resolves when task execution starts.
+   * @param force - If `true`, starts even if the manager is in an error state.
+   * @returns A promise that resolves when execution starts.
+   * @emits progress - When task progress updates.
+   * @emits success - When all tasks complete successfully.
+   * @emits error - When a task or the manager encounters an error.
+   * @emits fail - When a task fails and the `CONTINUE_ON_ERROR` flag is not set.
    */
   public async start(force?: boolean) {
     if (!this.flowController.hasPending) {
@@ -121,14 +130,12 @@ export class TaskManager extends TaskManagerBase {
     return this.setProgress(1).setStatus("success").emit("success");
   }
 
-  // TODO: Update docs
   /**
-   * Executes tasks in a linear sequence.
+   * Executes tasks sequentially (linear mode).
    *
-   * @emits task - When a task is picked for execution.
-   * @emits change - When the task manager state changes.
-   * @emits progress - When task progress is updated.
-   * @returns A promise that resolves when all tasks in the queue are executed sequentially.
+   * @returns A promise that resolves when all tasks are executed sequentially.
+   * @emits task - When a task starts execution.
+   * @emits progress - When task progress updates.
    */
   private async executeLinear() {
     const task = this.flowController.startNext();
@@ -161,14 +168,12 @@ export class TaskManager extends TaskManagerBase {
     }
   }
 
-  // TODO: Update docs
   /**
-   * Executes tasks in parallel.
+   * Executes tasks concurrently (parallel mode).
    *
-   * @emits task - When a task is picked for execution.
-   * @emits change - When the task manager state changes.
-   * @emits progress - When task progress is updated.
-   * @returns A promise that resolves when all tasks in the queue are executed concurrently.
+   * @returns A promise that resolves when all tasks are executed concurrently.
+   * @emits task - When a task starts execution.
+   * @emits progress - When task progress updates.
    */
   private async executeParallel() {
     const executeTask = async (task: ExecutableTask) => {
@@ -221,9 +226,7 @@ export class TaskManager extends TaskManagerBase {
   }
 
   /**
-   * Stops the execution of tasks in the task manager.
-   *
-   * @emits change - When the task manager is stopped.
+   * Stops task execution.
    */
   public stop() {
     if (!this.isStatus("in-progress")) {
@@ -233,12 +236,8 @@ export class TaskManager extends TaskManagerBase {
     this.addFlag(TaskManagerFlag.STOP);
   }
 
-  // TODO: Update docs
   /**
    * Resets the task manager to its initial state.
-   *
-   * @emits change - When the task manager is reset.
-   * @emits progress - When the task progress is reset.
    */
   public reset() {
     if (this.isStatus("in-progress")) {
@@ -258,13 +257,9 @@ export class TaskManager extends TaskManagerBase {
   }
 
   /**
-   * TODO: Update docs
+   * Clears all tasks from the queue.
    *
-   *
-   * Clears the task queue.
-   *
-   * @emits change - When the queue is cleared.
-   * @returns The instance of the task manager.
+   * @returns The instance of the task manager for chaining.
    */
   public clearQueue(): this {
     this.flowController.clearQueue();

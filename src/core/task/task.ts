@@ -1,7 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { Optional } from "@lilbunnyrabbit/optional";
 import { v4 as uuidv4 } from "uuid";
-import type { TaskManager } from "../";
+import type { TaskManager, TaskGroup } from "../";
 import { TaskQuery } from "../";
 import { LogEntry, Logger, TaskError } from "../../common";
 import { TaskBase } from "./task-base";
@@ -9,44 +9,42 @@ import type { TaskBuilder, TaskConfig } from "./task-builder";
 import type { ParsedTask, TaskSpec } from "./task.type";
 
 /**
- * Single task in the task manager system.
+ * Single task within the task management system.
  *
- * @template TData - Type of input data.
- * @template TResult - Type of result data.
- * @template TError - Type of possible error.
+ * @template TSpec - Task specification type.
  * @extends TaskBase
  */
 export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
-   * Unique task identifier.
+   * Unique identifier for the task.
    */
   readonly id!: string;
 
   /**
-   * Task logger.
+   * Logger for task-related events.
    */
   protected logger = new Logger(this as unknown as EventEmitter<{ log: LogEntry }>);
 
   /**
-   * Task logs.
+   * Logs recorded for the task.
    */
   public get logs() {
     return this.logger.logs;
   }
 
   /**
-   * {@link TaskQuery} instance bound to the task.
+   * {@link TaskQuery} instance bound to this task.
    *
-   * This query originates from either a {@link TaskManager} or {@link TaskGroup}.
+   * The query originates from either a {@link TaskManager} or {@link TaskGroup}.
    */
   private _query?: TaskQuery;
 
   /**
-   * Creates a {@link Task} instance.
+   * Creates a new task instance.
    *
-   * @param builder - Task builder function.
-   * @param name - Task name.
-   * @param _config - Task configuration.
+   * @param builder - Builder used to create the task.
+   * @param name - Name of the task.
+   * @param _config - Configuration for the task.
    * @param data - Input data for the task.
    */
   constructor(
@@ -62,8 +60,6 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
    * Binds the task to a {@link TaskQuery}.
    *
-   * The query originates from either a {@link TaskManager} or a {@link TaskGroup}.
-   *
    * @param query - TaskQuery instance.
    */
   public bind(query: TaskQuery) {
@@ -71,12 +67,10 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   }
 
   /**
-   * Retrieves the {@link TaskQuery} to which this task is bound.
+   * Gets the {@link TaskQuery} instance bound to this task.
    *
-   * The query originates from either a {@link TaskManager} or a {@link TaskGroup}.
-   *
-   * @returns Associated {@link TaskQuery}.
-   * @throws If the task is not bound to a {@link TaskQuery}.
+   * @returns TaskQuery instance.
+   * @throws If the task is not bound to a query.
    */
   public get query(): TaskQuery {
     if (!this._query) {
@@ -89,8 +83,8 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
    * Executes the task.
    *
-   * @returns Result of the task execution.
-   * @throws If not in "idle" state or if execution fails.
+   * @returns Result wrapped in `Optional`.
+   * @throws If the task is not in "idle" state or if execution fails.
    */
   public async execute(): Promise<Optional<TSpec["TResult"]>> {
     if (this.status !== "idle") {
@@ -118,7 +112,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   /**
    * Parses the task for UI rendering.
    *
-   * @returns Parsed representation of the task.
+   * @returns Parsed task data.
    */
   public parse(): ParsedTask {
     const parsed = this._config.parse?.bind(this)() ?? {};
@@ -132,9 +126,10 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
   }
 
   /**
-   * String representation of the task.
+   * Converts the task to a string representation.
    *
-   * @returns Task as a string.
+   * @param pretty - If true, formats the string for readability.
+   * @returns String representation of the task.
    */
   public toString(pretty?: boolean) {
     if (pretty === true) {

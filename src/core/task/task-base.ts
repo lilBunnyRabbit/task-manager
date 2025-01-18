@@ -4,7 +4,7 @@ import { clamp01 } from "../../utils";
 import type { TaskEvents, TaskSpec, TaskStatus } from "./task.type";
 
 /**
- * Base class for managing task status, progress, error handling, and event emission.
+ * Base class for managing task status, progress, result handling, and emitting events.
  *
  * @template TSpec - Task specification type.
  * @extends EventEmitter<TaskEvents>
@@ -13,22 +13,26 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   // Status
 
   /**
-   * Current task status.
+   * Current status of the task.
+   *
    * @default "idle"
    */
   protected _status: TaskStatus = "idle";
 
   /**
-   * Task status.
+   * Current status of the task.
+   *
+   * @default "idle"
    */
   public get status() {
     return this._status;
   }
 
   /**
-   * Updates task status.
-   * @param status - New status.
-   * @emits change - When status changes.
+   * Updates the task status.
+   *
+   * @param status - New status to set.
+   * @emits param - Emits when the `status` parameter changes.
    */
   public set status(status: typeof this._status) {
     if (status !== this.status) {
@@ -39,10 +43,11 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   }
 
   /**
-   * Updates task status.
-   * @param status - New status.
-   * @emits change - When status changes.
-   * @returns Task instance.
+   * Sets the task status.
+   *
+   * @param status - Status to set.
+   * @returns Instance of the task for chaining.
+   * @emits param - Emits when the `status` parameter changes.
    */
   public setStatus(status: typeof this._status): this {
     this.status = status;
@@ -51,10 +56,10 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   }
 
   /**
-   * Checks if the current status matches any of the provided statuses.
+   * Checks if the task status matches any of the provided statuses.
    *
-   * @param statuses - Array of statuses to check against.
-   * @returns `true` if the current status matches any provided status.
+   * @param statuses - List of statuses to check.
+   * @returns `true` if the current status matches one of the provided statuses.
    */
   public isStatus(...statuses: Array<typeof this._status>) {
     return statuses.includes(this.status);
@@ -63,23 +68,27 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   // Progress
 
   /**
-   * Task progress (0 to 1).
+   * Progress of the task (range 0 to 1).
+   *
    * @default 0
    */
   protected _progress: number = 0;
 
   /**
-   * Task progress (0 to 1).
+   * Progress of the task (range 0 to 1).
+   *
+   * @default 0
    */
   public get progress() {
     return this._progress;
   }
 
   /**
-   * Updates task progress.
+   * Updates the task progress.
+   *
    * @param progress - New progress value (0 to 1).
    * @emits progress - When progress changes.
-   * @emits change - When progress changes.
+   * @emits param - When the `progress` parameter changes.
    */
   public set progress(progress: typeof this._progress) {
     const validProgress = clamp01(progress);
@@ -92,11 +101,12 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   }
 
   /**
-   * Updates task progress.
-   * @param progress - New progress value (0 to 1).
+   * Sets the task progress.
+   *
+   * @param progress - Progress value to set.
+   * @returns Instance of the task for chaining.
    * @emits progress - When progress changes.
-   * @emits change - When progress changes.
-   * @returns Task instance.
+   * @emits param - When the `progress` parameter changes.
    */
   public setProgress(progress: typeof this._progress) {
     this.progress = progress;
@@ -107,22 +117,22 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   // Result
 
   /**
-   * Task result wrapped in an Optional.
+   * Task result, wrapped in an `Optional` object.
    */
   protected _result: Optional<TSpec["TResult"]> = Optional.empty();
 
   /**
-   * Task result wrapped in an Optional.
+   * Task result, wrapped in an `Optional` object.
    */
   public get result() {
     return this._result;
   }
 
   /**
-   * Updates task result, sets status to "success," and progress to 1.
-   * @param result - Task result.
-   * @emits progress - When result is updated and progress is completed.
-   * @emits change - When result is updated.
+   * Sets the task result.
+   *
+   * @param result - Result to set.
+   * @emits param - When the `result` parameter changes.
    */
   protected set result(result: typeof this._result) {
     this._result = result;
@@ -130,11 +140,11 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
   }
 
   /**
-   * Updates task result, sets status to "success," and progress to 1.
-   * @param result - Task result.
-   * @emits progress - When result is updated and progress is completed.
-   * @emits change - When result is updated.
-   * @returns Task instance.
+   * Sets the task result and updates the status to `success`.
+   *
+   * @param result - Result to set.
+   * @returns Instance of the task for chaining.
+   * @emits param - When the `result` parameter changes.
    */
   protected setResult(result: typeof this._result): this {
     this.result = result;

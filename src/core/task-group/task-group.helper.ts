@@ -2,7 +2,7 @@ import { TaskGroup } from "./task-group";
 import type { TaskGroupBuilder } from "./task-group-builder";
 
 /**
- * Type guard to check if an object is an instance of {@link TaskGroup}.
+ * Checks if an object is an instance of {@link TaskGroup}.
  *
  * @template TArgs - Arguments used to create the task group.
  * @param taskGroup - Object to check.

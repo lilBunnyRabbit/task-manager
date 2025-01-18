@@ -9,7 +9,7 @@ import { TaskManagerFlag } from "./task-manager.type";
 /**
  * Base class for managing tasks, their statuses, progress, flags, and queue operations.
  *
- * Emits events related to task lifecycle and status changes.
+ * Provides foundational methods for task lifecycle management and event-driven operations, used by task manager implementations.
  *
  * @extends EventEmitter<TaskManagerEvents>
  */
@@ -24,7 +24,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   protected _status: TaskManagerStatus = "idle";
 
   /**
-   * Gets the current status of the task manager.
+   * Retrieves the current status of the task manager.
    */
   public get status() {
     return this._status;
@@ -34,7 +34,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * Updates the status of the task manager.
    *
    * @param status - New status to set.
-   * @emits change - When the status changes.
+   * @emits param - When the `status` parameter changes.
    */
   protected set status(status: typeof this._status) {
     if (status !== this.status) {
@@ -47,9 +47,9 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   /**
    * Sets the status of the task manager.
    *
-   * @param status - New status to set.
-   * @emits change - When the status changes.
-   * @returns Instance of the manager for chaining.
+   * @param status - Status to set.
+   * @returns Instance of the task manager for chaining.
+   * @emits param - When the `status` parameter changes.
    */
   protected setStatus(status: typeof this._status) {
     this.status = status;
@@ -77,7 +77,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   protected _progress: number = 0;
 
   /**
-   * Gets the current progress of tasks.
+   * Retrieves the current progress of tasks.
    */
   public get progress() {
     return this._progress;
@@ -86,9 +86,9 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   /**
    * Updates the progress of tasks.
    *
-   * @param progress - New progress value (between 0 and 1).
-   * @emits progress - When the progress changes.
-   * @emits change - When the progress changes.
+   * @param progress - New progress value (0 to 1).
+   * @emits progress - When progress changes.
+   * @emits param - When the `progress` parameter changes.
    */
   protected set progress(progress: typeof this._progress) {
     const validProgress = clamp01(progress);
@@ -104,9 +104,9 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * Sets the progress of tasks.
    *
    * @param progress - Progress value to set.
-   * @emits progress - When the progress changes.
-   * @emits change - When the progress changes.
-   * @returns Instance of the manager for chaining.
+   * @returns Instance of the task manager for chaining.
+   * @emits progress - When progress changes.
+   * @emits param - When the `progress` parameter changes.
    */
   protected setProgress(progress: typeof this._progress) {
     this.progress = progress;
@@ -124,7 +124,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   protected _flags: Set<TaskManagerFlag> = new Set([]);
 
   /**
-   * Gets the current flags.
+   * Retrieves the current flags of the task manager as an array.
    */
   public get flags(): TaskManagerFlag[] {
     return Array.from(this._flags);
@@ -134,7 +134,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * Updates the flags for the task manager.
    *
    * @param flags - New set of flags to apply.
-   * @emits change - When the flags are updated.
+   * @emits param - When the `flags` parameter changes.
    */
   public set flags(flags: typeof this._flags) {
     this._flags = flags;
@@ -146,8 +146,8 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * Sets the flags for the task manager.
    *
    * @param flags - Flags to set.
-   * @emits change - When the flags are updated.
-   * @returns Instance of the manager for chaining.
+   * @returns Instance of the task manager for chaining.
+   * @emits param - When the `flags` parameter changes.
    */
   public setFlags(flags: typeof this._flags) {
     this.flags = flags;
@@ -159,8 +159,8 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * Adds a flag to the task manager.
    *
    * @param flag - Flag to add.
-   * @emits change - When the flags are updated.
-   * @returns Instance of the manager for chaining.
+   * @returns Instance of the task manager for chaining.
+   * @emits param - When the `flags` parameter changes.
    */
   public addFlag(flag: TaskManagerFlag): this {
     this._flags.add(flag);
@@ -174,8 +174,8 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * Removes a flag from the task manager.
    *
    * @param flag - Flag to remove.
-   * @emits change - When the flags are updated.
-   * @returns Instance of the manager for chaining.
+   * @returns Instance of the task manager for chaining.
+   * @emits param - When the `flags` parameter changes.
    */
   public removeFlag(flag: TaskManagerFlag): this {
     this._flags.delete(flag);
@@ -186,7 +186,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   }
 
   /**
-   * Checks if a specific flag is set.
+   * Checks if a specific flag is set in the task manager.
    *
    * @param flag - Flag to check.
    * @returns `true` if the flag is set.
@@ -196,20 +196,23 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   }
 
   /**
-   * Checks if all specified flags are set.
+   * Checks if all specified flags are set in the task manager.
    *
    * @param flags - Flags to check.
-   * @returns `true` if all flags are set.
+   * @returns `true` if all specified flags are set.
    */
   public hasFlags(...flags: TaskManagerFlag[]): boolean {
     return flags.every((flag) => this.hasFlag(flag));
   }
 
   /**
-   * TODO: Update docs
+   * Manages task execution and flow control.
    */
   protected flowController: FlowController = new FlowController();
 
+  /**
+   * Retrieves all tasks managed by the task manager.
+   */
   public get tasks() {
     return this.flowController.tasks;
   }
@@ -229,7 +232,9 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
   protected _mode: ExecutionMode = ExecutionMode.LINEAR;
 
   /**
-   * Gets the current execution mode.
+   * Current execution mode of the task manager.
+   *
+   * @default ExecutionMode.LINEAR
    */
   public get mode() {
     return this._mode;
@@ -250,7 +255,7 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
    * Sets the execution mode.
    *
    * @param mode - Execution mode to set.
-   * @returns Instance of the manager for chaining.
+   * @returns Instance of the task manager for chaining.
    */
   public setMode(mode: ExecutionMode) {
     this.mode = mode;

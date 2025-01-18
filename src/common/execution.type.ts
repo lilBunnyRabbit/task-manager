@@ -1,4 +1,4 @@
-import type { Task, TaskGroup, TaskSpec } from "../core";
+import type { Task, TaskGroup } from "../core";
 
 /**
  * Defines the execution modes for tasks.
