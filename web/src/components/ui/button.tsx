@@ -20,7 +20,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-foreground/10 hover:foreground active:translate-y-px",
         nav: "justify-between hover:bg-background hover:text-foreground gap-4",
         link: "text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-50",
-        chevron: "hover:bg-primary/10 data-[active=true]:bg-primary/10 border border-transparent data-[active=true]:border-primary/50",
+        chevron: "hover:bg-primary/10  border border-transparent data-[active=true]:!bg-primary/10 data-[active=true]:border-primary/50 data-[highlight=true]:bg-info/10",
         transparent: "",
       },
       size: {

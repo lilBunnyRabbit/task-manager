@@ -6,15 +6,17 @@ export type BadgeTypes = "manager" | "group" | "task";
 const config: Record<BadgeTypes, { label: string; className: string }> = {
   manager: {
     label: "manager",
-    className: "bg-purple-500/20 text-purple-800",
+    className: "bg-info/40 text-info dark:bg-info/20",
   },
   group: {
     label: "group",
-    className: "bg-blue-500/20 text-blue-800",
+    className:
+      "bg-success/40 text-success dark:bg-success/20",
   },
   task: {
     label: "task",
-    className: "bg-foreground/20 text-foreground",
+    className:
+      "bg-primary/40 text-primary dark:bg-primary/20",
   },
 };
 
@@ -26,5 +28,9 @@ interface TypeBadgeProps {
 export const TypeBadge: React.FC<TypeBadgeProps> = ({ type, className: externalClassName }) => {
   const { label, className } = config[type];
 
-  return <span className={cn("px-2 py-0.5 rounded-md text-xs", className, externalClassName)}>{label}</span>;
+  return (
+    <span className={cn("px-2 py-0.5 rounded-md text-xs [&>span]:brightness-[.75] dark:[&>span]:filter-none", className, externalClassName)}>
+      <span>{label}</span>
+    </span>
+  );
 };

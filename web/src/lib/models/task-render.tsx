@@ -62,11 +62,11 @@ export const TaskRender: React.FC<TaskRenderProps> = ({ task }) => {
 
       <LabelSection label="Objects">
         <div className="grid grid-cols-[repeat(2,minmax(0px,500px))] gap-x-4">
-          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+          <div className="border border-foreground rounded-md bg-background overflow-hidden">
             <pre className="overflow-x-auto p-4 text-sm h-full">{task.toString(true)}</pre>
           </div>
 
-          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+          <div className="border border-foreground rounded-md bg-background overflow-hidden">
             <pre className="overflow-x-auto p-4 text-sm h-full">{task.builder.toString(true)}</pre>
           </div>
         </div>
@@ -74,7 +74,7 @@ export const TaskRender: React.FC<TaskRenderProps> = ({ task }) => {
 
       {!isUndefined(parsed.result) && (
         <LabelSection label="Result">
-          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+          <div className="border border-foreground rounded-md bg-background overflow-hidden">
             <pre className="overflow-x-auto p-4 text-sm">{parsed.result}</pre>
           </div>
         </LabelSection>

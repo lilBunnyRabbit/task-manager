@@ -17,8 +17,97 @@ interface ManagerProps {
 }
 
 export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
-  const [selected, setSelected] = React.useState<ExecutableTask | undefined>();
   const taskManager = React.useMemo(() => example.taskManager, [example]);
+
+  return (
+    <div
+      className={cn(
+        "relative grid grid-cols-1 grid-rows-[min-content,min-content,1fr] h-full max-w-full overflow-x-hidden",
+        className
+      )}
+    >
+      <div className="px-10 pt-6">
+        <div className="flex items-start justify-between">
+          <h1 className="col-span-2">{example.title ?? "Unknown Example"} </h1>
+          <SourceDialog title={example.title ?? "Unknown Example"} description="Source code" source={example.source}>
+            <Button size="icon" className="border">
+              <Code2Icon className="!size-5" />
+            </Button>
+          </SourceDialog>
+        </div>
+
+        {example.description && <div>{example.description}</div>}
+      </div>
+
+      <ManagerPreview className="w-full h-full" taskManager={taskManager}>
+        {({ taskManager, setSelected }) => (
+          <div className="flex gap-2 items-center flex-wrap border-b border-b-foreground px-10 py-6">
+            <Button
+              variant="action"
+              className={
+                taskManager.isStatus("in-progress", "success")
+                  ? "bg-red-200 border-red-700 text-red-700"
+                  : taskManager.isStatus("error")
+                  ? "bg-amber-200 border-amber-700 text-amber-700"
+                  : "bg-lime-200 border-lime-700 text-lime-700"
+              }
+              disabled={
+                taskManager.isStatus("success") ||
+                (taskManager.hasFlag(TaskManagerFlag.STOP) && taskManager.isStatus("in-progress")) ||
+                (taskManager.isStatus("error") && taskManager.isEmptyQueue)
+              }
+              onClick={() => {
+                if (taskManager.isStatus("in-progress")) {
+                  return taskManager.stop();
+                }
+
+                taskManager.start(taskManager.isStatus("error"));
+              }}
+            >
+              {taskManager.isStatus("in-progress", "success")
+                ? "Stop"
+                : taskManager.isStatus("idle")
+                ? "Start"
+                : "Continue"}{" "}
+              {taskManager.isStatus("error") && "(force)"}
+            </Button>
+            <Button
+              variant="action"
+              className="bg-orange-200 border-orange-700 text-orange-700"
+              disabled={taskManager.isStatus("in-progress", "idle")}
+              onClick={() => {
+                taskManager.reset();
+                setSelected(undefined);
+              }}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="action"
+              className="bg-blue-200 border-blue-700 text-blue-700"
+              disabled={taskManager.isEmptyQueue}
+              onClick={() => taskManager.clearQueue()}
+            >
+              Clear Queue
+            </Button>
+          </div>
+        )}
+      </ManagerPreview>
+    </div>
+  );
+};
+
+interface ManagerPreviewProps {
+  taskManager: TaskManager;
+  className?: string;
+  children?: React.FC<{
+    taskManager: TaskManager;
+    setSelected: React.Dispatch<React.SetStateAction<ExecutableTask | undefined>>;
+  }>;
+}
+
+export const ManagerPreview: React.FC<ManagerPreviewProps> = ({ taskManager, className, children: Children }) => {
+  const [selected, setSelected] = React.useState<ExecutableTask | undefined>();
 
   const counterState = React.useState(0);
 
@@ -33,9 +122,8 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
   }, []);
 
   React.useEffect(() => {
-    function onAll(this: TaskManager, ...args: unknown[]) {
+    function onAll(this: TaskManager) {
       counterState[1]((c) => c + 1);
-      // console.log(...args);
     }
 
     taskManager.onAll(onAll);
@@ -54,106 +142,41 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
   );
 
   return (
-    <div
-      className={cn(
-        "relative grid grid-cols-[min-content,1fr] grid-rows-[min-content,min-content,1fr] h-full max-w-full overflow-x-hidden",
-        className
-      )}
-    >
-      <div className="col-span-2 px-10 pt-6">
-        <div className="flex items-start justify-between">
-          <h1 className="col-span-2">{example.title ?? "Unknown Example"} </h1>
-          <SourceDialog title={example.title ?? "Unknown Example"} description="Source code" source={example.source}>
-            <Button size="icon" className="border">
-              <Code2Icon className="!size-5" />
-            </Button>
-          </SourceDialog>
+    <>
+      {Children && <Children taskManager={taskManager} setSelected={setSelected} />}
+
+      <div className={cn("grid grid-cols-[min-content,1fr]", className)}>
+        <div className="border-r border-r-foreground max-h-full overflow-y-auto w-fit">
+          <div className="p-4">
+            <NodeList
+              mode={taskManager.mode}
+              node={
+                <NodeButton
+                  data={{
+                    status: taskManager.status,
+                    name: "Task Manager",
+                    type: "manager",
+                  }}
+                  data-active={!selected}
+                  onClick={() => setSelected(undefined)}
+                />
+              }
+            >
+              {taskManager.tasks.map((task) => (
+                <TreeRender key={`task-${task.id}`} task={task} selected={selected} onSelect={onSelect} />
+              ))}
+            </NodeList>
+          </div>
         </div>
 
-        {example.description && <div>{example.description}</div>}
-      </div>
-
-      <div className="col-span-2 flex gap-2 items-center flex-wrap border-b border-b-foreground px-10 py-6">
-        <Button
-          variant="action"
-          className={
-            taskManager.isStatus("in-progress", "success")
-              ? "bg-red-200 border-red-700 text-red-700"
-              : taskManager.isStatus("error")
-              ? "bg-amber-200 border-amber-700 text-amber-700"
-              : "bg-lime-200 border-lime-700 text-lime-700"
-          }
-          disabled={
-            taskManager.isStatus("success") ||
-            (taskManager.hasFlag(TaskManagerFlag.STOP) && taskManager.isStatus("in-progress")) ||
-            (taskManager.isStatus("error") && taskManager.isEmptyQueue)
-          }
-          onClick={() => {
-            if (taskManager.isStatus("in-progress")) {
-              return taskManager.stop();
-            }
-
-            taskManager.start(taskManager.isStatus("error"));
-          }}
-        >
-          {taskManager.isStatus("in-progress", "success")
-            ? "Stop"
-            : taskManager.isStatus("idle")
-            ? "Start"
-            : "Continue"}{" "}
-          {taskManager.isStatus("error") && "(force)"}
-        </Button>
-        <Button
-          variant="action"
-          className="bg-orange-200 border-orange-700 text-orange-700"
-          disabled={taskManager.isStatus("in-progress", "idle")}
-          onClick={() => {
-            taskManager.reset();
-            setSelected(undefined);
-          }}
-        >
-          Reset
-        </Button>
-        <Button
-          variant="action"
-          className="bg-blue-200 border-blue-700 text-blue-700"
-          disabled={taskManager.isEmptyQueue}
-          onClick={() => taskManager.clearQueue()}
-        >
-          Clear Queue
-        </Button>
-      </div>
-
-      <div className="border-r border-r-foreground max-h-full overflow-y-auto w-fit">
-        <div className="p-4">
-          <NodeList
-            mode={taskManager.mode}
-            node={
-              <NodeButton
-                data={{
-                  status: taskManager.status,
-                  name: "Task Manager",
-                  type: "manager",
-                }}
-                data-active={!selected}
-                onClick={() => setSelected(undefined)}
-              />
-            }
-          >
-            {taskManager.tasks.map((task) => (
-              <TreeRender key={`task-${task.id}`} task={task} selected={selected} onSelect={onSelect} />
-            ))}
-          </NodeList>
+        <div className="p-8 max-w-full overflow-x-hidden max-h-full overflow-y-auto">
+          <div className="border border-foreground rounded-md p-4 bg-foreground/10">
+            {selected && <ExecutableTaskRender key={`selected-${selected.id}`} task={selected} />}
+            {!selected && <TaskManagerRender taskManager={taskManager} />}
+          </div>
         </div>
       </div>
-
-      <div className="p-8 max-w-full overflow-x-hidden max-h-full overflow-y-auto">
-        <div className="border border-foreground rounded-md p-4 bg-white">
-          {selected && <ExecutableTaskRender key={`selected-${selected.id}`} task={selected} />}
-          {!selected && <TaskManagerRender taskManager={taskManager} />}
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
@@ -174,6 +197,7 @@ const TreeRender: React.FC<TreeRenderProps> = ({ task, selected, onSelect }) => 
         }}
         className={cn(task.status === "idle" && "opacity-60")}
         data-active={selected?.id === task.id}
+        data-highlight={selected?.builder.id === task.builder.id}
         onClick={() => onSelect(task)}
       />
     );
@@ -192,6 +216,7 @@ const TreeRender: React.FC<TreeRenderProps> = ({ task, selected, onSelect }) => 
           }}
           className={cn(task.status === "idle" && "opacity-60")}
           data-active={selected?.id === task.id}
+          data-highlight={selected?.builder.id === task.builder.id}
           onClick={() => onSelect(task)}
         />
       }

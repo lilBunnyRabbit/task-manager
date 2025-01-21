@@ -19,6 +19,34 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
+
+  <script>
+    const DARK_CLASS = "dark";
+
+    function setClass(isDark) {
+      if (isDark) {
+        if (!document.documentElement.classList.contains(DARK_CLASS)) {
+          document.documentElement.classList.add(DARK_CLASS);
+        }
+      } else {
+        if (document.documentElement.classList.contains(DARK_CLASS)) {
+          document.documentElement.classList.remove(DARK_CLASS);
+        }
+      }
+    }
+
+    const savedTheme = localStorage.getItem("@lilbunnyrabbit/theme");
+    if (savedTheme !== null && (savedTheme === "dark" || savedTheme === "light")) {
+      setClass(savedTheme === "dark");
+    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setClass(true);
+    }
+
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+      localStorage.setItem("@lilbunnyrabbit/theme", event.matches ? "dark" : "light");
+      setClass(event.matches);
+    });
+  </script>
 </body>
 
 </html>

@@ -1,7 +1,5 @@
-import { javascript } from "@codemirror/lang-javascript";
-import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirror from "@uiw/react-codemirror";
 import React from "react";
+import { CodeBlock } from "./code-block";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 
 interface SourceDialogProps {
@@ -22,12 +20,7 @@ export const SourceDialog: React.FC<SourceDialogProps> = ({ title, description, 
         </DialogHeader>
 
         <div className="h-full max-h-full overflow-y-scroll">
-          <CodeMirror
-            value={source}
-            theme={githubLight}
-            readOnly
-            extensions={[javascript({ typescript: true, jsx: true })]}
-          />
+          <CodeBlock value={source} readOnly />
         </div>
       </DialogContent>
     </Dialog>

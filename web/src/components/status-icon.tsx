@@ -8,31 +8,31 @@ export type AllStatus = TaskManagerStatus | TaskGroupStatus | TaskStatus;
 const config: Record<AllStatus, { label: string; className: string }> = {
   idle: {
     label: "idle",
-    className: "bg-foreground/20 !text-foreground",
+    className: "bg-foreground/20 text-foreground",
   },
   "in-progress": {
     label: "in-progress",
-    className: "bg-foreground/20 !text-foreground",
+    className: "bg-info/40 text-info dark:bg-info/20",
   },
   success: {
     label: "success",
-    className: "bg-success/40 !text-foreground",
+    className: "bg-success/40 text-success dark:bg-success/20",
   },
   stopped: {
     label: "stopped",
-    className: "bg-foreground/20 !text-foreground",
+    className: "bg-warn/40 text-warn dark:bg-warn/20",
   },
   error: {
     label: "error",
-    className: "bg-error/20 !text-error",
+    className: "bg-error/40 text-error dark:bg-error/20",
   },
 };
 
 const icons: Record<AllStatus, React.ReactNode> = {
   idle: <ClockIcon className="text-foreground" />,
-  "in-progress": <LoaderIcon className="text-foreground animate-spin" />,
+  "in-progress": <LoaderIcon className="text-info animate-spin" />,
   success: <CheckCircleIcon className="text-success" />,
-  stopped: <PauseIcon className="text-foreground" />,
+  stopped: <PauseIcon className="text-warn" />,
   error: <AlertCircleIcon className="text-error" />,
 };
 
@@ -50,12 +50,13 @@ export const StatusBadge: React.FC<StatusIconProps> = ({ status }) => {
   return (
     <div
       className={cn(
-        "px-2 py-0.5 rounded-md text-xs flex items-center gap-2 whitespace-nowrap [&_svg]:h-4 [&_svg]:w-4 [&_svg]:flex-shrink-0 [&_svg]:text-current",
+        "px-2 py-0.5 rounded-md text-xs whitespace-nowrap w-fit [&>span]:brightness-[.75] dark:[&>span]:filter-none [&_svg]:h-4 [&_svg]:w-[14px] [&_svg]:flex-shrink-0 [&_svg]:text-current",
         className
       )}
     >
-      {label}
-      {icons[status]}
+      <span className="flex items-center gap-2">
+        {label} {icons[status]}
+      </span>
     </div>
   );
 };

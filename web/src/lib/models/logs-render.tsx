@@ -9,7 +9,7 @@ interface LogsRenderProps {
 
 export const LogsRender: React.FC<LogsRenderProps> = ({ logs }) => {
   return (
-    <div className="border border-foreground rounded-md overflow-x-hidden bg-foreground/10">
+    <div className="border border-foreground rounded-md overflow-x-hidden bg-background">
       <ScrollBottom className="overflow-auto text-sm max-h-[22rem]">
         <pre className="p-4 w-fit h-fit">
           {logs.map((log, i) => {

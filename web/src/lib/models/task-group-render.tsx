@@ -62,11 +62,11 @@ export const TaskGroupRender: React.FC<TaskGroupRenderProps> = ({ taskGroup }) =
 
       <LabelSection label="Objects">
         <div className="grid grid-cols-[repeat(2,minmax(0px,500px))] gap-x-4">
-          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+          <div className="border border-foreground rounded-md bg-background overflow-hidden">
             <pre className="overflow-x-auto p-4 text-sm h-full">{taskGroup.toString(true)}</pre>
           </div>
 
-          <div className="border border-foreground rounded-md bg-foreground/10 overflow-hidden">
+          <div className="border border-foreground rounded-md bg-background overflow-hidden">
             <pre className="overflow-x-auto p-4 text-sm h-full">{taskGroup.builder.toString(true)}</pre>
           </div>
         </div>
