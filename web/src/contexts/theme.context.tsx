@@ -55,6 +55,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           const theme = getElementTheme(target);
           setTheme(theme);
           localStorage.setItem("@lilbunnyrabbit/theme", theme);
+          localStorage.setItem("tsd-theme", theme);
         }
       }
     });

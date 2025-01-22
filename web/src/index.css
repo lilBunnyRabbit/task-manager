@@ -50,7 +50,7 @@
 
   /* Links */
   a {
-    @apply underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply no-underline hover:underline hover:text-primary transition-all !outline-none focus:underline;
   }
 
   code {

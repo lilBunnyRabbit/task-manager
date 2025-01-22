@@ -14,5 +14,8 @@
 [ ] `createGroup(name: string, tasks: ExecutableTask[])` `createGroup(name: string, tasks: (...T) => ExecutableTask[])`
 [ ] Fix `TaskGroup` clone
 [ ] Execute on group
+[ ] Parent access
 
 [ ] TypeDoc - generates into public
+[ ] Update README
+[ ] BaseURL

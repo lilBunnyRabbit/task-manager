@@ -1,5 +1,8 @@
-import { CodeBlock } from "@/components/code-block";
+import { CodeBlock, CopyCodeBlock } from "@/components/code-block";
+import { GithubIcon, NpmIcon } from "@/components/icons";
+import { ToTop } from "@/components/to-top";
 import { Button } from "@/components/ui/button";
+import { LINK } from "@/config";
 import demoExample from "@/examples/demo.example";
 import { FeatureCard, FeatureHorizontal, UseCaseCard } from "@/lib/landing/feature-card";
 import { ManagerPreview } from "@/lib/manager";
@@ -16,6 +19,7 @@ import {
   ImageIcon,
   LayersIcon,
   LayoutGridIcon,
+  MailIcon,
   PlayIcon,
   RefreshCwIcon,
   RepeatIcon,
@@ -28,7 +32,7 @@ import {
   WorkflowIcon,
 } from "lucide-react";
 import React from "react";
-import { LINK } from ".";
+import { Link } from "react-router";
 
 const example = demoExample();
 
@@ -248,7 +252,7 @@ await fetchUsers.on("success", () => {
         </div>
       </Section>
 
-      <Section rootClassName="py-16 bg-gradient-to-b from-foreground/20 to-background border-b border-b-foreground">
+      <Section rootClassName="py-16 bg-gradient-to-b from-foreground/20 via-background to-foreground/20 border-b border-b-foreground">
         <h2 className="text-3xl font-bold mb-4 text-center">Try It Out</h2>
         <p className="mb-8 text-center mx-auto max-w-4xl">
           Experience the power of our Task Management System with this interactive demo. See how tasks are executed,
@@ -258,19 +262,19 @@ await fetchUsers.on("success", () => {
         <div className="border border-foreground bg-foreground rounded-lg overflow-hidden">
           <ManagerPreview className="bg-background" taskManager={example}>
             {({ taskManager, setSelected }) => (
-              <div className="flex items-center justify-between text-background px-4 py-2">
-                <div>Task Manager Demo</div>
-                <div className="flex gap-2 items-center flex-wrap">
+              <div className="flex items-center justify-between text-background pl-10 pr-4 py-2">
+                <div className="flex gap-2 items-center">
                   <Button
-                    variant="action"
+                    variant="ghost"
                     size="sm"
-                    className={
+                    className={cn(
+                      "hover:bg-background",
                       taskManager.isStatus("in-progress", "success")
-                        ? "bg-red-200 border-red-700 text-red-700"
+                        ? "bg-red-200 hover:bg-red-100 text-red-700"
                         : taskManager.isStatus("error")
-                        ? "bg-amber-200 border-amber-700 text-amber-700"
-                        : "bg-lime-200/60 text-lime-700"
-                    }
+                        ? "bg-amber-200 hover:bg-amber-100 text-amber-700"
+                        : "bg-lime-200 hover:bg-lime-100 text-lime-700"
+                    )}
                     disabled={
                       taskManager.isStatus("success") ||
                       (taskManager.hasFlag(TaskManagerFlag.STOP) && taskManager.isStatus("in-progress")) ||
@@ -293,9 +297,9 @@ await fetchUsers.on("success", () => {
                   </Button>
 
                   <Button
-                    variant="action"
+                    variant="ghost"
                     size="sm"
-                    className="bg-background text-warn"
+                    className="hover:bg-orange-100 bg-orange-200 text-orange-700"
                     disabled={taskManager.isStatus("in-progress", "idle")}
                     onClick={() => {
                       taskManager.reset();
@@ -305,13 +309,14 @@ await fetchUsers.on("success", () => {
                     Reset
                   </Button>
                 </div>
+                <div>Task Manager Demo</div>
               </div>
             )}
           </ManagerPreview>
         </div>
       </Section>
 
-      <Section rootClassName="py-16 bg-gradient-to-b from-primary/20 to-background">
+      <Section rootClassName="py-16 bg-background border-b border-b-foreground">
         <h2 className="text-3xl font-bold mb-4 text-center">Use Cases</h2>
         <p className="mb-8 text-center mx-auto max-w-4xl">
           Explore practical examples of how this task management system can simplify workflows, from file uploads to
@@ -534,6 +539,106 @@ const inventoryManagementGroup = createTaskGroup({
           />
         </div>
       </Section>
+
+      <Section rootClassName="py-16 bg-gradient-to-b from-foreground/20 via-background to-foreground/20 border-b border-b-foreground">
+        <h2 className="text-3xl font-bold mb-4 text-center">Get Started in Seconds</h2>
+        <p className="mb-8 text-center mx-auto max-w-4xl">
+          Task Management System is designed for quick integration and ease of use. Follow these simple steps to get up
+          and running with powerful task management in your project.
+        </p>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-foreground">1. Install the Package</h3>
+
+            <CopyCodeBlock code="npm install @lilbunnyrabbit/task-manager" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-foreground">2. Import and Use</h3>
+
+            <div className="rounded-lg overflow-hidden border border-foreground bg-foreground ">
+              <CodeBlock
+                readOnly
+                value={`import { createTask, TaskManager } from "@lilbunnyrabbit/task-manager";
+
+const myTask = createTask({
+  name: "My First Task",
+  async execute() {
+    // Your task logic here
+  }
+});
+
+const manager = new TaskManager()
+  .addTask(myTask())
+  .start();`}
+              />
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <footer className="bg-background border-t border-foreground/20 py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col items-start">
+              <h3 className="font-semibold mb-4">Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/api-reference">API Reference</Link>
+                </li>
+                <li>
+                  <Link to="/examples">Examples</Link>
+                </li>
+                <li>
+                  <Link to="/changelog">Changelog</Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-4">Contact</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href={LINK.Email} className="flex items-center">
+                    <MailIcon size={16} className="mr-2" />
+                    Email
+                  </a>
+                </li>
+                <li>
+                  <a href={LINK.GitHub} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                    <GithubIcon className="mr-2 size-4" />
+                    GitHub
+                  </a>
+                </li>
+                <li>
+                  <a href={LINK.NPM} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                    <NpmIcon className="mr-2 size-4" />
+                    NPM
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-4">Support</h3>
+              <div className="space-y-4">
+                <a href="https://www.buymeacoffee.com/lilBunnyRabbit" className="block dark:hidden">
+                  <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lilBunnyRabbit&button_colour=648096&font_colour=fff6e7&outline_colour=fff6e7&coffee_colour=fff6e7" />
+                </a>
+                <a href="https://www.buymeacoffee.com/lilBunnyRabbit" className="hidden dark:block">
+                  <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lilBunnyRabbit&button_colour=b9b6aa&font_colour=1a2b33&outline_colour=1a2b33&coffee_colour=1a2b33" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-8 border-t border-foreground/20 flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
+            <p className="text-foreground text-sm">MIT © 2024-present Andraž Mesarič-Sirec. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+      <ToTop />
     </>
   );
 }

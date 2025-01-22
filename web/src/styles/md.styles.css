@@ -1,0 +1,13 @@
+.md-render {
+  & h2 {
+    @apply text-2xl font-medium leading-normal mt-4 border-l-2 border-foreground/40 pl-4;
+  }
+
+  & h3 {
+    @apply text-xl font-medium leading-relaxed border-l-2 border-foreground/40 pl-4;
+  }
+
+  & ul {
+    @apply list-disc list-inside border-l-2 border-foreground/40 pl-6;
+  }
+}

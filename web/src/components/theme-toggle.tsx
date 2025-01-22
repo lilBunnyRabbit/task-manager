@@ -1,7 +1,6 @@
-import React from "react";
-import { Button } from "./ui/button";
-import { MoonIcon, SunIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MoonStarIcon, SunIcon } from "lucide-react";
+import React from "react";
 
 const DARK_CLASS = "dark";
 
@@ -36,9 +35,14 @@ export const ThemeToggle = React.forwardRef<
   }, []);
 
   return (
-    <Button ref={ref} variant="ghost" size="icon" className={cn(className)} onClick={toggle} {...props}>
-      {isDark ? <MoonIcon /> : <SunIcon />}
-    </Button>
+    <button
+      ref={ref}
+      className={cn("[&_svg]:size-6 block w-fit h-fit text-primary", className)}
+      onClick={toggle}
+      {...props}
+    >
+      {isDark ? <MoonStarIcon /> : <SunIcon />}
+    </button>
   );
 });
 

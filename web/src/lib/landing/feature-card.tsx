@@ -59,7 +59,7 @@ export const UseCaseCard: React.FC<FeatureCardProps & { code?: string }> = ({
       </div>
 
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="opacity-80 mb-4">{description}</p>
+      <p className="opacity-80 mb-4 min-h-20">{description}</p>
 
       <div className="rounded-lg overflow-hidden border border-inherit bg-foreground">
         <CodeBlock value={code} readOnly />
