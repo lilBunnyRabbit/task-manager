@@ -58,7 +58,7 @@ const createNumbersGroup = createTaskGroup({
 
   mode: "parallel",
 
-  create(min: number, max: number) {
+  tasks(min: number, max: number) {
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
     const count = Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
@@ -117,7 +117,7 @@ const averageObjectsTask = createTask<void, number>({
 const calculationGruoup = createTaskGroup({
   name: "Objects Calculation Group",
 
-  create(min: number, max: number) {
+  tasks(min: number, max: number) {
     return [createNumbersGroup(min, max), sumTask(), averageObjectsTask()];
   },
 });

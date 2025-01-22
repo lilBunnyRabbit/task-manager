@@ -197,7 +197,7 @@ const completeUploadTask = createTask<void, CompleteData>({
 const uploadFileGroup = createTaskGroup({
   name: "Upload File",
 
-  create(file: string) {
+  tasks(file: string) {
     return [initUploadTask(file), uploadPartsTask(), completeUploadTask()];
   },
 });

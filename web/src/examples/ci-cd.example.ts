@@ -1,4 +1,4 @@
-import { createTask, createTaskGroup, ExecutionMode, TaskManager, TaskManagerFlag } from "@lilbunnyrabbit/task-manager";
+import { createTask, createTaskGroup, TaskManager, TaskManagerFlag } from "@lilbunnyrabbit/task-manager";
 import { sleep } from "./utils";
 
 const buildTask = createTask<{ name: string }, () => string>({
@@ -43,7 +43,9 @@ const testTask = createTask<(data: unknown) => boolean, boolean>({
   name: "Run Test",
 
   async execute(check) {
-    const fn = this.query.getLastResult(buildTask);
+    console.log(this);
+
+    const fn = this.query.parent.orElseThrow(Error).getLastResult(buildTask);
 
     this.logger.info(`Testing "${fn}"...`);
     await sleep(250);
@@ -55,7 +57,7 @@ const testTask = createTask<(data: unknown) => boolean, boolean>({
 const testsGroup = createTaskGroup({
   name: "Run Tests",
 
-  create() {
+  tasks() {
     return [
       testTask((data) => {
         if (typeof data !== "string") {

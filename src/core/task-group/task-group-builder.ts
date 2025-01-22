@@ -28,7 +28,7 @@ export type TaskGroupConfig<TArgs extends unknown[] = []> = {
    * @param args - Arguments used to create the tasks.
    * @returns An array of tasks for the group.
    */
-  create(...args: TArgs): ExecutableTask[];
+  tasks(...args: TArgs): ExecutableTask[];
 };
 
 /**
@@ -70,7 +70,7 @@ export interface TaskGroupBuilder<TArgs extends unknown[] = []> extends BuilderI
  */
 export function createTaskGroup<TArgs extends unknown[] = []>({ name, ...config }: TaskGroupConfig<TArgs>) {
   const builder: TaskGroupBuilder<TArgs> = function (...args) {
-    const taskGroup = new TaskGroup(builder, args, name, config.mode, config.create(...args));
+    const taskGroup = new TaskGroup(builder, args, name, config.mode, config.tasks(...args));
 
     taskGroup.flags = new Set(config.flags);
 

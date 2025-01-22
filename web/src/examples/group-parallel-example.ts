@@ -58,7 +58,7 @@ const getUsersGroup = createTaskGroup({
   mode: ExecutionMode.PARALLEL,
   flags: [TaskGroupFlag.CONTINUE_ON_ERROR],
 
-  create(count: number) {
+  tasks(count: number) {
     return Array(count)
       .fill(0)
       .map((_, i) => getUserTask({ id: i }));

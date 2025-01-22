@@ -10,6 +10,10 @@ export default function ExamplesRoute(): React.ReactNode {
     taskManager: examples[0].create(),
   });
 
+  React.useEffect(() => {
+    console.log(example);
+  }, [example]);
+
   return (
     <>
       <div className="fixed top-14 left-0 bottom-0 w-[300px] border-r border-foreground bg-foreground/20 p-4 text-foreground flex flex-col gap-y-1">

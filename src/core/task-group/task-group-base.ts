@@ -223,7 +223,7 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   }
 
   /**
-   * Query interface for accessing and managing tasks.
+   * Query interface for accessing tasks.
    */
-  public query: TaskQuery = new TaskQuery(this.flowController);
+  readonly query: TaskQuery = new TaskQuery(this.flowController);
 }

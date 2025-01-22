@@ -61,9 +61,12 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * Binds the task to a {@link TaskQuery}.
    *
    * @param query - TaskQuery instance.
+   * @returns Instance of the task for chaining.
    */
   public bind(query: TaskQuery) {
     this._query = query;
+
+    return this;
   }
 
   /**

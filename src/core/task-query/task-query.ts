@@ -1,3 +1,4 @@
+import { Optional } from "@lilbunnyrabbit/optional";
 import type { TaskBuilder, TaskSpec } from "../";
 import type { BuilderIs } from "../../common";
 import type { FlowController } from "../flow-controller";
@@ -6,6 +7,18 @@ import type { FlowController } from "../flow-controller";
  * Provides methods to query, retrieve, and manage tasks and their results within a {@link FlowController}.
  */
 export class TaskQuery {
+  /**
+   * Parent {@link TaskQuery} instance.
+   */
+  private _parent: Optional<TaskQuery> = Optional.empty();
+
+  /**
+   * Parent {@link TaskQuery} instance.
+   */
+  public get parent() {
+    return this._parent;
+  }
+
   /**
    * Initializes the TaskQuery with a {@link FlowController}.
    *

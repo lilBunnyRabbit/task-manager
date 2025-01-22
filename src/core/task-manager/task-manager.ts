@@ -39,11 +39,7 @@ export class TaskManager extends TaskManagerBase {
    * @returns The instance of the task manager for chaining.
    */
   public addTask(task: ExecutableTask) {
-    if (task instanceof Task) {
-      task.bind(this.query);
-    }
-
-    this.flowController.addTask(task);
+    this.flowController.addTask(task.bind(this.query));
 
     return this;
   }

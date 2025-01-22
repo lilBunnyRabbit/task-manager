@@ -15,6 +15,8 @@
 [ ] Fix `TaskGroup` clone
 [ ] Execute on group
 [ ] Parent access
+[ ] Access parent query on taskgroup tasks create
+[ ] Optimize TaskGroup bind()
 
 [ ] TypeDoc - generates into public
 [ ] Update README

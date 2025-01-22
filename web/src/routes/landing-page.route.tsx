@@ -209,7 +209,7 @@ const fetchUsersGroup = createTaskGroup({
   name: "Fetch Users",
   mode: ExecutionMode.PARALLEL,
   flags: [TaskGroupFlag.CONTINUE_ON_ERROR],
-  create(ids: string[]) {
+  tasks(ids: string[]) {
     return ids.map((id) => fetchUserTask(id));
   },
 });
@@ -351,7 +351,7 @@ const uploadChunkTask = createTask<{ chunk: Blob }, void>({
 const fileUploadGroup = createTaskGroup({
   name: "File Upload Workflow",
   mode: "sequential",
-  create(file, chunks) {
+  tasks(file, chunks) {
     return [
       preflightTask({ fileName: file.name }),
       ...chunks.map(chunk => uploadChunkTask({ chunk })),
@@ -385,7 +385,7 @@ const testTask = createTask<void, void>({
 const ciCdPipeline = createTaskGroup({
   name: "CI/CD Pipeline",
   mode: "sequential",
-  create() {
+  tasks() {
     return [buildTask(), testTask()];
   },
 });
@@ -416,7 +416,7 @@ const notifyCustomerTask = createTask<{ orderId: string }, void>({
 const orderFulfillmentGroup = createTaskGroup({
   name: "Order Fulfillment Workflow",
   mode: "sequential",
-  create(orderId) {
+  tasks(orderId) {
     return [processOrderTask({ orderId }), notifyCustomerTask({ orderId })];
   },
 });
@@ -439,7 +439,7 @@ const resizeImageTask = createTask<{ dimensions: { width: number; height: number
 const imageProcessingGroup = createTaskGroup({
   name: "Image Processing Workflow",
   mode: "sequential",
-  create(image, dimensions) {
+  tasks(image, dimensions) {
     return [resizeImageTask({ dimensions })];
   },
 });
@@ -462,7 +462,7 @@ const convertDocumentTask = createTask<{ format: string }, void>({
 const documentConversionGroup = createTaskGroup({
   name: "Document Conversion Workflow",
   mode: "sequential",
-  create(document, format) {
+  tasks(document, format) {
     return [convertDocumentTask({ format })];
   },
 });
@@ -485,7 +485,7 @@ const fetchDataTask = createTask<{ url: string }, any>({
 const apiDataProcessingGroup = createTaskGroup({
   name: "API Data Fetch and Processing",
   mode: "sequential",
-  create(urls) {
+  tasks(urls) {
     return urls.map(url => fetchDataTask({ url }));
   },
 });
@@ -508,7 +508,7 @@ const deactivateUserTask = createTask<{ userId: string }, void>({
 const userCleanupGroup = createTaskGroup({
   name: "User Account Cleanup",
   mode: "sequential",
-  create(userIds) {
+  tasks(userIds) {
     return userIds.map(userId => deactivateUserTask({ userId }));
   },
 });
@@ -531,7 +531,7 @@ const updateInventoryTask = createTask<{ itemId: string; quantity: number }, voi
 const inventoryManagementGroup = createTaskGroup({
   name: "Inventory Management Workflow",
   mode: "sequential",
-  create(items) {
+  tasks(items) {
     return items.map(item => updateInventoryTask(item));
   },
 });

@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
-import { Task } from "../";
+import { Task, TaskQuery } from "../";
 import type { ExecutableTask } from "../../common";
 import { ExecutionMode, TasksError } from "../../common";
 import { TaskGroupBase } from "./task-group-base";
 import { TaskGroupBuilder } from "./task-group-builder";
 import { TaskGroupFlag } from "./task-group.type";
+import { Optional } from "@lilbunnyrabbit/optional";
 
 /**
  * Represents a group of tasks that can be executed in different modes.
@@ -44,15 +45,20 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
       this.updateProgress();
     });
 
-    this.flowController.addTasks(
-      ...tasks.map((task) => {
-        if (task instanceof Task) {
-          task.bind(this.query);
-        }
+    this.flowController.addTasks(...tasks.map((task) => task.bind(this.query)));
+  }
 
-        return task;
-      })
-    );
+  /**
+   * Binds the task group to a parent {@link TaskQuery}.
+   *
+   * @param query - TaskQuery instance.
+   * @returns Instance of the task group for chaining.
+   */
+  public bind(query: TaskQuery) {
+    // TODO: Not ideal solution.
+    (this.query as any)["_parent"] = Optional(query);
+
+    return this;
   }
 
   /**
