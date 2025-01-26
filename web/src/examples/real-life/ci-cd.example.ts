@@ -1,5 +1,5 @@
 import { createTask, createTaskGroup, TaskManager, TaskManagerFlag } from "@lilbunnyrabbit/task-manager";
-import { sleep } from "./utils";
+import { sleep } from "../utils";
 
 const buildTask = createTask<{ name: string }, () => string>({
   name: "Build Code",
@@ -83,7 +83,9 @@ const deployTask = createTask<void, void>({
   name: "Deploy Code",
 
   async execute() {
-    this.query.getLastResult(testTask);
+    console.log(this);
+    
+    this.query.get(testsGroup).query.getLastResult(testTask);
     await sleep(250);
     this.logger.info("Confirmed that tests passed!");
     this.logger.info("Deploying...");

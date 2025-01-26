@@ -12,7 +12,7 @@
     href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
     rel="stylesheet">
 
-  <title>Task Manager | Examples</title>
+  <title>@lilbunnyrabbit/task-manager</title>
 
 </head>
 
@@ -44,6 +44,7 @@
 
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
       localStorage.setItem("@lilbunnyrabbit/theme", event.matches ? "dark" : "light");
+      localStorage.setItem("tsd-theme", theme);
       setClass(event.matches);
     });
   </script>

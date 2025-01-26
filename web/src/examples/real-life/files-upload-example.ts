@@ -1,5 +1,5 @@
 import { createTask, createTaskGroup, ExecutionMode, TaskManager } from "@lilbunnyrabbit/task-manager";
-import { randomInt, sleep } from "./utils";
+import { randomInt, sleep } from "../utils";
 
 interface InitData {
   file: { id: string; name: string; size: number; type: string };

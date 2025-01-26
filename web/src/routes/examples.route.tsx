@@ -3,6 +3,7 @@ import {
   examples,
   flagExamples,
   queryExamples,
+  realLifeExamples,
   simpleExamples,
   TaskManagerExample,
   TaskManagerExampleCreate,
@@ -64,6 +65,19 @@ export default function ExamplesRoute(): React.ReactNode {
         </h3>
 
         {flagExamples.map((example, i) => {
+          return (
+            <Button key={`example-${i}`} variant="nav" onClick={() => createExample(example)}>
+              <div className="truncate">{example.title}</div>
+              <ChevronRightIcon />
+            </Button>
+          );
+        })}
+
+        <h3 className="text-xl font-semibold text-foreground px-4 pb-2 mb-2 mt-2 border-b border-b-foreground/40">
+          Real-Life Examples
+        </h3>
+
+        {realLifeExamples.map((example, i) => {
           return (
             <Button key={`example-${i}`} variant="nav" onClick={() => createExample(example)}>
               <div className="truncate">{example.title}</div>

@@ -9,8 +9,9 @@
 [x] BaseURL
 [ ] Update README
 [ ] Fix Examples
-[ ] Flow controller needs error or maybe just add to query?
+[x] Flow controller needs error or maybe just add to query?
 [ ] Task/TaskGroup timestamps
+[x] Flow controller "task not in active" errors
 
 [-] TaskGroup - Replace `create` with `tasks()` and `tasks=[]`
 [ ] Nested stop

@@ -612,7 +612,7 @@ const inventoryManagementGroup = createTaskGroup({
 
       <footer className="bg-gradient-to-b from-primary/20 to-background border-t border-foreground/20 py-12 px-8">
         <div className="container mx-auto">
-          <div className="grid grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="flex flex-col items-start">
               <h3 className="font-semibold mb-4">Links</h3>
               <ul className="space-y-2">
@@ -647,6 +647,24 @@ const inventoryManagementGroup = createTaskGroup({
                   <a href={LINK.NPM} target="_blank" rel="noopener noreferrer" className="flex items-center">
                     <NpmIcon className="mr-2 size-4" />
                     NPM
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-4">Contribution</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href={`${LINK.GitHub}/pulls`} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                    <GithubIcon className="mr-2 size-4" />
+                    Pull Requests
+                  </a>
+                </li>
+                <li>
+                  <a href={`${LINK.GitHub}/issues`} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                    <GithubIcon className="mr-2 size-4" />
+                    Issues
                   </a>
                 </li>
               </ul>

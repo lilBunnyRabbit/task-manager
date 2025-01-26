@@ -1,15 +1,12 @@
-export { examples as simpleExamples } from "./simple";
-export { examples as queryExamples } from "./query";
 export { examples as flagExamples } from "./flag";
+export { examples as queryExamples } from "./query";
+export { examples as realLifeExamples } from "./real-life";
+export { examples as simpleExamples } from "./simple";
 
 import { TaskManager } from "@lilbunnyrabbit/task-manager";
 
 import calculationExample from "./calculation-example";
 import calculationExampleRaw from "./calculation-example?raw";
-import ciCdExample from "./ci-cd.example";
-import ciCdExampleRaw from "./ci-cd.example?raw";
-import filesUploadExample from "./files-upload-example";
-import filesUploadExampleRaw from "./files-upload-example?raw";
 import groupParallelExample from "./group-parallel-example";
 import groupParallelExampleFail from "./group-parallel-example-fail";
 import groupParallelExampleFailRaw from "./group-parallel-example-fail?raw";
@@ -65,18 +62,5 @@ export const examples: TaskManagerExampleCreate[] = [
     description: "",
     create: groupParallelExampleFail,
     source: groupParallelExampleFailRaw,
-  },
-  {
-    title: "Files Upload",
-    description:
-      "Streamline the file upload process by preparing metadata, splitting files into chunks, uploading each chunk, and finalizing the process with a preflight check to ensure all parts are correctly uploaded.",
-    create: filesUploadExample,
-    source: filesUploadExampleRaw,
-  },
-  {
-    title: "CI/CD Pipeline",
-    description: "Run a comprehensive pipeline by building the application, executing tests and deploying.",
-    create: ciCdExample,
-    source: ciCdExampleRaw,
   },
 ];
