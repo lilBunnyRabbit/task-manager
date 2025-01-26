@@ -29,7 +29,7 @@ export interface TaskConfig<TSpec extends TaskSpec> {
  *
  * @template TSpec - Task specification type.
  */
-export interface TaskBuilder<TSpec extends TaskSpec> extends BuilderIs<Task<TSpec>> {
+export interface TaskBuilder<TSpec extends TaskSpec = TaskSpec> extends BuilderIs<Task<TSpec>> {
   /**
    * Creates a new {@link Task} instance.
    *

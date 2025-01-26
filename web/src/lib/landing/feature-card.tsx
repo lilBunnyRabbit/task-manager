@@ -1,6 +1,7 @@
+import { CodeBlock } from "@/components/code-block";
+import { GithubIcon, NpmIcon } from "@/components/icons";
 import { type LucideIcon } from "lucide-react";
 import { cn } from "../utils";
-import { CodeBlock } from "@/components/code-block";
 
 interface FeatureCardProps {
   title: string;
@@ -64,6 +65,51 @@ export const UseCaseCard: React.FC<FeatureCardProps & { code?: string }> = ({
       <div className="rounded-lg overflow-hidden border border-inherit bg-foreground">
         <CodeBlock value={code} readOnly />
       </div>
+    </div>
+  );
+};
+
+interface FeaturedPackageCardProps {
+  npm: string;
+  github: string;
+  description: React.ReactNode;
+  className?: string;
+}
+
+export const FeaturedPackageCard: React.FC<FeaturedPackageCardProps> = ({ npm, github, description, className }) => {
+  const npmLink = `https://www.npmjs.com/package/${npm}`;
+
+  return (
+    <div
+      className={cn(
+        "p-6 bg-foreground/10 rounded-lg border border-foreground hover:bg-foreground/20 transition-colors",
+        className
+      )}
+    >
+      <div className="grid grid-cols-[1fr,min-content,min-content] gap-x-4">
+        <a className="cursor-pointer mb-2" href={npmLink}>
+          <h3 className="text-xl font-semibold">{npm}</h3>
+        </a>
+
+        <a href={npmLink} className="[&_svg]:size-5">
+          <NpmIcon />
+        </a>
+
+        <a href={`https://github.com/${github}`} className="[&_svg]:size-5">
+          <GithubIcon className="text-current" />
+        </a>
+      </div>
+
+      <div className="space-x-2 mb-2">
+        <a href={npmLink} rel="nofollow" className="inline-block">
+          <img alt="NPM Version" src={`https://img.shields.io/npm/v/${npm}`} />
+        </a>
+        <a href={npmLink} rel="nofollow" className="inline-block">
+          <img alt="NPM Downloads" src={`https://img.shields.io/npm/d18m/${npm}`} />
+        </a>
+      </div>
+
+      <p className="text-foreground/80">{description}</p>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { GithubIcon, NpmIcon } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LINK } from "@/config";
+import { LATEST_API_REFERENCE } from "@/utils/link.util";
 import { Link, Outlet } from "react-router";
 
 export const AppLayout: React.FC = () => {
@@ -19,7 +20,7 @@ export const AppLayout: React.FC = () => {
 
           <div className="flex items-center">
             <div className="space-x-4 md:space-x-8">
-              <Link to="/api-reference">API Reference</Link>
+              <a href={LATEST_API_REFERENCE}>API Reference</a>
 
               <Link to="/examples">Examples</Link>
             </div>
@@ -27,12 +28,12 @@ export const AppLayout: React.FC = () => {
             <div className="flex items-center gap-x-4 md:gap-x-6 border-l border-l-foreground/40 ml-4 md:ml-6 pl-4 md:pl-6">
               <ThemeToggle />
 
-              <a href={LINK.GitHub} className="[&_svg]:size-5">
-                <GithubIcon className="text-current" />
-              </a>
-
               <a href={LINK.NPM} className="[&_svg]:size-5">
                 <NpmIcon />
+              </a>
+
+              <a href={LINK.GitHub} className="[&_svg]:size-5">
+                <GithubIcon className="text-current" />
               </a>
             </div>
           </div>

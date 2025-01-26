@@ -1,0 +1,3 @@
+.example-description  code {
+  @apply text-sm bg-primary/10 text-primary rounded-md px-1.5;
+}

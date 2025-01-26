@@ -50,8 +50,9 @@
   },
   "dependencies": {
     "@lilbunnyrabbit/event-emitter": "^0.1.1",
-    "@lilbunnyrabbit/optional": "^0.0.1",
+    "@lilbunnyrabbit/optional": "^1.0.0",
     "@lilbunnyrabbit/utils": "^0.1.0",
+    "typedoc": "^0.27.6",
     "uuid": "^11.0.4"
   },
   "devDependencies": {
@@ -59,7 +60,6 @@
     "@types/jest": "^29.5.14",
     "rimraf": "^5.0.10",
     "ts-jest": "^29.2.5",
-    "typedoc": "^0.25.13",
     "typescript": "^5.7.3"
   },
   "engines": {

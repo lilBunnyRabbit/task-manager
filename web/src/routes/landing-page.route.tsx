@@ -4,9 +4,10 @@ import { ToTop } from "@/components/to-top";
 import { Button } from "@/components/ui/button";
 import { LINK } from "@/config";
 import demoExample from "@/examples/demo.example";
-import { FeatureCard, FeatureHorizontal, UseCaseCard } from "@/lib/landing/feature-card";
+import { FeatureCard, FeaturedPackageCard, FeatureHorizontal, UseCaseCard } from "@/lib/landing/feature-card";
 import { ManagerPreview } from "@/lib/manager";
 import { cn } from "@/lib/utils";
+import { LATEST_API_REFERENCE } from "@/utils/link.util";
 import { TaskManagerFlag } from "@lilbunnyrabbit/task-manager";
 import {
   ArrowRightIcon,
@@ -51,12 +52,18 @@ export default function LandingPageRoute(): React.ReactNode {
         </div>
 
         <div className="flex gap-2 mt-8">
-          <Button size="lg">
-            Get Started <ArrowRightIcon />
+          <Button
+            size="lg"
+            className="bg-foreground hover:bg-foreground/20 hover:text-foreground !no-underline"
+            asChild
+          >
+            <Link to="/examples">
+              Get Started <ArrowRightIcon />
+            </Link>
           </Button>
 
-          <Button size="lg" className="bg-primary" asChild>
-            <a href={LINK.GitHub} className="no-underline">
+          <Button size="lg" className="bg-primary hover:bg-primary/20 hover:text-primary !no-underline" asChild>
+            <a href={LINK.GitHub}>
               <GitBranchIcon /> View on GitHub
             </a>
           </Button>
@@ -317,6 +324,43 @@ await fetchUsers.on("success", () => {
       </Section>
 
       <Section rootClassName="py-16 bg-background border-b border-b-foreground">
+        <h2 className="text-3xl font-bold mb-4 text-center">Get Started in Seconds</h2>
+        <p className="mb-8 text-center mx-auto max-w-4xl">
+          Task Management System is designed for quick integration and ease of use. Follow these simple steps to get up
+          and running with powerful task management in your project.
+        </p>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-foreground">1. Install the Package</h3>
+
+            <CopyCodeBlock code="npm install @lilbunnyrabbit/task-manager" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-foreground">2. Import and Use</h3>
+
+            <div className="rounded-lg overflow-hidden border border-foreground bg-foreground ">
+              <CodeBlock
+                readOnly
+                value={`import { createTask, TaskManager } from "@lilbunnyrabbit/task-manager";
+
+const myTask = createTask({
+  name: "My First Task",
+  async execute() {
+    // Your task logic here
+  }
+});
+
+const manager = new TaskManager()
+  .addTask(myTask())
+  .start();`}
+              />
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section rootClassName="py-16 bg-gradient-to-b from-foreground/20 via-background to-foreground/20 border-b border-b-foreground">
         <h2 className="text-3xl font-bold mb-4 text-center">Use Cases</h2>
         <p className="mb-8 text-center mx-auto max-w-4xl">
           Explore practical examples of how this task management system can simplify workflows, from file uploads to
@@ -540,51 +584,40 @@ const inventoryManagementGroup = createTaskGroup({
         </div>
       </Section>
 
-      <Section rootClassName="py-16 bg-gradient-to-b from-foreground/20 via-background to-foreground/20 border-b border-b-foreground">
-        <h2 className="text-3xl font-bold mb-4 text-center">Get Started in Seconds</h2>
+      <Section rootClassName="py-16 bg-background border-b border-b-foreground">
+        <h2 className="text-3xl font-bold mb-4 text-center">Related Packages</h2>
         <p className="mb-8 text-center mx-auto max-w-4xl">
-          Task Management System is designed for quick integration and ease of use. Follow these simple steps to get up
-          and running with powerful task management in your project.
+          Explore other packages in the ecosystem used by the Task Manager, providing key utilities and functionality to
+          enhance its capabilities.
         </p>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-xl font-semibold mb-2 text-foreground">1. Install the Package</h3>
-
-            <CopyCodeBlock code="npm install @lilbunnyrabbit/task-manager" />
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-2 text-foreground">2. Import and Use</h3>
-
-            <div className="rounded-lg overflow-hidden border border-foreground bg-foreground ">
-              <CodeBlock
-                readOnly
-                value={`import { createTask, TaskManager } from "@lilbunnyrabbit/task-manager";
-
-const myTask = createTask({
-  name: "My First Task",
-  async execute() {
-    // Your task logic here
-  }
-});
-
-const manager = new TaskManager()
-  .addTask(myTask())
-  .start();`}
-              />
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <FeaturedPackageCard
+            npm="@lilbunnyrabbit/event-emitter"
+            github="lilBunnyRabbit/event-emitter"
+            description="A lightweight and type-safe EventEmitter implementation for TypeScript."
+          />
+          <FeaturedPackageCard
+            npm="@lilbunnyrabbit/optional"
+            github="lilBunnyRabbit/optional"
+            description="A TypeScript implementation of Java's Optional<T>, a container for nullable values with safe handling."
+          />
+          <FeaturedPackageCard
+            npm="@lilbunnyrabbit/utils"
+            github="lilBunnyRabbit/typescript-utils"
+            description="TypeScript library containing a collection of utility classes, functions, etc."
+          />
         </div>
       </Section>
 
-      <footer className="bg-background border-t border-foreground/20 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <footer className="bg-gradient-to-b from-primary/20 to-background border-t border-foreground/20 py-12 px-8">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-3 gap-8">
             <div className="flex flex-col items-start">
               <h3 className="font-semibold mb-4">Links</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/api-reference">API Reference</Link>
+                  <a href={LATEST_API_REFERENCE}>API Reference</a>
                 </li>
                 <li>
                   <Link to="/examples">Examples</Link>

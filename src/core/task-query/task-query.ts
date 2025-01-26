@@ -37,13 +37,15 @@ export class TaskQuery {
     const completedTasks = this.controller.completed.values();
     for (const task of completedTasks) {
       if (builder.is(task)) {
-        return task;
+        return task as T;
       }
     }
   }
 
   /**
    * Retrieves the first task in the `completed` collection that matches the provided builder.
+   *
+   * This method behaves the same as {@link find}, except it throws an error if no task is found.
    *
    * @template T - Type of the task.
    * @param builder - Builder used to identify the task.
@@ -83,6 +85,8 @@ export class TaskQuery {
 
   /**
    * Retrieves the last task in the `completed` collection that matches the provided builder.
+   *
+   * This method behaves the same as {@link findLast}, except it throws an error if no task is found.
    *
    * @template T - Type of the task.
    * @param builder - Builder used to identify the task.

@@ -14,3 +14,7 @@ export function randomInt(min: number, max: number) {
   const maxFloored = Math.floor(max);
   return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
+
+export function randomSleep(min: number, max: number) {
+  return sleep(randomInt(min, max));
+}

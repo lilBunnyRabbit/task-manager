@@ -1,7 +1,15 @@
+export { examples as simpleExamples } from "./simple";
+export { examples as queryExamples } from "./query";
+export { examples as flagExamples } from "./flag";
+
 import { TaskManager } from "@lilbunnyrabbit/task-manager";
 
 import calculationExample from "./calculation-example";
 import calculationExampleRaw from "./calculation-example?raw";
+import ciCdExample from "./ci-cd.example";
+import ciCdExampleRaw from "./ci-cd.example?raw";
+import filesUploadExample from "./files-upload-example";
+import filesUploadExampleRaw from "./files-upload-example?raw";
 import groupParallelExample from "./group-parallel-example";
 import groupParallelExampleFail from "./group-parallel-example-fail";
 import groupParallelExampleFailRaw from "./group-parallel-example-fail?raw";
@@ -10,21 +18,19 @@ import prallelExample from "./prallel-example";
 import prallelExampleFail from "./prallel-example-fail";
 import prallelExampleFailRaw from "./prallel-example-fail?raw";
 import prallelExampleRaw from "./prallel-example?raw";
-import filesUploadExample from "./files-upload-example";
-import filesUploadExampleRaw from "./files-upload-example?raw";
-import ciCdExample from "./ci-cd.example";
-import ciCdExampleRaw from "./ci-cd.example?raw";
+
+// Query examples, flags examples, error handling
 
 export interface TaskManagerExampleCreate {
   title: string;
-  description: string;
+  description: React.ReactNode;
   create: () => TaskManager;
   source: string;
 }
 
 export interface TaskManagerExample {
   title: string;
-  description: string;
+  description: React.ReactNode;
   taskManager: TaskManager;
   source: string;
 }
