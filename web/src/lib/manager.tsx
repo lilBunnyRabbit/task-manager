@@ -7,9 +7,9 @@ import { ExecutableTask, ExecutionMode, Task, TaskManager, TaskManagerFlag } fro
 import { ChevronRightIcon, Code2Icon } from "lucide-react";
 import React from "react";
 import { cn } from "../utils/ui.util";
+import "./manager.css";
 import { ExecutableTaskRender } from "./models/executable-task-render";
 import { TaskManagerRender } from "./models/task-manager-render";
-import "./manager.css";
 
 interface ManagerProps {
   example: TaskManagerExample;
@@ -27,7 +27,7 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
         className
       )}
     >
-      <div className="px-10 pt-6 mb-6">
+      <div className="pl-10 pr-8 pt-6 mb-6">
         <div className="flex items-start justify-between">
           <h2 className="text-3xl font-bold">{example.title ?? "Unknown Example"}</h2>
           <SourceDialog title={example.title ?? "Unknown Example"} description="Source code" source={example.source}>
@@ -49,7 +49,7 @@ export const Manager: React.FC<ManagerProps> = ({ example, className }) => {
                 taskManager.isStatus("in-progress", "success")
                   ? "bg-red-200 border-red-700 text-red-700"
                   : taskManager.isStatus("error")
-                  ? "bg-amber-200 border-amber-700 text-amber-700 dark:bg-amber-700/40"
+                  ? "bg-amber-200 border-amber-700 text-amber-700"
                   : "bg-lime-200 border-lime-700 text-lime-700"
               }
               disabled={

@@ -1,3 +1,4 @@
+import { Optional } from "@lilbunnyrabbit/optional";
 import { v4 as uuidv4 } from "uuid";
 import { Task, TaskQuery } from "../";
 import type { ExecutableTask } from "../../common";
@@ -5,7 +6,6 @@ import { ExecutionMode, TasksError } from "../../common";
 import { TaskGroupBase } from "./task-group-base";
 import { TaskGroupBuilder } from "./task-group-builder";
 import { TaskGroupFlag } from "./task-group.type";
-import { Optional } from "@lilbunnyrabbit/optional";
 
 /**
  * Represents a group of tasks that can be executed in different modes.
@@ -134,7 +134,11 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
 
       try {
         await task.execute();
+
+        this.flowController.complete(task.id);
       } catch (error: any) {
+        this.flowController.complete(task.id, () => false);
+
         if (!this.hasFlag(TaskGroupFlag.CONTINUE_ON_ERROR)) {
           throw error;
         }
@@ -147,8 +151,6 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
         } else {
           task.off("progress", onProgress);
         }
-
-        this.flowController.complete(task.id);
       }
     }
   }
@@ -160,6 +162,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * @emits progress - When progress is updated.
    */
   private async executeParallel() {
+    const errors: Map<string, Error> = new Map();
+
     const executeTask = async (task: ExecutableTask) => {
       const onProgress = () => {
         this.updateProgress();
@@ -174,6 +178,10 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
 
       try {
         await task.execute();
+      } catch (error: any) {
+        errors.set(task.id, error);
+
+        throw error;
       } finally {
         // Workaround
         if (task instanceof Task) {
@@ -190,20 +198,13 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
     });
 
     try {
-      const results = await Promise.allSettled(executionPromises);
+      await Promise.allSettled(executionPromises);
 
-      const errors: Error[] = [];
-      for (const result of results) {
-        if (result.status === "rejected") {
-          errors.push(result.reason);
-        }
-      }
-
-      if (errors.length) {
-        throw new TasksError(errors);
+      if (errors.size) {
+        throw new TasksError(Array.from(errors.values()));
       }
     } finally {
-      completeAll();
+      completeAll((task) => !errors.has(task.id));
     }
   }
 

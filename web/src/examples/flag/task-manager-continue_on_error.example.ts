@@ -1,10 +1,15 @@
 import { createTask, TaskManager, TaskManagerFlag } from "@lilbunnyrabbit/task-manager";
 import { randomInt, sleep } from "../utils";
 
-const randomNumberTask = createTask<void, number>({
+const randomNumberTask = createTask<number, number>({
   name: "Random Number",
-  async execute() {
+  async execute(index) {
     await sleep(250);
+
+    if ([0, 2, 4].includes(index)) {
+      throw new Error(`Index is equal to ${index}`);
+    }
+
     return randomInt(0, 100);
   },
 });
@@ -78,9 +83,9 @@ export default function () {
   taskManager.addTasks(findFirstTask(), findLastTask(), findAllTask());
 
   taskManager.addTasks(
-    ...Array(3)
+    ...Array(5)
       .fill(0)
-      .map(() => randomNumberTask())
+      .map((_, i) => randomNumberTask(i))
   );
 
   taskManager.addTasks(findFirstTask(), findLastTask(), findAllTask());

@@ -6,8 +6,8 @@ const randomNumberTask = createTask<number, number>({
   async execute(index: number) {
     await sleep(250);
 
-    if (index === 2) {
-      throw new Error(`Index is equal to 2`);
+    if ([0, 2, 4].includes(index)) {
+      throw new Error(`Index is equal to ${index}`);
     }
 
     return randomInt(0, 100);
@@ -92,7 +92,7 @@ const findAllTask = createTask<void, string>({
 export default function () {
   const taskManager = new TaskManager();
 
-  taskManager.addTask(randomNumbersGroup(3));
+  taskManager.addTask(randomNumbersGroup(5));
 
   taskManager.addTasks(findFirstTask(), findLastTask(), findAllTask());
 

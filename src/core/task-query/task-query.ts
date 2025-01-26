@@ -35,8 +35,8 @@ export class TaskQuery {
    */
   public find<T>(builder: BuilderIs<T>) {
     const completedTasks = this.controller.completed.values();
-    for (const task of completedTasks) {
-      if (builder.is(task)) {
+    for (const { task, valid } of completedTasks) {
+      if (valid && builder.is(task)) {
         return task as T;
       }
     }
@@ -74,8 +74,8 @@ export class TaskQuery {
     let lastTask: T | undefined;
 
     const completedTasks = this.controller.completed.values();
-    for (const task of completedTasks) {
-      if (builder.is(task)) {
+    for (const { valid, task } of completedTasks) {
+      if (valid && builder.is(task)) {
         lastTask = task;
       }
     }
@@ -114,8 +114,8 @@ export class TaskQuery {
     const tasks: T[] = [];
 
     const completedTasks = this.controller.completed.values();
-    for (const task of completedTasks) {
-      if (builder.is(task)) {
+    for (const { valid, task } of completedTasks) {
+      if (valid && builder.is(task)) {
         tasks.push(task);
       }
     }
@@ -173,8 +173,8 @@ export class TaskQuery {
     const results: NonNullable<TSpec["TResult"]>[] = [];
 
     const completedTasks = this.controller.completed.values();
-    for (const task of completedTasks) {
-      if (taskBuilder.is(task)) {
+    for (const { valid, task } of completedTasks) {
+      if (valid && taskBuilder.is(task)) {
         if (task.result.isEmpty()) {
           throw new Error(`${task} result is empty.`);
         }

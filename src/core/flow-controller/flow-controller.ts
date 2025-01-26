@@ -38,7 +38,7 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
   /**
    * Tasks that have completed execution.
    */
-  readonly completed: Map<string, ExecutableTask> = new Map();
+  readonly completed: Map<string, { task: ExecutableTask; valid: boolean }> = new Map();
 
   /**
    * Checks if there are tasks in the `pending` collection.
@@ -128,6 +128,9 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
    * @param callback - Function to execute for each task.
    * @emits transition - For each task, emits a transition from `pending` to `active`.
    * @returns A cleanup function to mark tasks as completed.
+   *          The cleanup function accepts an optional `validityCheck` callback, which determines
+   *          if each task should be marked as valid. The `validityCheck` is called for each task
+   *          and should return `true` for valid tasks and `false` otherwise.
    */
   public startAll(callback: (task: ExecutableTask) => void) {
     const pendingTasks = Array.from(this.pending.values());
@@ -143,18 +146,21 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
       callback(task);
     }
 
-    return () => {
-      this.complete(...completeIds);
+    return (validityCheck?: (task: ExecutableTask) => boolean) => {
+      this.complete(completeIds, validityCheck);
     };
   }
 
   /**
    * Moves tasks from `active` to `completed`.
    *
-   * @param taskIds - IDs of tasks to complete.
+   * @param taskId - ID/s of task/s to complete.
+   * @param validityCheck - An optional callback to determine if the task is valid.
    * @emits transition - For each task, emits a transition from `active` to `completed`.
    */
-  public complete(...taskIds: string[]) {
+  public complete(taskId: string | string[], validityCheck?: (task: ExecutableTask) => boolean) {
+    const taskIds = Array.isArray(taskId) ? taskId : [taskId];
+
     for (const taskId of taskIds) {
       if (!this.validTransition(taskId, "active", "completed")) {
         continue;
@@ -166,8 +172,10 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
         continue;
       }
 
+      const isValid = validityCheck ? validityCheck(task) : true;
+
       this.active.delete(taskId);
-      this.completed.set(taskId, task);
+      this.completed.set(taskId, { task, valid: isValid });
 
       this.emit("transition", { from: "active", to: "completed", task });
     }
@@ -222,16 +230,12 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
 
     const activeTasks = this.active.values();
     for (const task of activeTasks) {
-      if (task.isStatus("error") && errorSuccess) {
-        progressSum += 1;
-      } else {
-        progressSum += task.progress;
-      }
+      progressSum += task.progress;
     }
 
     const completedTasks = this.completed.values();
-    for (const task of completedTasks) {
-      if (task.isStatus("error") && errorSuccess) {
+    for (const { task, valid } of completedTasks) {
+      if (errorSuccess && !valid) {
         progressSum += 1;
       } else {
         progressSum += task.progress;

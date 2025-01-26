@@ -10,6 +10,7 @@
 [ ] Update README
 [ ] Fix Examples
 [ ] Flow controller needs error or maybe just add to query?
+[ ] Task/TaskGroup timestamps
 
 [-] TaskGroup - Replace `create` with `tasks()` and `tasks=[]`
 [ ] Nested stop

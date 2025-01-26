@@ -150,8 +150,12 @@ export class TaskManager extends TaskManagerBase {
 
     try {
       await task.execute();
-    } catch (error) {
-      throw new TaskError(task, error);
+
+      this.flowController.complete(task.id);
+    } catch (error: any) {
+      this.flowController.complete(task.id, () => false);
+
+      throw error;
     } finally {
       // Workaround
       if (task instanceof Task) {
@@ -172,6 +176,8 @@ export class TaskManager extends TaskManagerBase {
    * @emits progress - When task progress updates.
    */
   private async executeParallel() {
+    const errors: Map<string, Error> = new Map();
+
     const executeTask = async (task: ExecutableTask) => {
       const onProgress = () => {
         this.updateProgress();
@@ -187,7 +193,9 @@ export class TaskManager extends TaskManagerBase {
       try {
         await task.execute();
       } catch (error: any) {
-        throw new TaskError(task, error);
+        errors.set(task.id, error);
+
+        throw error;
       } finally {
         // Workaround
         if (task instanceof Task) {
@@ -204,20 +212,13 @@ export class TaskManager extends TaskManagerBase {
     });
 
     try {
-      const results = await Promise.allSettled(executionPromises);
+      await Promise.allSettled(executionPromises);
 
-      const errors: Error[] = [];
-      for (const result of results) {
-        if (result.status === "rejected") {
-          errors.push(result.reason);
-        }
-      }
-
-      if (errors.length) {
-        throw new TasksError(errors);
+      if (errors.size) {
+        throw new TasksError(Array.from(errors.values()));
       }
     } finally {
-      completeAll();
+      completeAll((task) => !errors.has(task.id));
     }
   }
 

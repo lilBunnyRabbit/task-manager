@@ -1,14 +1,17 @@
 import { GithubIcon, NpmIcon } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LINK } from "@/config";
+import { cn } from "@/lib/utils";
 import { LATEST_API_REFERENCE } from "@/utils/link.util";
-import { Link, Outlet } from "react-router";
+import { Link, Outlet, useMatch } from "react-router";
 
 export const AppLayout: React.FC = () => {
+  const isFull = !!useMatch("/examples");
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-b-foreground bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 h-14 px-8">
-        <div className="container flex items-center justify-between mx-auto h-14">
+        <div className={cn("flex items-center justify-between h-14 transition-transform", !isFull && "container mx-auto")}>
           <div className="flex items-center gap-x-1">
             <Link
               className="font-bold text-primary text-sm font-mono mr-3 bg-primary/10 px-2 py-1 rounded-md whitespace-nowrap"
