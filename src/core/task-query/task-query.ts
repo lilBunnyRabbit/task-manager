@@ -74,7 +74,7 @@ export class TaskQuery {
     let lastTask: T | undefined;
 
     const completedTasks = this.controller.completed.values();
-    for (const { valid, task } of completedTasks) {
+    for (const { task, valid } of completedTasks) {
       if (valid && builder.is(task)) {
         lastTask = task;
       }

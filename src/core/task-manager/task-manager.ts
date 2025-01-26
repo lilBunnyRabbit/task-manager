@@ -1,6 +1,6 @@
 import { Task } from "../";
 import type { ExecutableTask } from "../../common";
-import { ExecutionMode, TaskError, TasksError } from "../../common";
+import { ExecutionMode, TasksError } from "../../common";
 import { TaskManagerBase } from "./task-manager-base";
 import { TaskManagerFlag } from "./task-manager.type";
 
@@ -163,8 +163,6 @@ export class TaskManager extends TaskManagerBase {
       } else {
         task.off("progress", onProgress);
       }
-
-      this.flowController.complete(task.id);
     }
   }
 
