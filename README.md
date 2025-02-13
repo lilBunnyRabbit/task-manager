@@ -1,95 +1,158 @@
-# [TypeScript](https://www.typescriptlang.org/) Task Management System
+# [TypeScript Task Manager](https://lilbunnyrabbit.github.io/task-manager)
 
 [![npm version](https://img.shields.io/npm/v/@lilbunnyrabbit/task-manager.svg)](https://www.npmjs.com/package/@lilbunnyrabbit/task-manager)
 [![npm downloads](https://img.shields.io/npm/dt/@lilbunnyrabbit/task-manager.svg)](https://www.npmjs.com/package/@lilbunnyrabbit/task-manager)
 
-A flexible and powerful task management system built with [TypeScript](https://www.typescriptlang.org/). It helps in managing both synchronous and asynchronous tasks with ease, allowing you to queue tasks, execute them sequentially or in parallel, and monitor their progress.
+A flexible and powerful task management system built with [TypeScript](https://www.typescriptlang.org/). It helps in managing both **synchronous** and **asynchronous** tasks with ease, allowing you to queue tasks, execute them **sequentially** or **in parallel**, and monitor their progress.
 
-> [!NOTE]  
-> This project uses `EventEmitter` and `Optional` from [![npm version](https://img.shields.io/npm/v/%40lilbunnyrabbit%2Futils?label=%40lilbunnyrabbit%2Futils)](https://www.npmjs.com/package/@lilbunnyrabbit/utils) for handling events and optional values.
+> **✨ Check out the [Landing Page](https://lilbunnyrabbit.github.io/task-manager) for an Overview, Examples, and Use Cases!**
 
-## Installation
+## 🚀 Installation
 
-To use this package in your project, run:
+To install the package, run:
 
 ```sh
 npm i @lilbunnyrabbit/task-manager
 ```
 
-## Getting Started
+## 🎯 Features
 
-This system revolves around two main components: [`TaskManager`](#taskmanager) and [`Task`](#task).
+- **Task Orchestration** – Manage workflows with **sequential** or **parallel** execution.
+- **Progress Tracking** – Monitor task progress with built-in state handling.
+- **Type Safety** – Built with TypeScript for safe task handling.
+- **Composable Workflows** – Reuse task groups for structured execution.
+- **Error Recovery** – Handle failures and continue execution.
+- **Query Interface** – Access task results, states, and logs.
 
-- **[`TaskManager`](#taskmanager)**: Manages task execution, queuing, and progress tracking. It can run tasks sequentially or in parallel, giving full control over execution.
-- **[`Task`](#task)**: Represents a single unit of work. Each task encapsulates its own logic, data, and execution state, with custom error handling and progress reporting.
+For more details, visit the **[API Documentation](https://lilbunnyrabbit.github.io/task-manager/docs/api/v1.0.0/index.html)**.
+
+## 🔥 Getting Started
+
+This system revolves around three core components: **[`Task`](#task)**, **[`TaskGroup`](#taskgroup)**, and **[`TaskManager`](#taskmanager)**.
+
+- **[`Task`](#task)**: Represents a single unit of work with its own logic, data, execution state, and error handling.
+- **[`TaskGroup`](#taskgroup)**: Allows grouping related tasks together, managing dependencies, and structuring workflows.
+- **[`TaskManager`](#taskmanager)**: Orchestrates execution, handles progress tracking, and manages error recovery.
+
 
 ### Creating a Task
-
-You can create a task using the `createTask` function:
+Define a task using `createTask`:
 
 ```ts
 import { createTask } from "@lilbunnyrabbit/task-manager";
 
-const myTask = createTask<void, string>({
+const myTask = createTask<number, string>({
   name: "Example Task",
-
-  async execute() {
-    return "Task Completed!";
+  async execute(id) {
+    return `Task #${id} Completed!`;
   },
 });
 ```
 
-### Managing Tasks with TaskManager
+### Grouping Tasks with TaskGroup
+A `TaskGroup` allows structuring workflows by managing multiple tasks:
 
-[`Tasks`](#task) are managed using the [`TaskManager`](#taskmanager), which allows you to add tasks, track progress, and handle task completion:
+```ts
+import { createTaskGroup } from "@lilbunnyrabbit/task-manager";
+
+const exampleGroup = createTaskGroup({
+  name: "Example Group",
+  tasks(ids: number[]) {
+    return ids.map((id) => myTask(id));
+  },
+});
+```
+
+### Managing Execution with TaskManager
+A `TaskManager` runs and tracks task execution:
 
 ```ts
 import { TaskManager } from "@lilbunnyrabbit/task-manager";
 
 const manager = new TaskManager();
-
-manager.addTasks([myTask()]);
+manager.addTasks(exampleGroup([1, 2, 3]), myTask(4));
 manager.start();
 ```
 
-## Examples
+For **more examples**, visit the [Examples Section](https://lilbunnyrabbit.github.io/task-manager/#/examples).
 
-You can find more examples of how to use this task management system in the [`examples`](./examples) folder. Some key examples include:
+## 📂 Use Cases
 
-- **[Basic Task Execution](./examples/basic-example)**: Learn how to create and execute a simple task.
-- **[Sequential Task Execution](./examples/sequential-example)**: Execute tasks one after the other.
-- **[Parallel Task Execution](./examples/parallel-example)**: Run tasks concurrently with parallel execution.
+Some practical use cases of `@lilbunnyrabbit/task-manager` include:
 
-## API Overview
+- **[File Upload Workflow](https://lilbunnyrabbit.github.io/task-manager/#/examples?example=real-life-file-upload)** – Upload files in chunks and track progress.
+- **[CI/CD Pipelines](https://lilbunnyrabbit.github.io/task-manager/#/examples?example=real-life-ci-cd-pipeline)** – Automate build, test, and deploy tasks.
+- **[Image Processing](https://lilbunnyrabbit.github.io/task-manager/#/examples?example=real-life-image-processing)** – Process images with transformations.
+- **[API Request Handling](https://lilbunnyrabbit.github.io/task-manager/#/examples?example=real-life-api-request)** – Fetch and process multiple API responses.
 
-This is a quick rundown of the key classes and methods in the task management system.
+See more in the [Use Cases Section](https://lilbunnyrabbit.github.io/task-manager/#/?section=section-use-cases).
 
-If you're looking for detailed API docs, check out the [full documentation](https://lilbunnyrabbit.github.io/task-manager/api) generated via [Typedoc](https://typedoc.org/).
 
-### TaskManager
+## 📚 API Overview
 
-The `TaskManager` is responsible for managing tasks and controlling their execution.
-
-- `addTasks(tasks: Task[])`: Adds tasks to the queue.
-- `start([force: boolean])`: Starts executing the tasks in the queue.
-- `stop()`: Stops execution of tasks.
-- `reset()`: Resets the task manager and its state.
-- `clearQueue()`: Clears the task queue.
+This section provides a rough TypeScript definition of the main components.
 
 ### Task
+A `Task` represents a unit of work with execution logic, progress tracking, and result management.
 
-A `Task` represents a single unit of work within the system.
+```ts
+interface Task<TSpec extends TaskSpec> extends TaskBase<TSpec> {
+  readonly id: string;
+  readonly name: string;
+  readonly data: TSpec["TData"]
+  readonly builder: TaskBuilder<TSpec>
+  readonly logs: LogEntry[];
+  readonly query?: TaskQuery;
 
-- `execute()`: Executes the task.
-- `parse()`: Returns a UI-friendly representation of the task's state.
-- `clone()`: Clones the task for re-execution.
+  execute(): Promise<Optional<TSpec["TResult"]>>;
+  parse(): ParsedTask;
+  toString(pretty?: boolean): string;
+  clone(): Task<TSpec>;
+}
+```
 
-## Development
+### TaskGroup
+A `TaskGroup` manages multiple tasks and defines execution order.
 
-This section provides a guide for developers to set up the project environment and utilize various npm scripts defined in the project for efficient development and release processes.
+```ts
+interface TaskGroup<TArgs extends unknown[]> extends TaskGroupBase {
+  readonly id: string;
+  readonly name: string;
+  readonly args: TArgs;
+  readonly builder: TaskGroupBuilder<TArgs>;
+  readonly mode: ExecutionMode;
+  readonly tasks: ExecutableTask[];
+  readonly query: TaskQuery;
 
-### Setting Up
+  execute(): Promise<this>;
+  toString(pretty?: boolean): string;
+  clone(): TaskGroup<TArgs>;
+}
+```
 
+### TaskManager
+A `TaskManager` executes tasks, tracks progress, and manages execution settings.
+
+```ts
+interface TaskManager extends TaskManagerBase {
+  readonly tasks: ExecutableTask[];
+  readonly query: TaskQuery;
+
+  addTask(task: ExecutableTask): this;
+  addTasks(...tasks: ExecutableTask[]): this;
+  start(force?: boolean): Promise<void>;
+  stop(): void;
+  reset(): void;
+  clearQueue(): this;
+}
+```
+
+For **full API documentation**, visit the [Docs](https://lilbunnyrabbit.github.io/task-manager/docs/api/v1.0.0/index.html).
+
+
+## 🔧 Development
+
+### Setup
 Clone the repository and install dependencies:
 
 ```sh
@@ -98,31 +161,39 @@ cd task-manager
 npm install
 ```
 
-### NPM Scripts
+### Available Scripts
+| Command                 | Description                                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| `npm run build`         | Compiles [TypeScript](https://www.typescriptlang.org/) code.                                          |
+| `npm test`              | Runs tests with [Jest](https://jestjs.io/).                                                           |
+| `npm run clean`         | Clears `dist/` and `node_modules/`.                                                                   |
+| `npm run changeset`     | Manages versioning and changelog updates with [Changesets](https://github.com/changesets/changesets). |
+| `npm run release`       | Publishes the package to npm.                                                                         |
+| `npm run generate:docs` | Generates API documentation.                                                                          |
 
-The project includes several npm scripts to streamline common tasks such as building, testing, and cleaning up the project.
 
-| Script              | Description                                                                                                                                                                                       | Command                 |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| **`build`**         | Compiles the [TypeScript](https://www.typescriptlang.org/) source code to JavaScript, placing the output in the `dist` directory. Essential for preparing the package for publication or testing. | `npm run build`         |
-| **`test`**          | Executes the test suite using [Jest](https://jestjs.io/). Crucial for ensuring that your code meets all defined tests and behaves as expected.                                                    | `npm test`              |
-| **`clean`**         | Removes both the `dist` directory and the `node_modules` directory. Useful for resetting the project's state during development or before a fresh install.                                        | `npm run clean`         |
-| **`changeset`**     | Manages versioning and changelog generation based on conventional commit messages. Helps prepare for a new release by determining which parts of the package need version updates.                | `npm run changeset`     |
-| **`release`**       | Publishes the package to npm. Uses `changeset publish` to automatically update package versions and changelogs before publishing. Streamlines the release process.                                | `npm run release`       |
-| **`generate:docs`** | Generates project documentation using [Typedoc](https://typedoc.org/). Facilitates the creation of comprehensive and accessible API documentation.                                                | `npm run generate:docs` |
+## 📦 Related Packages
 
-These scripts are designed to facilitate the development process, from cleaning and building the project to running tests and releasing new versions. Feel free to use and customize them as needed for your development workflow.
+These utilities complement `@lilbunnyrabbit/task-manager`:
 
-## Contribution
+| Package                                                                                          | Description                                        |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| **[@lilbunnyrabbit/event-emitter](https://www.npmjs.com/package/@lilbunnyrabbit/event-emitter)** | A lightweight event system for tasks.              |
+| **[@lilbunnyrabbit/optional](https://www.npmjs.com/package/@lilbunnyrabbit/optional)**           | A TypeScript utility for handling optional values. |
+| **[@lilbunnyrabbit/utils](https://www.npmjs.com/package/@lilbunnyrabbit/utils)**                 | Collection of helper functions and utilities.      |
+
+
+## 🎉 Contribution
 
 Contributions are always welcome! For any enhancements or bug fixes, please open a pull request linked to the relevant issue. If there's no existing issue related to your contribution, feel free to create one.
 
-## Support
+## 💖 Support
 
 Your support is greatly appreciated! If this package has been helpful, consider supporting by buying me a coffee.
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/lilBunnyRabbit)
 
-## License
+
+## 📜 License
 
 MIT © Andraž Mesarič-Sirec

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>@lilbunnyrabbit/task-manager - TypeScript Task Manager</title>
+  <meta name="description" content="A flexible and powerful task management system built with TypeScript. Queue tasks, execute them sequentially or in parallel, and track their progress with ease." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <!-- <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"> -->
+  <!-- <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"> -->
+  <!-- <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"> -->
+  <!-- <link rel="manifest" href="/site.webmanifest"> -->
+
+  <!-- Open Graph (for social media previews) -->
+  <meta property="og:title" content="@lilbunnyrabbit/task-manager - TypeScript Task Manager" />
+  <meta property="og:description" content="A flexible and powerful task management system built with TypeScript. Queue tasks, execute them sequentially or in parallel, and track their progress with ease." />
+  <meta property="og:image" content="/task-manager/og-image.png" />
+  <meta property="og:url" content="https://lilbunnyrabbit.github.io/task-manager" />
+  <meta property="og:type" content="website" />
+
+  <!-- Twitter Card (for Twitter previews) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="@lilbunnyrabbit/task-manager - TypeScript Task Manager" />
+  <meta name="twitter:description" content="A flexible and powerful task management system built with TypeScript. Queue tasks, execute them sequentially or in parallel, and track their progress with ease." />
+  <meta name="twitter:image" content="/task-manager/og-image.png" />
+
+  <!-- Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+
+  <script>
+    const DARK_CLASS = "dark";
+
+    function setClass(isDark) {
+      if (isDark) {
+        if (!document.documentElement.classList.contains(DARK_CLASS)) {
+          document.documentElement.classList.add(DARK_CLASS);
+        }
+      } else {
+        if (document.documentElement.classList.contains(DARK_CLASS)) {
+          document.documentElement.classList.remove(DARK_CLASS);
+        }
+      }
+    }
+
+    const savedTheme = localStorage.getItem("@lilbunnyrabbit/theme");
+    if (savedTheme !== null && (savedTheme === "dark" || savedTheme === "light")) {
+      setClass(savedTheme === "dark");
+    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      setClass(true);
+    }
+
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (event) => {
+      localStorage.setItem("@lilbunnyrabbit/theme", event.matches ? "dark" : "light");
+      localStorage.setItem("tsd-theme", theme);
+      setClass(event.matches);
+    });
+  </script>
+</body>
+
+</html>

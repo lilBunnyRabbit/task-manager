@@ -1,17 +1,28 @@
 {
-  "entryPoints": ["src/index.ts", "README.md"],
+  "entryPoints": ["./src/index.ts", "./README.md"],
+  "exclude": ["./src/core/flow-controller"],
   "excludeExternals": false,
   "excludePrivate": true,
   "excludeReferences": false,
-  "entryPointStrategy": "expand",
+  "entryPointStrategy": "resolve",
   "visibilityFilters": {
     "protected": false,
     "private": false,
     "inherited": true,
     "external": true
   },
+  "readme": "./README.md",
 
   "githubPages": true,
   "hideGenerator": true,
-  "out": "./docs/api"
+  "titleLink": "http://lilbunnyrabbit.github.io/task-manager",
+  "navigationLinks": {
+    "Examples": "http://lilbunnyrabbit.github.io/task-manager/#/examples",
+    "GitHub": "https://github.com/lilBunnyRabbit/task-manager",
+    "NPM": "https://www.npmjs.com/package/@lilbunnyrabbit/task-manager"
+  },
+
+  "out": "./web/public/docs/api/v1.0.0",
+  "name": "@lilbunnyrabbit/task-manager@1.0.0",
+  "customJs": "./web/public/docs/api/inject-versions.js"
 }
