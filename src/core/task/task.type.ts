@@ -23,7 +23,7 @@ export interface ParsedTask {
   /**
    * Current status of the {@link Task}.
    */
-  status: string;
+  status?: string;
   /**
    * Optional result of the {@link Task}.
    */

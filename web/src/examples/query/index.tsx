@@ -9,6 +9,7 @@ import queryFindParentExampleRaw from "./query-find-parent.example?raw";
 
 export const examples: TaskManagerExampleCreate[] = [
   {
+    id: "query-find-tasks",
     title: "Find Tasks",
     description: (
       <>
@@ -23,6 +24,7 @@ export const examples: TaskManagerExampleCreate[] = [
     source: queryFindExampleRaw,
   },
   {
+    id: "query-tasks-grouped",
     title: "Find Tasks (Grouped)",
     description: (
       <>
@@ -36,6 +38,7 @@ export const examples: TaskManagerExampleCreate[] = [
     source: queryFindGroupedExampleRaw,
   },
   {
+    id: "query-find-tasks-parent",
     title: "Find Tasks (Parent)",
     description: (
       <>

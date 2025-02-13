@@ -7,13 +7,15 @@
 [x] TypeDoc - generates into public
 [x] TypeDoc with version name, link to website
 [x] BaseURL
-[ ] Update README
-[ ] Fix Examples
+[x] Fix Examples
 [x] Flow controller needs error or maybe just add to query?
-[ ] Task/TaskGroup timestamps
 [x] Flow controller "task not in active" errors
+[x] TaskGroup - Replace `create` with `tasks()` and `tasks=[]`
+[x] Rename LINEAR to SEQUENTIAL
+[x] Examples link
+[x] Landing section link
+[ ] Update README
 
-[-] TaskGroup - Replace `create` with `tasks()` and `tasks=[]`
 [ ] Nested stop
 [ ] Serialize
 [ ] Controller - pass controller to task (stop)
@@ -25,3 +27,6 @@
 [ ] `createTask(name: string, execute: (...T) => R)`
 [ ] `createGroup(name: string, tasks: ExecutableTask[])` `createGroup(name: string, tasks: (...T) => ExecutableTask[])`
 [ ] Fix `TaskGroup` clone
+[ ] TaskGroup result
+[ ] Task/TaskGroup timestamps
+[ ] TaskGroup - Support `tasks=[]`

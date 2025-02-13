@@ -74,9 +74,13 @@ export const TaskRender: React.FC<TaskRenderProps> = ({ task }) => {
 
       {!isUndefined(parsed.result) && (
         <LabelSection label="Result">
-          <div className="border border-foreground rounded-md bg-background overflow-hidden">
-            <pre className="overflow-x-auto p-4 text-sm">{parsed.result}</pre>
-          </div>
+          {parsed.result!.startsWith("data:image") ? (
+            <img src={parsed.result} className="border border-foreground bg-background rounded-md object-contain h-[22rem] max-w-full"></img>
+          ) : (
+            <div className="border border-foreground rounded-md bg-background overflow-hidden">
+              <pre className="overflow-x-auto p-4 text-sm">{parsed.result}</pre>
+            </div>
+          )}
         </LabelSection>
       )}
 

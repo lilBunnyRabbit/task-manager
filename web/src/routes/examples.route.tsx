@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
-  examples,
+  otherExamples,
   flagExamples,
   queryExamples,
   realLifeExamples,
@@ -11,29 +11,63 @@ import {
 import { Manager } from "@/lib/manager";
 import { ChevronRightIcon } from "lucide-react";
 import React from "react";
+import { useSearchParams } from "react-router";
+
+const allExamples = [simpleExamples, queryExamples, flagExamples, realLifeExamples, otherExamples];
+function findExampleById(id: string) {
+  for (const examples of allExamples) {
+    for (const example of examples) {
+      if (example.id === id) {
+        return example;
+      }
+    }
+  }
+}
 
 export default function ExamplesRoute(): React.ReactNode {
-  const [example, setExample] = React.useState<{ example: TaskManagerExample; timestamp: number }>({
-    example: {
-      ...examples[0],
-      taskManager: examples[0].create(),
-    },
-    timestamp: Date.now(),
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const createExample = React.useCallback((example: TaskManagerExampleCreate) => {
-    setExample({
+  const [example, setExample] = React.useState<{ example: TaskManagerExample; timestamp: number }>(() => {
+    let example = simpleExamples[0];
+    const exampleId = searchParams.get("example");
+    if (exampleId) {
+      const newExample = findExampleById(exampleId);
+      if (newExample) {
+        example = newExample;
+      }
+    }
+
+    return {
       example: {
         ...example,
         taskManager: example.create(),
       },
       timestamp: Date.now(),
-    });
-  }, []);
+    };
+  });
+
+  const createExample = React.useCallback(
+    (example: TaskManagerExampleCreate) => {
+      setSearchParams((params) => {
+        params.delete("example");
+        params.set("example", example.id);
+        return params;
+      });
+
+      setExample({
+        example: {
+          ...example,
+          taskManager: example.create(),
+        },
+        timestamp: Date.now(),
+      });
+    },
+    [setSearchParams]
+  );
 
   return (
     <>
-      <div className="fixed top-14 left-0 bottom-0 w-[300px] border-r border-foreground bg-foreground/20 p-4 text-foreground flex flex-col gap-y-1">
+      <div className="fixed top-14 left-0 bottom-0 w-[300px] border-r border-foreground bg-foreground/10 p-4 text-foreground flex flex-col gap-y-1 overflow-y-auto">
         <h3 className="text-xl font-semibold text-foreground px-4 pb-2 mb-2 border-b border-b-foreground/40">
           Simple Examples
         </h3>
@@ -87,10 +121,10 @@ export default function ExamplesRoute(): React.ReactNode {
         })}
 
         <h3 className="text-xl font-semibold text-foreground px-4 pb-2 mb-2 mt-2 border-b border-b-foreground/40">
-          Examples
+          Other Examples
         </h3>
 
-        {examples.map((example, i) => {
+        {otherExamples.map((example, i) => {
           return (
             <Button key={`example-${i}`} variant="nav" onClick={() => createExample(example)}>
               <div className="truncate">{example.title}</div>

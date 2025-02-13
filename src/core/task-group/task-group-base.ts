@@ -209,21 +209,4 @@ export abstract class TaskGroupBase extends EventEmitter<TaskGroupEvents> {
   public hasFlags(...flags: TaskGroupFlag[]): boolean {
     return flags.every((flag) => this.hasFlag(flag));
   }
-
-  /**
-   * Manages task execution and flow control.
-   */
-  protected flowController: FlowController = new FlowController();
-
-  /**
-   * Retrieves all tasks managed by the task group.
-   */
-  public get tasks() {
-    return this.flowController.tasks;
-  }
-
-  /**
-   * Query interface for accessing tasks.
-   */
-  readonly query: TaskQuery = new TaskQuery(this.flowController);
 }

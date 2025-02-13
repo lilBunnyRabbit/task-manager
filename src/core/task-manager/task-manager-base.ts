@@ -1,8 +1,6 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { ExecutionMode } from "../../common";
 import { clamp01 } from "../../utils";
-import { FlowController } from "../flow-controller";
-import { TaskQuery } from "../task-query";
 import type { TaskManagerEvents, TaskManagerStatus } from "./task-manager.type";
 import { TaskManagerFlag } from "./task-manager.type";
 
@@ -205,36 +203,19 @@ export class TaskManagerBase extends EventEmitter<TaskManagerEvents> {
     return flags.every((flag) => this.hasFlag(flag));
   }
 
-  /**
-   * Manages task execution and flow control.
-   */
-  protected flowController: FlowController = new FlowController();
-
-  /**
-   * Retrieves all tasks managed by the task manager.
-   */
-  public get tasks() {
-    return this.flowController.tasks;
-  }
-
-  /**
-   * Query interface for accessing and managing tasks.
-   */
-  public query: TaskQuery = new TaskQuery(this.flowController);
-
   // Execution Mode
 
   /**
    * Current execution mode of the task manager.
    *
-   * @default ExecutionMode.LINEAR
+   * @default ExecutionMode.SEQUENTIAL
    */
-  protected _mode: ExecutionMode = ExecutionMode.LINEAR;
+  protected _mode: ExecutionMode = ExecutionMode.SEQUENTIAL;
 
   /**
    * Current execution mode of the task manager.
    *
-   * @default ExecutionMode.LINEAR
+   * @default ExecutionMode.SEQUENTIAL
    */
   public get mode() {
     return this._mode;

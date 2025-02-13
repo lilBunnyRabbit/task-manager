@@ -58,24 +58,21 @@ const testsGroup = createTaskGroup({
   name: "Run Tests",
 
   tasks() {
-    return [
-      testTask((data) => {
-        if (typeof data !== "string") {
-          throw new Error(`Invalid return type. Expected "string" got "${data}"`);
-        }
+    return Array(5)
+      .fill(0)
+      .map(() =>
+        testTask((data) => {
+          if (typeof data !== "string") {
+            throw new Error(`Invalid return type. Expected "string" got "${data}"`);
+          }
 
-        return true;
-      }),
-      testTask((data) => {
-        const expected = "invalid-return-value";
+          if (Math.random() < 0.1) {
+            throw new Error("Random Error...");
+          }
 
-        if (data !== expected) {
-          throw new Error(`Invalid return value. Expected "${expected}" got "${data}"`);
-        }
-
-        return true;
-      }),
-    ];
+          return true;
+        })
+      );
   },
 });
 
@@ -84,7 +81,7 @@ const deployTask = createTask<void, void>({
 
   async execute() {
     console.log(this);
-    
+
     this.query.get(testsGroup).query.getLastResult(testTask);
     await sleep(250);
     this.logger.info("Confirmed that tests passed!");

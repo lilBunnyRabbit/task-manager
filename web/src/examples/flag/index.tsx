@@ -7,6 +7,7 @@ import taskManagerContinue_on_errorExampleRaw from "./task-manager-continue_on_e
 
 export const examples: TaskManagerExampleCreate[] = [
   {
+    id: "flag-continue-on-error-task-manager",
     title: "CONTINUE_ON_ERROR (TaskManager)",
     description: (
       <>
@@ -19,6 +20,7 @@ export const examples: TaskManagerExampleCreate[] = [
     source: taskManagerContinue_on_errorExampleRaw,
   },
   {
+    id: "flag-continue-on-error-task-group",
     title: "CONTINUE_ON_ERROR (TaskGroup)",
     description: (
       <>

@@ -1,6 +1,6 @@
 import { Optional } from "@lilbunnyrabbit/optional";
 import { v4 as uuidv4 } from "uuid";
-import { Task, TaskQuery } from "../";
+import { FlowController, Task, TaskQuery } from "../";
 import type { ExecutableTask } from "../../common";
 import { ExecutionMode, TasksError } from "../../common";
 import { TaskGroupBase } from "./task-group-base";
@@ -20,19 +20,36 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   readonly id!: string;
 
   /**
+   * Manages task execution and flow control.
+   */
+  protected flowController: FlowController = new FlowController();
+
+  /**
+   * Retrieves all tasks managed by the task group.
+   */
+  public get tasks() {
+    return this.flowController.tasks;
+  }
+
+  /**
+   * Query interface for accessing tasks.
+   */
+  readonly query: TaskQuery = new TaskQuery(this.flowController);
+
+  /**
    * Creates a new {@link TaskGroup}.
    *
    * @param builder - Builder for creating the task group.
    * @param args - Arguments for the task group.
    * @param name - Name of the task group.
-   * @param mode - Execution mode (linear or parallel).
+   * @param mode - Execution mode (sequential or parallel).
    * @param tasks - List of tasks to be executed.
    */
   constructor(
     readonly builder: TaskGroupBuilder<TArgs>,
-    private args: TArgs,
+    readonly args: TArgs,
     readonly name: string,
-    readonly mode: ExecutionMode = ExecutionMode.LINEAR,
+    readonly mode: ExecutionMode = ExecutionMode.SEQUENTIAL,
     tasks: ExecutableTask[]
   ) {
     super();
@@ -83,8 +100,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
 
     try {
       switch (this.mode) {
-        case ExecutionMode.LINEAR: {
-          await this.executeLinear();
+        case ExecutionMode.SEQUENTIAL: {
+          await this.executeSequential();
           break;
         }
 
@@ -110,13 +127,13 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   }
 
   /**
-   * Executes tasks sequentially (linear mode).
+   * Executes tasks sequentially (sequential mode).
    *
    * @emits transition - When a task transitions states.
    * @emits progress - When progress is updated.
    * @emits error - When task fails.
    */
-  private async executeLinear() {
+  private async executeSequential() {
     while (this.flowController.hasPending) {
       const task = this.flowController.startNext();
       if (!task) return;

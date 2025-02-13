@@ -17,7 +17,7 @@ export interface TaskConfig<TSpec extends TaskSpec> {
   /**
    * Function to parse the task's outcome into a {@link ParsedTask}.
    */
-  parse?: (this: Task<TSpec>) => ParsedTask;
+  parse?: (this: Task<TSpec>) => ParsedTask | undefined;
   /**
    * Function to execute the task, returning a result or a promise.
    */

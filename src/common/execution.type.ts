@@ -11,7 +11,7 @@ export const ExecutionMode = {
   /**
    * Executes tasks sequentially.
    */
-  LINEAR: "linear",
+  SEQUENTIAL: "sequential",
 } as const;
 
 export type ExecutionMode = (typeof ExecutionMode)[keyof typeof ExecutionMode];

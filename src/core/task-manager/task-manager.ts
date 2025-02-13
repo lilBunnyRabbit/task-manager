@@ -1,4 +1,4 @@
-import { Task } from "../";
+import { FlowController, Task, TaskQuery } from "../";
 import type { ExecutableTask } from "../../common";
 import { ExecutionMode, TasksError } from "../../common";
 import { TaskManagerBase } from "./task-manager-base";
@@ -12,6 +12,23 @@ import { TaskManagerFlag } from "./task-manager.type";
  * @extends TaskManagerBase
  */
 export class TaskManager extends TaskManagerBase {
+  /**
+   * Manages task execution and flow control.
+   */
+  protected flowController: FlowController = new FlowController();
+
+  /**
+   * Retrieves all tasks managed by the task manager.
+   */
+  public get tasks() {
+    return this.flowController.tasks;
+  }
+
+  /**
+   * Query interface for accessing and managing tasks.
+   */
+  public query: TaskQuery = new TaskQuery(this.flowController);
+
   /**
    * Initializes a new `TaskManager` instance.
    */
@@ -97,8 +114,8 @@ export class TaskManager extends TaskManagerBase {
     while (this.flowController.hasPending) {
       try {
         switch (this.mode) {
-          case ExecutionMode.LINEAR: {
-            await this.executeLinear();
+          case ExecutionMode.SEQUENTIAL: {
+            await this.executeSequential();
             break;
           }
 
@@ -127,13 +144,13 @@ export class TaskManager extends TaskManagerBase {
   }
 
   /**
-   * Executes tasks sequentially (linear mode).
+   * Executes tasks sequentially (sequential mode).
    *
    * @returns A promise that resolves when all tasks are executed sequentially.
    * @emits task - When a task starts execution.
    * @emits progress - When task progress updates.
    */
-  private async executeLinear() {
+  private async executeSequential() {
     const task = this.flowController.startNext();
     if (!task) return;
 

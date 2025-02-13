@@ -13,6 +13,7 @@ import simpleTaskExampleRaw from "./simple-task.example?raw";
 
 export const examples: TaskManagerExampleCreate[] = [
   {
+    id: "simple-tasks",
     title: "Simple Tasks",
     description: (
       <>
@@ -27,6 +28,7 @@ export const examples: TaskManagerExampleCreate[] = [
     source: simpleTaskExampleRaw,
   },
   {
+    id: "simple-tasks-parallel",
     title: "Simple Tasks (Parallel)",
     description: (
       <>
@@ -39,6 +41,7 @@ export const examples: TaskManagerExampleCreate[] = [
     source: simpleTaskParallelExampleRaw,
   },
   {
+    id: "simple-group",
     title: "Simple Group",
     description: (
       <>
@@ -52,6 +55,7 @@ export const examples: TaskManagerExampleCreate[] = [
     source: simpleGroupExampleRaw,
   },
   {
+    id: "simple-group-parallel",
     title: "Simple Group (Parallel)",
     description: (
       <>
@@ -65,6 +69,7 @@ export const examples: TaskManagerExampleCreate[] = [
     source: simpleGroupParallelExampleRaw,
   },
   {
+    id: "simple-group-mixed",
     title: "Simple Group (Mixed)",
     description: (
       <>

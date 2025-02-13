@@ -1,8 +1,8 @@
 import { createTask, createTaskGroup, TaskManager } from "@lilbunnyrabbit/task-manager";
-import { sleep } from "../utils/dummy.util";
+import { sleep } from "../../utils/dummy.util";
 
 const createNumberTask = createTask<Record<"min" | "max", number>, number>({
-  name: "Generate Number",
+  name: "Create Random Number",
 
   parse() {
     switch (this.status) {
@@ -54,7 +54,7 @@ const createNumberTask = createTask<Record<"min" | "max", number>, number>({
 });
 
 const createNumbersGroup = createTaskGroup({
-  name: "Generate Numbers",
+  name: "Create Random Numbers",
 
   mode: "parallel",
 
@@ -72,10 +72,10 @@ const createNumbersGroup = createTaskGroup({
 });
 
 const sumTask = createTask<void, number>({
-  name: "Calculate Sum",
+  name: "Sum Objects",
 
   async execute() {
-    const values = this.query.getAll(createNumbersGroup).flatMap((g) => g.query.getResults(createNumberTask));
+    const values = this.query.get(createNumbersGroup).query.getResults(createNumberTask);
 
     if (!values.length) {
       throw new Error(`Requires at least one task by ${createNumberTask} in ${createNumbersGroup}`);
@@ -98,10 +98,10 @@ const sumTask = createTask<void, number>({
 });
 
 const averageObjectsTask = createTask<void, number>({
-  name: "Calculate Average",
+  name: "Average Objects",
 
   async execute() {
-    const tasks = this.query.getAll(createNumbersGroup).flatMap((g) => g.query.getAll(createNumberTask));
+    const tasks = this.query.get(createNumbersGroup).query.getAll(createNumberTask);
     const sum = this.query.getLastResult(sumTask);
 
     this.logger.info(`Found ${tasks.length} ${createNumberTask} in ${createNumbersGroup}.`);
@@ -114,17 +114,42 @@ const averageObjectsTask = createTask<void, number>({
   },
 });
 
+const calculationGruoup = createTaskGroup({
+  name: "Objects Calculation Group",
+
+  tasks(min: number, max: number) {
+    return [createNumbersGroup(min, max), sumTask(), averageObjectsTask()];
+  },
+});
+
+const summaryTask = createTask<void, string>({
+  name: "Summary",
+
+  async execute() {
+    const groups = this.query.getAll(calculationGruoup);
+
+    await sleep(500);
+
+    return `Summary:
+\t- ${groups.length} "${calculationGruoup.taskGroupName}" groups.
+
+Groups:
+${groups
+  .map((group, i) => {
+    const sum = group.query.getResult(sumTask);
+    const avg = group.query.getResult(averageObjectsTask);
+
+    return `\t${i + 1}. ${group.name}: SUM = ${sum}, AVG = ${avg}`;
+  })
+  .join("\n")}
+`;
+  },
+});
+
 export default function () {
   const manager = new TaskManager();
 
-  manager.addTasks(
-    createNumbersGroup(2, 5),
-    sumTask(),
-    averageObjectsTask(),
-    createNumbersGroup(2, 5),
-    sumTask(),
-    averageObjectsTask()
-  );
+  manager.addTasks(calculationGruoup(1, 9), calculationGruoup(1, 9), calculationGruoup(1, 9), summaryTask());
 
   return manager;
 }
