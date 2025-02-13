@@ -1,7 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { Optional } from "@lilbunnyrabbit/optional";
 import { v4 as uuidv4 } from "uuid";
-import type { TaskManager, TaskGroup } from "../";
+import type { TaskGroup, TaskManager } from "../";
 import { TaskQuery } from "../";
 import { LogEntry, Logger, TaskError } from "../../common";
 import { TaskBase } from "./task-base";

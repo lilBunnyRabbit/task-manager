@@ -1,2 +1,2 @@
 export { Logger } from "./logger";
-export type { LogMessage, LogEntryInput, LogEntry } from "./logger.type";
+export type { LogEntry, LogEntryInput, LogMessage } from "./logger.type";
