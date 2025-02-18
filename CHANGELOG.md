@@ -1,5 +1,11 @@
 # @lilbunnyrabbit/task-manager
 
+## 1.0.1
+
+### Patch Changes
+
+- 5139bfc: docs: GitHub Sponsor button
+
 ## 1.0.0
 
 ### Major Changes
