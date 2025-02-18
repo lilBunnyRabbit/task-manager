@@ -189,10 +189,9 @@ Contributions are always welcome! For any enhancements or bug fixes, please open
 
 ## 💖 Support
 
-Your support is greatly appreciated! If this package has been helpful, consider supporting by buying me a coffee.
+Your support is greatly appreciated! If this package has been helpful, consider supporting its development. Your contributions help maintain and improve this project.  
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/lilBunnyRabbit)
-
+[![GitHub Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/lilBunnyRabbit)
 
 ## 📜 License
 

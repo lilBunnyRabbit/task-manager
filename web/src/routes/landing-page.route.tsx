@@ -685,12 +685,16 @@ const FooterSection: React.FC<SectionProps> = ({ className }) => {
           <div>
             <h3 className="mb-4 font-semibold">Support</h3>
             <div className="space-y-4">
-              <a href="https://www.buymeacoffee.com/lilBunnyRabbit" className="block dark:hidden">
-                <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lilBunnyRabbit&button_colour=648096&font_colour=fff6e7&outline_colour=fff6e7&coffee_colour=fff6e7" />
-              </a>
-              <a href="https://www.buymeacoffee.com/lilBunnyRabbit" className="hidden dark:block">
-                <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=lilBunnyRabbit&button_colour=b9b6aa&font_colour=1a2b33&outline_colour=1a2b33&coffee_colour=1a2b33" />
-              </a>
+              <iframe
+                src="https://github.com/sponsors/lilBunnyRabbit/button"
+                title="Sponsor lilBunnyRabbit"
+                height="32"
+                width="114"
+                style={{
+                  border: 0,
+                  borderRadius: "6px",
+                }}
+              />
             </div>
           </div>
         </div>
