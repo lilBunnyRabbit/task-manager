@@ -4,7 +4,7 @@ import type { TaskGroup, TaskManager } from "../index.js";
 import { TaskQuery } from "../index.js";
 import type { LogEntry } from "../../common/index.js";
 import { Logger, TaskError } from "../../common/index.js";
-import { abortableDelay, createAbortError, isAbortError, raceAbort } from "../../utils/index.js";
+import { abortableDelay, createAbortError, isAbortError } from "../../utils/index.js";
 import { TaskBase } from "./task-base.js";
 import type { TaskBuilder, TaskConfig } from "./task-builder.js";
 import type { ParsedTask, TaskSpec } from "./task.type.js";
@@ -100,7 +100,8 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * Executes the task.
    *
    * With a `retry` config, a failing `execute` runs again (after an abortable delay) until it succeeds or the attempts run out.
-   * A cancelled task rejects immediately, even if `execute` ignores {@link signal}.
+   * Cancellation is cooperative: after {@link cancel} the task stays "in-progress" until `execute` settles. If it then
+   * throws or even resolves, the task becomes "cancelled" (a late result is discarded).
    *
    * @returns Result wrapped in `Optional`.
    * @throws If the task is not in "idle" state, or a {@link TaskError} if execution fails or is cancelled.
@@ -120,16 +121,10 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
     const attempts = Math.max(1, Math.floor(retry?.attempts ?? 1));
 
     for (let attempt = 1; ; attempt++) {
+      let result: TSpec["TResult"];
+
       try {
-        const result = await raceAbort(
-          Promise.resolve(this._config.execute.bind(this)(this.data)),
-          this.signal
-        );
-        this.result = Optional(result);
-
-        this.setProgress(1).setStatus("success").emit("success");
-
-        return this.result;
+        result = await Promise.resolve(this._config.execute.bind(this)(this.data));
       } catch (error) {
         if (this.signal.aborted) {
           throw this.settleCancelled();
@@ -155,7 +150,19 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
         }
 
         this.setProgress(0);
+
+        continue;
       }
+
+      if (this.signal.aborted) {
+        throw this.settleCancelled();
+      }
+
+      this.result = Optional(result);
+
+      this.setProgress(1).setStatus("success").emit("success");
+
+      return this.result;
     }
   }
 
@@ -163,7 +170,8 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
    * Cancels the task by aborting its {@link signal}.
    *
    * - `idle`: becomes `cancelled` right away.
-   * - `in-progress`: `execute` rejects with a {@link TaskError} holding the reason and the task becomes `cancelled`.
+   * - `in-progress`: aborts {@link signal}; once `execute` settles, the task becomes `cancelled` and `execute`
+   *   rejects with a {@link TaskError} holding the reason. Code that ignores the signal runs to the end first.
    * - Otherwise: no-op.
    *
    * @param reason - Abort reason, defaults to a `DOMException` named `"AbortError"`.

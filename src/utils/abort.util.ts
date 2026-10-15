@@ -44,24 +44,3 @@ export function abortableDelay(ms: number, signal: AbortSignal) {
     signal.addEventListener("abort", onAbort, { once: true });
   });
 }
-
-/**
- * Settles with the given promise, or rejects with the signal's reason as soon as the signal aborts.
- *
- * @param promise - Promise to race against the signal.
- * @param signal - Signal that rejects the race.
- * @returns Promise settling with whichever comes first.
- */
-export function raceAbort<T>(promise: Promise<T>, signal: AbortSignal) {
-  return new Promise<T>((resolve, reject) => {
-    if (signal.aborted) {
-      promise.catch(() => {});
-      return reject(signal.reason);
-    }
-
-    const onAbort = () => reject(signal.reason);
-    signal.addEventListener("abort", onAbort, { once: true });
-
-    promise.then(resolve, reject).finally(() => signal.removeEventListener("abort", onAbort));
-  });
-}

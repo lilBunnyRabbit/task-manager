@@ -320,8 +320,8 @@ export class TaskManager extends TaskManagerBase {
   }
 
   /**
-   * Cancels execution by aborting {@link signal}: running tasks are cancelled (their `signal` aborts and they
-   * reject right away) and pending tasks become "cancelled". Unlike {@link stop}, the run cannot be resumed with
+   * Cancels execution by aborting {@link signal}: running tasks are cancelled (their `signal` aborts) and pending
+   * tasks become "cancelled" right away. The manager becomes "cancelled" once the running tasks have settled. Unlike {@link stop}, the run cannot be resumed with
    * {@link start}; use {@link retry} or {@link reset}.
    *
    * Works while "in-progress" or "stopped". Otherwise it only warns.

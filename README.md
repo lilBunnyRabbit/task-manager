@@ -97,11 +97,11 @@ const download = createTask<string, Blob>({
 const manager = new TaskManager().addTasks(download("/a.zip"), download("/b.zip"));
 manager.start();
 
-manager.cancel(); // later: aborts the running download, pending ones become "cancelled"
+manager.cancel(); // later: aborts the running fetch, pending downloads become "cancelled"
 await manager.retry(); // re-runs only failed and cancelled tasks, keeps successful results
 ```
 
-- **`cancel()`** aborts the signal with a `DOMException` named `AbortError`. Running tasks reject right away (even if `execute` ignores the signal) and end in `"cancelled"`, pending tasks become `"cancelled"`, and the owner emits `cancel` instead of `error`/`fail`. Cancelling a parent cancels its children. `stop()` is unchanged: it pauses between tasks and `start()` resumes.
+- **`cancel()`** aborts the signal with a `DOMException` named `AbortError`. Cancellation is **cooperative**: a running task stays `"in-progress"` until its `execute` settles, so pass `this.signal` on. Once it settles after the abort it ends in `"cancelled"`, whether it threw or resolved (a late result is discarded). Pending tasks become `"cancelled"` right away. A group or manager reaches `"cancelled"` only after its running tasks have settled, and emits `cancel` instead of `error`/`fail`. Cancelling a parent cancels its children. `stop()` is unchanged: it pauses between tasks and `start()` resumes.
 - **A task that cancels itself** (its own `cancel()` while the parent keeps running) cancels its parent too, unless the parent has `CONTINUE_ON_ERROR`, in which case it's skipped like a failed task.
 - **`retry` config** re-runs a failing `execute` up to `attempts` times in total, waiting `delay_ms` (`"fixed"`) or `delay_ms * 2 ** (attempt - 1)` (`"exponential"`) between attempts and emitting `retry` each time. It never retries an `AbortError` or anything after `cancel()`, and the wait itself is cancellable.
 - **`manager.retry()`** works after an error, a cancel, a stop, or a `CONTINUE_ON_ERROR` run with failures. Successful tasks stay completed with their results (so `this.query` still finds them), failed and cancelled tasks are replaced by fresh clones, tasks that never ran stay queued, then the manager starts again. A `TaskGroup` that failed, or holds a failed task, is retried **in place** with `group.retry()`: its successful tasks are kept and only its failed ones run again.

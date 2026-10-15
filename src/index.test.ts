@@ -103,17 +103,31 @@ describe("Task cancel", () => {
     expect(onError).not.toHaveBeenCalled();
   });
 
-  test("a task ignoring the signal still rejects right away", async () => {
-    const task = createTask({
+  test("cancel is cooperative: a task ignoring the signal stays in-progress, then ends cancelled without a result", async () => {
+    let finish!: (value: number) => void;
+    const task = createTask<void, number>({
       name: "stubborn",
-      execute: () => new Promise<number>((resolve) => setTimeout(() => resolve(1), 50)),
+      execute: () => new Promise<number>((resolve) => (finish = resolve)),
     })();
+    const onSuccess = jest.fn();
+    const onCancel = jest.fn();
+    task.on("success", onSuccess).on("cancel", onCancel);
 
     const running = task.execute();
     task.cancel();
+    await tick();
+
+    expect(task.signal.aborted).toBe(true);
+    expect(task.status).toBe("in-progress");
+    expect(onCancel).not.toHaveBeenCalled();
+
+    finish(1);
 
     await expect(running).rejects.toBeDefined();
     expect(task.status).toBe("cancelled");
+    expect(task.result.isEmpty()).toBe(true);
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 
   test("cancelling an idle task makes it cancelled", async () => {
@@ -238,6 +252,28 @@ describe("TaskManager cancel", () => {
     expect(onError).not.toHaveBeenCalled();
     expect(onFail).not.toHaveBeenCalled();
     expect(manager.progress).toBeLessThan(1);
+  });
+
+  test("the manager reaches cancelled only after running tasks settle", async () => {
+    let finish!: () => void;
+    const slow = createTask({ name: "slow", execute: () => new Promise<void>((resolve) => (finish = resolve)) })();
+    const pending = createTask({ name: "pending", execute() {} })();
+    const manager = new TaskManager().addTasks(slow, pending);
+
+    const running = manager.start();
+    await tick();
+    manager.cancel();
+    await tick();
+
+    expect(pending.status).toBe("cancelled");
+    expect(slow.status).toBe("in-progress");
+    expect(manager.status).toBe("in-progress");
+
+    finish();
+    await running;
+
+    expect(slow.status).toBe("cancelled");
+    expect(manager.status).toBe("cancelled");
   });
 
   test("cancels nested groups and their tasks", async () => {

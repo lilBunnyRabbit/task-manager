@@ -156,7 +156,8 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
    * Cancels the task group by aborting its {@link signal}, which cancels its running and pending tasks.
    *
    * - `idle`: becomes `cancelled` right away.
-   * - `in-progress`: `execute` rejects with a {@link TaskError} holding the reason and the group becomes `cancelled`.
+   * - `in-progress`: running tasks are cancelled and pending ones become `cancelled` right away; once the running
+   *   tasks settle, the group becomes `cancelled` and `execute` rejects with a {@link TaskError} holding the reason.
    * - Otherwise: no-op.
    *
    * @param reason - Abort reason, defaults to a `DOMException` named `"AbortError"`.
