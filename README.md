@@ -15,6 +15,8 @@ To install the package, run:
 npm i @lilbunnyrabbit/task-manager
 ```
 
+The package is **ESM only** (since 2.0) and needs Node.js 20+ or a bundler.
+
 ## 🎯 Features
 
 - **Task Orchestration** – Manage workflows with **sequential** or **parallel** execution.
@@ -22,6 +24,7 @@ npm i @lilbunnyrabbit/task-manager
 - **Type Safety** – Built with TypeScript for safe task handling.
 - **Composable Workflows** – Reuse task groups for structured execution.
 - **Error Recovery** – Handle failures and continue execution.
+- **Cancel and Retry** – Abort running work with an `AbortSignal`, retry failing tasks automatically, or re-run only what failed.
 - **Query Interface** – Access task results, states, and logs.
 
 For more details, visit the **[API Documentation](https://lilbunnyrabbit.github.io/task-manager/docs/api/v1.0.0/index.html)**.
@@ -76,6 +79,34 @@ manager.start();
 
 For **more examples**, visit the [Examples Section](https://lilbunnyrabbit.github.io/task-manager/#/examples).
 
+### Cancel and Retry
+
+Every `Task`, `TaskGroup` and `TaskManager` has a `signal` and a `cancel()`. Inside `execute`, pass `this.signal` to anything cancellable and report what's happening with `this.setMessage()`:
+
+```ts
+const download = createTask<string, Blob>({
+  name: "Download",
+  retry: { attempts: 3, backoff: "exponential", delay_ms: 500 },
+  async execute(url) {
+    this.setMessage(`Fetching ${url}`);
+    const response = await fetch(url, { signal: this.signal });
+    return response.blob();
+  },
+});
+
+const manager = new TaskManager().addTasks(download("/a.zip"), download("/b.zip"));
+manager.start();
+
+manager.cancel(); // later: aborts the running download, pending ones become "cancelled"
+await manager.retry(); // re-runs only failed and cancelled tasks, keeps successful results
+```
+
+- **`cancel()`** aborts the signal with a `DOMException` named `AbortError`. Running tasks reject right away (even if `execute` ignores the signal) and end in `"cancelled"`, pending tasks become `"cancelled"`, and the owner emits `cancel` instead of `error`/`fail`. Cancelling a parent cancels its children. `stop()` is unchanged: it pauses between tasks and `start()` resumes.
+- **A task that cancels itself** (its own `cancel()` while the parent keeps running) cancels its parent too, unless the parent has `CONTINUE_ON_ERROR`, in which case it's skipped like a failed task.
+- **`retry` config** re-runs a failing `execute` up to `attempts` times in total, waiting `delay_ms` (`"fixed"`) or `delay_ms * 2 ** (attempt - 1)` (`"exponential"`) between attempts and emitting `retry` each time. It never retries an `AbortError` or anything after `cancel()`, and the wait itself is cancellable.
+- **`manager.retry()`** works after an error, a cancel, a stop, or a `CONTINUE_ON_ERROR` run with failures. Successful tasks stay completed with their results (so `this.query` still finds them), failed and cancelled tasks are replaced by fresh clones, tasks that never ran stay queued, then the manager starts again. A `TaskGroup` that failed, or holds a failed task, is retried **in place** with `group.retry()`: its successful tasks are kept and only its failed ones run again.
+- **Progress** counts work actually done. A cancelled task keeps the progress it had, a pending task that got cancelled counts as 0, so a cancelled manager or group stays below 1. With `CONTINUE_ON_ERROR`, a cancelled task counts as done, like a failed one.
+
 ## 📂 Use Cases
 
 Some practical use cases of `@lilbunnyrabbit/task-manager` include:
@@ -103,13 +134,29 @@ interface Task<TSpec extends TaskSpec> extends TaskBase<TSpec> {
   readonly builder: TaskBuilder<TSpec>
   readonly logs: LogEntry[];
   readonly query?: TaskQuery;
+  readonly signal: AbortSignal;
+  readonly status: "idle" | "in-progress" | "error" | "success" | "cancelled";
+  readonly progress: number;
+  readonly message: string | null;
 
+  setProgress(progress: number): this;
+  setMessage(message: string | null): this;
   execute(): Promise<Optional<TSpec["TResult"]>>;
+  cancel(reason?: unknown): this;
   parse(): ParsedTask;
   toString(pretty?: boolean): string;
   clone(): Task<TSpec>;
 }
+
+interface TaskConfig<TSpec extends TaskSpec> {
+  name: string;
+  execute(this: Task<TSpec>, data: TSpec["TData"]): TSpec["TResult"] | Promise<TSpec["TResult"]>;
+  parse?(this: Task<TSpec>): ParsedTask | undefined;
+  retry?: { attempts: number; backoff: "fixed" | "exponential"; delay_ms: number };
+}
 ```
+
+Task events: `param`, `log`, `progress`, `success`, `error`, `cancel`, `retry`. `TaskGroup` and `TaskManager` also emit `cancel`.
 
 ### TaskGroup
 A `TaskGroup` manages multiple tasks and defines execution order.
@@ -123,8 +170,12 @@ interface TaskGroup<TArgs extends unknown[]> extends TaskGroupBase {
   readonly mode: ExecutionMode;
   readonly tasks: ExecutableTask[];
   readonly query: TaskQuery;
+  readonly signal: AbortSignal;
+  readonly status: "idle" | "in-progress" | "error" | "success" | "cancelled";
 
   execute(): Promise<this>;
+  cancel(reason?: unknown): this;
+  retry(): this; // back to "idle", ready to execute again
   toString(pretty?: boolean): string;
   clone(): TaskGroup<TArgs>;
 }
@@ -137,11 +188,15 @@ A `TaskManager` executes tasks, tracks progress, and manages execution settings.
 interface TaskManager extends TaskManagerBase {
   readonly tasks: ExecutableTask[];
   readonly query: TaskQuery;
+  readonly signal: AbortSignal;
+  readonly status: "idle" | "in-progress" | "error" | "success" | "stopped" | "cancelled";
 
   addTask(task: ExecutableTask): this;
   addTasks(...tasks: ExecutableTask[]): this;
   start(force?: boolean): Promise<void>;
   stop(): void;
+  cancel(reason?: unknown): void;
+  retry(): Promise<void>;
   reset(): void;
   clearQueue(): this;
 }
