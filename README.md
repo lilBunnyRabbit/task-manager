@@ -27,7 +27,7 @@ The package is **ESM only** (since 2.0) and needs Node.js 20+ or a bundler.
 - **Cancel and Retry** – Abort running work with an `AbortSignal`, retry failing tasks automatically, or re-run only what failed.
 - **Query Interface** – Access task results, states, and logs.
 
-For more details, visit the **[API Documentation](https://lilbunnyrabbit.github.io/task-manager/docs/api/v1.0.0/index.html)**.
+For more details, visit the **[API Documentation](https://lilbunnyrabbit.github.io/task-manager/docs/api/v2.0.0/index.html)**.
 
 ## 🔥 Getting Started
 
@@ -202,7 +202,7 @@ interface TaskManager extends TaskManagerBase {
 }
 ```
 
-For **full API documentation**, visit the [Docs](https://lilbunnyrabbit.github.io/task-manager/docs/api/v1.0.0/index.html).
+For **full API documentation**, visit the [Docs](https://lilbunnyrabbit.github.io/task-manager/docs/api/v2.0.0/index.html).
 
 
 ## 🔧 Development

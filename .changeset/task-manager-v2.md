@@ -9,4 +9,5 @@
 - `retry` task config (`attempts`, `backoff: "fixed" | "exponential"`, `delay_ms`) with abortable delays and a `retry` event; never retries an `AbortError` or after a cancel
 - `TaskManager.retry()` and `TaskGroup.retry()` re-queue failed and cancelled tasks as fresh clones, keep successful tasks and their results, and retry nested groups in place
 - Fixed `clearQueue()` keeping the cleared tasks in `tasks` instead of removing them
+- API docs moved to `docs/api/v2.0.0`
 - Status unions now include `"cancelled"`: exhaustive `switch`/`Record` over `TaskStatus`, `TaskGroupStatus` or `TaskManagerStatus` needs a new case

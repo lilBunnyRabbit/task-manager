@@ -22,7 +22,7 @@
     "NPM": "https://www.npmjs.com/package/@lilbunnyrabbit/task-manager"
   },
 
-  "out": "./web/public/docs/api/v1.0.0",
-  "name": "@lilbunnyrabbit/task-manager@1.0.0",
+  "out": "./web/public/docs/api/v2.0.0",
+  "name": "@lilbunnyrabbit/task-manager@2.0.0",
   "customJs": "./web/public/docs/api/inject-versions.js"
 }

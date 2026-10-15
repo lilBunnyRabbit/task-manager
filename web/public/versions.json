@@ -1,5 +1,9 @@
 [
   {
+    "root": "2.x.x",
+    "versions": [{ "version": "2.0.0", "date": "2026-10-15", "src": "v2.0.0" }]
+  },
+  {
     "root": "1.x.x",
     "versions": [
       { "version": "1.0.0", "date": "2025-02-14", "src": "v1.0.0" },
