@@ -1,7 +1,7 @@
 import type { BuilderIs } from "../../common/index.js";
 import { Task } from "./task.js";
 import { isTask } from "./task.helper.js";
-import type { ParsedTask, TaskSpec } from "./task.type.js";
+import type { ParsedTask, TaskRetryConfig, TaskSpec } from "./task.type.js";
 
 /**
  * Configuration for creating a {@link Task}.
@@ -21,6 +21,10 @@ export interface TaskConfig<TSpec extends TaskSpec> {
    * Function to execute the task, returning a result or a promise.
    */
   execute: (this: Task<TSpec>, data: TSpec["TData"]) => TSpec["TResult"] | Promise<TSpec["TResult"]>;
+  /**
+   * Automatic retry of a failing `execute`. Never retries after the task is cancelled or when `execute` throws an `AbortError`.
+   */
+  retry?: TaskRetryConfig;
 }
 
 /**

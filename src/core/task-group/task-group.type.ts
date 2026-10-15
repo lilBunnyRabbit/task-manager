@@ -5,7 +5,7 @@ import type { TaskGroup } from "./task-group.js";
 /**
  * Statuses of a {@link TaskGroup}.
  */
-export type TaskGroupStatus = "idle" | "in-progress" | "error" | "success";
+export type TaskGroupStatus = "idle" | "in-progress" | "error" | "success" | "cancelled";
 
 /**
  * Flags controlling the behavior of a {@link TaskGroup}.
@@ -51,4 +51,8 @@ export type TaskGroupEvents = {
    * @type {TaskError | TasksError | Error} - The encountered error.
    */
   error: TaskError | TasksError | Error;
+  /**
+   * Emitted when the task group is cancelled, with the abort reason.
+   */
+  cancel: unknown;
 };

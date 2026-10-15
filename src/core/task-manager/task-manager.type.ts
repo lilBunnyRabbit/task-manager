@@ -5,7 +5,7 @@ import type { TaskManager } from "./task-manager.js";
 /**
  * Statuses for a {@link TaskManager}.
  */
-export type TaskManagerStatus = "idle" | "in-progress" | "error" | "success" | "stopped";
+export type TaskManagerStatus = "idle" | "in-progress" | "error" | "success" | "stopped" | "cancelled";
 
 /**
  * Flags controlling the behavior of a {@link TaskManager}.
@@ -61,4 +61,8 @@ export type TaskManagerEvents = {
    * @type {TaskError | TasksError | Error} - The error that caused the failure.
    */
   fail: TaskError | TasksError | Error;
+  /**
+   * Emitted when the task manager is cancelled, with the abort reason.
+   */
+  cancel: unknown;
 };

@@ -1,6 +1,6 @@
 import { cn } from "@/utils/ui.util";
 import { TaskGroupStatus, TaskManagerStatus, TaskStatus } from "@lilbunnyrabbit/task-manager";
-import { AlertCircleIcon, CheckCircleIcon, ClockIcon, LoaderIcon, PauseIcon } from "lucide-react";
+import { AlertCircleIcon, BanIcon, CheckCircleIcon, ClockIcon, LoaderIcon, PauseIcon } from "lucide-react";
 import React from "react";
 
 export type AllStatus = TaskManagerStatus | TaskGroupStatus | TaskStatus;
@@ -26,6 +26,10 @@ const config: Record<AllStatus, { label: string; className: string }> = {
     label: "error",
     className: "bg-error/40 text-error dark:bg-error/20",
   },
+  cancelled: {
+    label: "cancelled",
+    className: "bg-warn/40 text-warn dark:bg-warn/20",
+  },
 };
 
 const icons: Record<AllStatus, React.ReactNode> = {
@@ -34,6 +38,7 @@ const icons: Record<AllStatus, React.ReactNode> = {
   success: <CheckCircleIcon className="text-success" />,
   stopped: <PauseIcon className="text-warn" />,
   error: <AlertCircleIcon className="text-error" />,
+  cancelled: <BanIcon className="text-warn" />,
 };
 
 interface StatusIconProps {

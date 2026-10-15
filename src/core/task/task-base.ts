@@ -114,6 +114,51 @@ export class TaskBase<TSpec extends TaskSpec> extends EventEmitter<TaskEvents> {
     return this;
   }
 
+  // Message
+
+  /**
+   * Human-readable status message of the task, for example `"Uploading chunk 3/10"`.
+   *
+   * @default null
+   */
+  protected _message: string | null = null;
+
+  /**
+   * Human-readable status message of the task, for example `"Uploading chunk 3/10"`.
+   *
+   * @default null
+   */
+  public get message() {
+    return this._message;
+  }
+
+  /**
+   * Updates the task message.
+   *
+   * @param message - New message, or `null` to clear it.
+   * @emits param - When the `message` parameter changes.
+   */
+  public set message(message: typeof this._message) {
+    if (message !== this._message) {
+      this._message = message;
+
+      this.emit("param", "message");
+    }
+  }
+
+  /**
+   * Sets the task message.
+   *
+   * @param message - New message, or `null` to clear it.
+   * @returns Instance of the task for chaining.
+   * @emits param - When the `message` parameter changes.
+   */
+  public setMessage(message: typeof this._message) {
+    this.message = message;
+
+    return this;
+  }
+
   // Result
 
   /**
