@@ -211,7 +211,7 @@ export class FlowController extends EventEmitter<FlowControllerEvents> {
     this.pending.clear();
 
     this.tasks = this.tasks.filter((task) => {
-      return pendingTasks.findIndex(({ id }) => id === task.id) > -1;
+      return pendingTasks.findIndex(({ id }) => id === task.id) === -1;
     });
 
     for (const task of pendingTasks) {

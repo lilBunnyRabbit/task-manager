@@ -447,6 +447,25 @@ describe("TaskManager retry", () => {
   });
 });
 
+describe("TaskManager clearQueue", () => {
+  test("removes pending tasks and keeps the others", async () => {
+    const first = createTask({ name: "first", execute: () => new Promise((r) => setTimeout(r, 5)) })();
+    const second = createTask({ name: "second", execute() {} })();
+    const third = createTask({ name: "third", execute() {} })();
+    const manager = new TaskManager().addTasks(first, second, third);
+
+    const running = manager.start();
+    manager.stop();
+    await running;
+
+    manager.clearQueue();
+
+    expect(manager.tasks).toEqual([first]);
+    expect(manager.isEmptyQueue).toBe(true);
+    expect(manager.progress).toBe(1);
+  });
+});
+
 describe("TaskGroup", () => {
   test("cancel() on an idle group cancels its tasks", () => {
     const group = createTaskGroup({ name: "group", tasks: () => [hanging("a")(), hanging("b")()] })();
