@@ -1,7 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
-import { clamp01 } from "../../utils";
-import type { TaskGroupEvents, TaskGroupStatus } from "./task-group.type";
-import { TaskGroupFlag } from "./task-group.type";
+import { clamp01 } from "../../utils/index.js";
+import type { TaskGroupEvents, TaskGroupStatus } from "./task-group.type.js";
+import { TaskGroupFlag } from "./task-group.type.js";
 
 /**
  * Base class for managing task statuses, progress, flags, and event-driven operations.

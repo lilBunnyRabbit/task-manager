@@ -1,4 +1,4 @@
-import type { Task, TaskGroup } from "../core";
+import type { Task, TaskGroup } from "../core/index.js";
 
 /**
  * Defines the execution modes for tasks.

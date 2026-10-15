@@ -1,8 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
-import type { BuilderIs, ExecutableTask, ExecutionMode } from "../../common";
-import { TaskGroup } from "./task-group";
-import { isTaskGroup } from "./task-group.helper";
-import type { TaskGroupFlag } from "./task-group.type";
+import type { BuilderIs, ExecutableTask, ExecutionMode } from "../../common/index.js";
+import { TaskGroup } from "./task-group.js";
+import { isTaskGroup } from "./task-group.helper.js";
+import type { TaskGroupFlag } from "./task-group.type.js";
 
 /**
  * Configuration for creating a {@link TaskGroup}.
@@ -77,7 +76,7 @@ export function createTaskGroup<TArgs extends unknown[] = []>({ name, ...config 
     return taskGroup;
   };
 
-  builder.id = uuidv4();
+  builder.id = crypto.randomUUID();
   builder.taskGroupName = name;
   builder.toString = function (pretty?: boolean) {
     if (pretty === true) {

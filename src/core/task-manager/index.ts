@@ -1,3 +1,3 @@
-export { TaskManager } from "./task-manager";
-export { TaskManagerFlag } from "./task-manager.type";
-export type { TaskManagerEvents, TaskManagerStatus } from "./task-manager.type";
+export { TaskManager } from "./task-manager.js";
+export { TaskManagerFlag } from "./task-manager.type.js";
+export type { TaskManagerEvents, TaskManagerStatus } from "./task-manager.type.js";

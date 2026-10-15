@@ -1,7 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { isNullable, isUndefined } from "@lilbunnyrabbit/utils";
-import type { ExecutableTask } from "../../common";
-import type { FlowControllerEvents, FlowState } from "./flow-controller.type";
+import type { ExecutableTask } from "../../common/index.js";
+import type { FlowControllerEvents, FlowState } from "./flow-controller.type.js";
 
 /**
  * Manages task execution flow by organizing tasks into states (`pending`, `active`, and `completed`).

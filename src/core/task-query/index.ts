@@ -1,1 +1,1 @@
-export { TaskQuery } from "./task-query";
+export { TaskQuery } from "./task-query.js";

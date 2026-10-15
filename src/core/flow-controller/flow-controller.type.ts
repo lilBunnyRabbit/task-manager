@@ -1,5 +1,5 @@
-import type { ExecutableTask } from "../../common";
-import type { FlowController } from "./flow-controller";
+import type { ExecutableTask } from "../../common/index.js";
+import type { FlowController } from "./flow-controller.js";
 
 /**
  * Possible states of a task in the flow.

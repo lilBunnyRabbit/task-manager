@@ -1,6 +1,6 @@
-import type { ExecutableTask, TaskError, TasksError } from "../../common";
-import type { FlowState } from "../flow-controller";
-import type { TaskGroup } from "./task-group";
+import type { ExecutableTask, TaskError, TasksError } from "../../common/index.js";
+import type { FlowState } from "../flow-controller/index.js";
+import type { TaskGroup } from "./task-group.js";
 
 /**
  * Statuses of a {@link TaskGroup}.

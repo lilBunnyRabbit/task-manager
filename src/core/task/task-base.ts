@@ -1,7 +1,7 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { Optional } from "@lilbunnyrabbit/optional";
-import { clamp01 } from "../../utils";
-import type { TaskEvents, TaskSpec, TaskStatus } from "./task.type";
+import { clamp01 } from "../../utils/index.js";
+import type { TaskEvents, TaskSpec, TaskStatus } from "./task.type.js";
 
 /**
  * Base class for managing task status, progress, result handling, and emitting events.

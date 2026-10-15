@@ -1,4 +1,4 @@
-import { Task, TaskManager, TaskGroup } from "./";
+import { Task, TaskManager, TaskGroup } from "./index.js";
 
 describe("general", () => {
   test("can import classes", () => {

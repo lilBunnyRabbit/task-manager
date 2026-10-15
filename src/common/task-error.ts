@@ -1,4 +1,4 @@
-import type { ExecutableTask } from "./execution.type";
+import type { ExecutableTask } from "./execution.type.js";
 
 /**
  * Error linked to a specific {@link ExecutableTask}.

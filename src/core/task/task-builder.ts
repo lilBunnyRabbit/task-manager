@@ -1,8 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
-import type { BuilderIs } from "../../common";
-import { Task } from "./task";
-import { isTask } from "./task.helper";
-import type { ParsedTask, TaskSpec } from "./task.type";
+import type { BuilderIs } from "../../common/index.js";
+import { Task } from "./task.js";
+import { isTask } from "./task.helper.js";
+import type { ParsedTask, TaskSpec } from "./task.type.js";
 
 /**
  * Configuration for creating a {@link Task}.
@@ -67,7 +66,7 @@ export function createTask<TData = void, TResult = void>({ name, ...config }: Ta
     return new Task<TaskSpec<TData, TResult>>(builder, name, config, data);
   };
 
-  builder.id = uuidv4();
+  builder.id = crypto.randomUUID();
   builder.taskName = name;
   builder.toString = function (pretty?: boolean) {
     if (pretty === true) {

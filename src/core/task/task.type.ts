@@ -1,5 +1,5 @@
-import type { LogEntry } from "../../common";
-import type { Task } from "./task";
+import type { LogEntry } from "../../common/index.js";
+import type { Task } from "./task.js";
 
 /**
  * Structure for a task specification.

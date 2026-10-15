@@ -1,8 +1,8 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
-import { ExecutionMode } from "../../common";
-import { clamp01 } from "../../utils";
-import type { TaskManagerEvents, TaskManagerStatus } from "./task-manager.type";
-import { TaskManagerFlag } from "./task-manager.type";
+import { ExecutionMode } from "../../common/index.js";
+import { clamp01 } from "../../utils/index.js";
+import type { TaskManagerEvents, TaskManagerStatus } from "./task-manager.type.js";
+import { TaskManagerFlag } from "./task-manager.type.js";
 
 /**
  * Base class for managing tasks, their statuses, progress, flags, and queue operations.

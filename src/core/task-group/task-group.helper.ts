@@ -1,5 +1,5 @@
-import { TaskGroup } from "./task-group";
-import type { TaskGroupBuilder } from "./task-group-builder";
+import { TaskGroup } from "./task-group.js";
+import type { TaskGroupBuilder } from "./task-group-builder.js";
 
 /**
  * Checks if an object is an instance of {@link TaskGroup}.

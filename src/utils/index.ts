@@ -1,1 +1,1 @@
-export * from "./number.util";
+export * from "./number.util.js";

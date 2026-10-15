@@ -1,8 +1,8 @@
-import { FlowController, Task, TaskQuery } from "../";
-import type { ExecutableTask } from "../../common";
-import { ExecutionMode, TasksError } from "../../common";
-import { TaskManagerBase } from "./task-manager-base";
-import { TaskManagerFlag } from "./task-manager.type";
+import { FlowController, Task, TaskQuery } from "../index.js";
+import type { ExecutableTask } from "../../common/index.js";
+import { ExecutionMode, TasksError } from "../../common/index.js";
+import { TaskManagerBase } from "./task-manager-base.js";
+import { TaskManagerFlag } from "./task-manager.type.js";
 
 /**
  * Manages task execution, including queue management, progress control, and event handling.

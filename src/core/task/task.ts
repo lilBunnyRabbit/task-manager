@@ -1,12 +1,12 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
 import { Optional } from "@lilbunnyrabbit/optional";
-import { v4 as uuidv4 } from "uuid";
-import type { TaskGroup, TaskManager } from "../";
-import { TaskQuery } from "../";
-import { LogEntry, Logger, TaskError } from "../../common";
-import { TaskBase } from "./task-base";
-import type { TaskBuilder, TaskConfig } from "./task-builder";
-import type { ParsedTask, TaskSpec } from "./task.type";
+import type { TaskGroup, TaskManager } from "../index.js";
+import { TaskQuery } from "../index.js";
+import type { LogEntry } from "../../common/index.js";
+import { Logger, TaskError } from "../../common/index.js";
+import { TaskBase } from "./task-base.js";
+import type { TaskBuilder, TaskConfig } from "./task-builder.js";
+import type { ParsedTask, TaskSpec } from "./task.type.js";
 
 /**
  * Single task within the task management system.
@@ -54,7 +54,7 @@ export class Task<TSpec extends TaskSpec = TaskSpec> extends TaskBase<TSpec> {
     readonly data: TSpec["TData"]
   ) {
     super();
-    this.id = uuidv4();
+    this.id = crypto.randomUUID();
   }
 
   /**

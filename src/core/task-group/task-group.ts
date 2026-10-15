@@ -1,11 +1,10 @@
 import { Optional } from "@lilbunnyrabbit/optional";
-import { v4 as uuidv4 } from "uuid";
-import { FlowController, Task, TaskQuery } from "../";
-import type { ExecutableTask } from "../../common";
-import { ExecutionMode, TasksError } from "../../common";
-import { TaskGroupBase } from "./task-group-base";
-import { TaskGroupBuilder } from "./task-group-builder";
-import { TaskGroupFlag } from "./task-group.type";
+import { FlowController, Task, TaskQuery } from "../index.js";
+import type { ExecutableTask } from "../../common/index.js";
+import { ExecutionMode, TasksError } from "../../common/index.js";
+import { TaskGroupBase } from "./task-group-base.js";
+import type { TaskGroupBuilder } from "./task-group-builder.js";
+import { TaskGroupFlag } from "./task-group.type.js";
 
 /**
  * Represents a group of tasks that can be executed in different modes.
@@ -54,7 +53,7 @@ export class TaskGroup<TArgs extends unknown[] = unknown[]> extends TaskGroupBas
   ) {
     super();
 
-    this.id = uuidv4();
+    this.id = crypto.randomUUID();
 
     this.flowController.on("transition", (transition) => {
       this.emit("transition", transition);

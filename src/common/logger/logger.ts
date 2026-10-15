@@ -1,5 +1,5 @@
 import { EventEmitter } from "@lilbunnyrabbit/event-emitter";
-import type { LogEntry, LogEntryInput, LogMessage } from "./logger.type";
+import type { LogEntry, LogEntryInput, LogMessage } from "./logger.type.js";
 
 /**
  * Utility for managing and emitting log entries.

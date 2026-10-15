@@ -1,7 +1,7 @@
 import { Optional } from "@lilbunnyrabbit/optional";
-import type { TaskBuilder, TaskSpec } from "../";
-import type { BuilderIs } from "../../common";
-import type { FlowController } from "../flow-controller";
+import type { TaskBuilder, TaskSpec } from "../index.js";
+import type { BuilderIs } from "../../common/index.js";
+import type { FlowController } from "../flow-controller/index.js";
 
 /**
  * Provides methods to query, retrieve, and manage tasks and their results within a {@link FlowController}.

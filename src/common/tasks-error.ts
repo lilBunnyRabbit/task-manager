@@ -1,4 +1,4 @@
-import type { TaskError } from "./task-error";
+import type { TaskError } from "./task-error.js";
 
 /**
  * Error containing one or more nested errors, including {@link TaskError}, other {@link TasksError}, or general {@link Error} instances.

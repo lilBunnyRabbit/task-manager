@@ -1,6 +1,6 @@
-import { Task } from "./task";
-import type { TaskBuilder } from "./task-builder";
-import type { TaskSpec } from "./task.type";
+import { Task } from "./task.js";
+import type { TaskBuilder } from "./task-builder.js";
+import type { TaskSpec } from "./task.type.js";
 
 /**
  * Checks if an object is an instance of {@link Task}.
