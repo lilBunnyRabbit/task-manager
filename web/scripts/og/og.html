@@ -9,76 +9,41 @@
   --bg-lightest: oklch(0.357 0.0326 230.47); --fg: oklch(0.745 0.0078 50.47); --dim: oklch(0.745 0.0078 50.47 / 0.55);
   --primary: oklch(0.745 0.0699 122.47); --secondary: oklch(0.745 0.0466 302.47); --accent: oklch(0.745 0.0932 50.47);
   --tertiary: oklch(0.745 0.0233 176.47); --cottontail: oklch(0.949 0.0939 122.47);
-  --info: oklch(0.745 0.1398 240); --success: oklch(0.745 0.1398 140); --warn: oklch(0.745 0.1398 70); --danger: oklch(0.745 0.1398 30);
-  --light-1: oklch(0.983 0.0086 86.47); --light-2: oklch(0.966 0.0172 86.47); --light-3: oklch(0.949 0.0259 86.47);
-  --light-4: oklch(0.8907 0.0566 86.47); --light-5: oklch(0.8325 0.0777 86.47); --light-6: oklch(0.7742 0.0723 86.47);
-  --sans: Inter, sans-serif; --mono: Hack, Consolas, monospace;
+  --mono: Hack, Consolas, monospace;
 }
 * { box-sizing: border-box; margin: 0; }
-body { width: 1200px; height: 630px; overflow: hidden; background: var(--bg-darkest); font-family: var(--sans); color: var(--fg); position: relative; }
-.og-glow { position: absolute; inset: 0; background: radial-gradient(60% 70% at 20% 30%, oklch(0.745 0.0699 122.47 / 0.13), transparent 70%), radial-gradient(50% 60% at 85% 90%, oklch(0.745 0.0466 302.47 / 0.10), transparent 70%); }
-.og-frame { position: absolute; inset: 20px; border: 2px solid var(--bg-light); border-radius: 28px; }
-.og-left { position: absolute; left: 76px; top: 0; bottom: 0; width: 470px; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
-.og-brand { display: flex; align-items: center; gap: 0.22em; font-size: 92px; }
-.og-ears { height: 0.9em; width: auto; fill: var(--primary); flex-shrink: 0; }
-.og-left h1 { font-size: 1em; font-weight: 800; letter-spacing: -0.01em; color: var(--cottontail); line-height: 1; }
-.og-tag { font-size: 32px; font-weight: 500; line-height: 1.25; color: var(--fg); }
-.og-tag b { color: var(--primary); font-weight: 600; }
-.og-feat { font-size: 19px; color: oklch(0.745 0.0078 50.47 / 0.7); }
-.og-screen { position: absolute; left: 590px; top: 70px; width: 548px; height: 490px; border-radius: 22px; overflow: hidden; background: var(--bg-darker); border: 1px solid var(--bg-lighter); box-shadow: 0 30px 80px oklch(0 0 0 / 0.5); }
-.bar { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: var(--bg-light); font-size: 14px; font-weight: 600; }
-.bar .sp { flex: 1; }
-.bar s { width: 11px; height: 11px; border-radius: 50%; background: oklch(0.745 0.0078 50.47 / 0.3); display: block; text-decoration: none; }
-.mono { font-family: var(--mono); }
-</style></head>
-<body>
-<div class="og-glow"></div>
-<div class="og-frame"></div>
-<div class="og-left">
-  <div class="og-brand"><svg class="og-ears" viewBox="0 0 200 180" aria-hidden="true"><path d="M 180.78951,9.4642023 C 167.26793,35.862516 153.19234,51.171994 121.3308,74.909274 c -9.83885,7.33009 -20.56801,28.781376 -19.83643,53.665226 0.48749,16.58156 -1.19704,24.10166 16.50142,37.51644 10.04673,7.61505 24.84456,10.73078 37.73503,5.21428 9.15926,-3.91972 14.86134,-10.24668 13.85759,-12.07669 -10.05575,3.27975 -20.2675,4.2772 -31.63206,0.60045 -7.22358,-2.33703 -22.34681,-8.63089 -22.43956,-28.48702 -0.0519,-11.10019 5.77576,-23.5906 15.97731,-26.01239 5.65284,-1.34195 12.04702,-0.34048 13.55827,5.86571 -0.89118,-1.49479 -5.42011,-5.00853 -11.88232,-3.18133 -5.71991,1.61731 -11.0719,8.87864 -11.92516,16.26466 5.76133,5.52566 39.66171,12.5901 57.75466,-13.52407 13.38833,-19.323816 19.37298,-44.595936 20.20369,-68.581476 0.84632,-24.436568 -4.89214,-59.107171 -18.41373,-32.7088617 z"/><path d="M 18.49504,9.4642043 C 32.01662,35.862514 46.09221,51.171994 77.95375,74.909274 c 9.83885,7.33009 20.56801,28.781376 19.83643,53.665226 -0.48749,16.58156 1.19704,24.10166 -16.50142,37.51644 -10.04673,7.61505 -24.84456,10.73078 -37.73503,5.21428 -9.15926,-3.91972 -14.86134,-10.24668 -13.85759,-12.07669 10.05575,3.27975 20.2675,4.2772 31.63206,0.60045 7.22358,-2.33703 22.34681,-8.63089 22.43956,-28.48702 0.0519,-11.10019 -5.77576,-23.5906 -15.97731,-26.01239 -5.65284,-1.34195 -12.04702,-0.34048 -13.55827,5.86571 0.89118,-1.49479 5.42011,-5.00853 11.88232,-3.18133 5.71991,1.61731 11.0719,8.87864 11.92516,16.26466 C 72.27833,129.80427 38.37795,136.86871 20.285,110.75454 6.8966696,91.430724 0.91201967,66.158604 0.08130967,42.173064 -0.76501033,17.736494 4.9734496,-16.93411 18.49504,9.4642043 Z"/></svg><h1>
-Task Manager</h1></div>
-  <p class="og-tag">Queue tasks, run them <b>in order or in parallel</b>, and watch each one move.</p>
-  <p class="og-feat">TypeScript · progress events · error recovery</p>
+body { width: 1200px; height: 630px; overflow: hidden; background: var(--bg-darkest); font-family: Inter, sans-serif; color: var(--fg); position: relative; }
+.ears { fill: var(--primary); }
+.cot { color: var(--cottontail); }
+.glow { position: absolute; inset: 0; pointer-events: none; }
+
+.glow { background: radial-gradient(60% 70% at 10% 10%, oklch(0.745 0.0699 122.47 / 0.12), transparent 70%); }
+.head { position: absolute; left: 72px; top: 60px; display: flex; align-items: center; gap: 18px; }
+.head .ears { width: 64px; }
+.head h1 { font-size: 64px; font-weight: 800; color: var(--cottontail); line-height: 1; }
+.tag { position: absolute; left: 72px; top: 150px; font-size: 26px; color: var(--fg); }
+.tag b { color: var(--primary); }
+.chart { position: absolute; left: 72px; right: 72px; top: 230px; bottom: 60px; }
+.axis { position: absolute; left: 190px; right: 0; top: 0; bottom: 0; background: repeating-linear-gradient(90deg, var(--bg-light) 0 1px, transparent 1px 106px); opacity: .7; }
+.lane { position: absolute; left: 0; right: 0; height: 40px; display: flex; align-items: center; }
+.lane > span { width: 190px; font: 15px var(--mono); color: var(--fg); }
+.bar { position: absolute; height: 28px; border-radius: 8px; display: flex; align-items: center; padding: 0 12px; font: 600 13px var(--mono); color: var(--bg-darkest); }
+.ok { background: var(--primary); } .run { background: var(--secondary); } .q { background: transparent; border: 2px dashed var(--bg-lightest); color: var(--dim); } .err { background: var(--accent); }
+.now { position: absolute; left: 640px; top: -12px; bottom: -6px; width: 2px; background: var(--cottontail); }
+.now::after { content: "now"; position: absolute; top: -20px; left: -12px; font: 13px var(--mono); color: var(--cottontail); }
+.fork { position: absolute; left: 190px; top: 98px; height: 152px; border-left: 2px solid var(--bg-lightest); }
+
+</style></head><body>
+<div class="glow"></div>
+<div class="head"><svg class="ears" viewBox="0 0 200 180"><path d="M 180.78951,9.4642023 C 167.26793,35.862516 153.19234,51.171994 121.3308,74.909274 c -9.83885,7.33009 -20.56801,28.781376 -19.83643,53.665226 0.48749,16.58156 -1.19704,24.10166 16.50142,37.51644 10.04673,7.61505 24.84456,10.73078 37.73503,5.21428 9.15926,-3.91972 14.86134,-10.24668 13.85759,-12.07669 -10.05575,3.27975 -20.2675,4.2772 -31.63206,0.60045 -7.22358,-2.33703 -22.34681,-8.63089 -22.43956,-28.48702 -0.0519,-11.10019 5.77576,-23.5906 15.97731,-26.01239 5.65284,-1.34195 12.04702,-0.34048 13.55827,5.86571 -0.89118,-1.49479 -5.42011,-5.00853 -11.88232,-3.18133 -5.71991,1.61731 -11.0719,8.87864 -11.92516,16.26466 5.76133,5.52566 39.66171,12.5901 57.75466,-13.52407 13.38833,-19.323816 19.37298,-44.595936 20.20369,-68.581476 0.84632,-24.436568 -4.89214,-59.107171 -18.41373,-32.7088617 z"/><path d="M 18.49504,9.4642043 C 32.01662,35.862514 46.09221,51.171994 77.95375,74.909274 c 9.83885,7.33009 20.56801,28.781376 19.83643,53.665226 -0.48749,16.58156 1.19704,24.10166 -16.50142,37.51644 -10.04673,7.61505 -24.84456,10.73078 -37.73503,5.21428 -9.15926,-3.91972 -14.86134,-10.24668 -13.85759,-12.07669 10.05575,3.27975 20.2675,4.2772 31.63206,0.60045 7.22358,-2.33703 22.34681,-8.63089 22.43956,-28.48702 0.0519,-11.10019 -5.77576,-23.5906 -15.97731,-26.01239 -5.65284,-1.34195 -12.04702,-0.34048 -13.55827,5.86571 0.89118,-1.49479 5.42011,-5.00853 11.88232,-3.18133 5.71991,1.61731 11.0719,8.87864 11.92516,16.26466 C 72.27833,129.80427 38.37795,136.86871 20.285,110.75454 6.8966696,91.430724 0.91201967,66.158604 0.08130967,42.173064 -0.76501033,17.736494 4.9734496,-16.93411 18.49504,9.4642043 Z"/></svg><h1>Task Manager</h1></div>
+<p class="tag">Sequential, then <b>parallel</b>. Every task reports its progress.</p>
+<div class="chart"><div class="axis"></div>
+  <div class="lane" style="top:0"><span>fetchManifest</span><div class="bar ok" style="left:190px;width:120px">✓</div></div>
+  <div class="lane" style="top:50px"><span>parseCsv</span><div class="bar ok" style="left:312px;width:96px">✓</div></div>
+  <div class="lane" style="top:110px"><span>uploadImages</span><div class="bar run" style="left:410px;width:230px">72%</div><div class="bar q" style="left:642px;width:90px"></div></div>
+  <div class="lane" style="top:160px"><span>resizeThumbs</span><div class="bar run" style="left:410px;width:160px">35%</div><div class="bar q" style="left:572px;width:260px"></div></div>
+  <div class="lane" style="top:210px"><span>notifyWebhook</span><div class="bar err" style="left:410px;width:110px">retry 1/3</div></div>
+  <div class="lane" style="top:270px"><span>writeReport</span><div class="bar q" style="left:840px;width:210px">queued</div></div>
+  <div class="now"></div>
 </div>
-<div class="og-screen">
-<style>
-.head { display: flex; align-items: baseline; gap: 12px; padding: 18px 22px 10px; }
-.head b { font-size: 34px; color: var(--cottontail); font-weight: 700; }
-.head span { color: var(--dim); font-size: 15px; }
-.head em { margin-left: auto; font-style: normal; font: 600 13px var(--mono); color: var(--primary); }
-.total { margin: 0 22px 18px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--primary) 64%, var(--bg-light) 64%); }
-.grp { margin: 0 16px 10px; padding: 10px 12px 6px; border-radius: 14px; background: var(--bg-dark); border: 1px solid var(--bg-lighter); }
-.grp-k { font: 600 12px var(--mono); color: var(--dim); margin: 0 4px 6px; }
-.grp-k b { color: var(--secondary); font-weight: 600; }
-.t { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 7px 4px; }
-.t i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 800; }
-.t .ok { background: var(--primary); color: var(--bg-darkest); }
-.t .run { border: 2.5px solid var(--secondary); border-right-color: transparent; }
-.t .q { border: 2px dashed var(--bg-lightest); }
-.t .err { background: var(--accent); color: var(--bg-darkest); }
-.t b { font: 600 15px var(--mono); color: var(--fg); }
-.t em { font-style: normal; font-size: 13px; color: var(--dim); }
-.t u { grid-column: 2 / -1; height: 4px; border-radius: 2px; text-decoration: none; display: block; }
-</style>
-  <div class="bar">TaskManager<span class="sp"></span><s></s><s></s><s></s></div>
-  <div class="head"><b>64%</b><span>3 of 6 done</span><em>status: in-progress</em></div>
-  <div class="total"></div>
-  <div class="grp"><p class="grp-k">TaskGroup · <b>sequential</b></p>
-    <div class="t"><i class="ok">✓</i><b>fetchManifest</b><em>120 ms</em></div>
-    <div class="t"><i class="ok">✓</i><b>parseCsv</b><em>48 ms</em></div>
-  </div>
-  <div class="grp"><p class="grp-k">TaskGroup · <b>parallel</b></p>
-    <div class="t"><i class="run"></i><b>uploadImages</b><em>72%</em><u style="background: linear-gradient(90deg, var(--secondary) 72%, var(--bg-light) 72%)"></u></div>
-    <div class="t"><i class="run"></i><b>resizeThumbs</b><em>35%</em><u style="background: linear-gradient(90deg, var(--secondary) 35%, var(--bg-light) 35%)"></u></div>
-    <div class="t"><i class="err">!</i><b>notifyWebhook</b><em>retry 1/3</em></div>
-  </div>
-  <div class="grp"><div class="t"><i class="ok">✓</i><b>writeReport</b><em>done</em></div></div>
-</div>
-<script>
-document.fonts.ready.then(() => {
-  const b = document.querySelector(".og-brand");
-  let s = 92;
-  while (b.scrollWidth > 470 && s > 48) b.style.fontSize = --s + "px";
-});
-</script>
 </body></html>
